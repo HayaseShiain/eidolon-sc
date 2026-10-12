@@ -227,8 +227,8 @@ export function useGifts() {
     return { character, gift, cue, stillCoolingUntil: nowCooling ? cooldownEnds(after) : null };
   };
 
-  /** 重置卡会拉回的角色：低于正常值 50 的（票 07）。 */
-  const resetTargets = (characters ?? []).filter((c) => value(c.id) < NORMAL);
+  /** 重置卡会拉回的角色：低于信任这一档的（票 07，票 14 改成按档位：40–49 已经显示信任，不算）。 */
+  const resetTargets = (characters ?? []).filter((c) => value(c.id) < 40);
   const applyReset = () => {
     setS((x) => {
       const values = { ...x.values };
@@ -430,7 +430,7 @@ export function PrototypePanel({ g }: { g: Gifts }) {
         value={g.resetTargets.length > 0 ? "mixed" : "fine"}
         options={[
           { v: "mixed", t: "有冷却、有疏远" },
-          { v: "fine", t: "都不低于 50" },
+          { v: "fine", t: "都不低于信任" },
         ]}
         onChange={(v) =>
           g.set(
@@ -466,7 +466,7 @@ export function PrototypePanel({ g }: { g: Gifts }) {
         onChange={(judgeOff) => g.set({ judgeOff })}
       />
       <p className="border-t border-white/20 pt-1.5 text-white/70">
-        次数 {g.draws} · 背包 {inv} 件 · 重置卡 {g.resetCards} · 冷却中：{coolingNames.join("、") || "无"} · 低于 50：
+        次数 {g.draws} · 背包 {inv} 件 · 重置卡 {g.resetCards} · 冷却中：{coolingNames.join("、") || "无"} · 低于信任：
         {g.resetTargets.map((c) => `${c.name} ${g.values[c.id]}`).join("、") || "无"}
       </p>
     </div>,
