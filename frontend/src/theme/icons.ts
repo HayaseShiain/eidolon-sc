@@ -58,6 +58,20 @@ export {
   Settings as SettingsIcon,
 } from "lucide-react";
 
+// PROTOTYPE（票 14「原型：礼物页」）：档位心形、冷却沙漏、抽奖、重置卡，以及还没出图的礼物的占位。
+export {
+  CakeSlice as FoodIcon,
+  CupSoda as DrinkIcon,
+  Flower2 as FlowerIcon,
+  Heart as HeartIcon,
+  HeartCrack as HeartCrackIcon,
+  HeartOff as HeartOffIcon,
+  Hourglass as CooldownIcon,
+  Package as TrinketIcon,
+  Sparkles as DrawIcon,
+  TicketCheck as ResetCardIcon,
+} from "lucide-react";
+
 // 对话列表页首的 GitHub 仓库链接；品牌标志 Lucide 不收，是 The Library Icon Rule 的例外。
 export { GitHubIcon } from "./GitHubIcon";
 
