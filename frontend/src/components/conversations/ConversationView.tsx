@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactElement, type ReactNode, type RefObject } from "react";
+import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type ReactElement, type ReactNode, type RefObject } from "react";
 
 import { FailureNotice, SignInButton } from "@/components/app/FailureNotice";
 import { MarkedAvatar } from "@/components/app/MarkedAvatar";
@@ -50,6 +50,19 @@ import { useDirectory, useWide } from "./ConversationDirectory";
 import { useCallTones } from "./useCallTones";
 import { useFocusBack } from "./useFocusBack";
 import { useStandOutfits } from "./useStandOutfits";
+import {
+  BubbleMark,
+  callCues,
+  CooldownComposer,
+  FAKE_LINE,
+  fakeShownCall,
+  HeaderBadge,
+  PrototypePanel,
+  StreamCue,
+  TitleWithTier,
+  useAffinityPrototype,
+  type AffinityPrototype,
+} from "./prototype-affinity/AffinityPrototype";
 
 const t = copy.conversation;
 
@@ -89,11 +102,14 @@ export function ConversationView({
   const [live, setLive] = useState<LiveConversation | null>(null);
   const snapshot = useSyncExternalStore(live?.subscribe ?? noSubscription, live?.snapshot ?? notOpen, notOpen);
   const { conversation, entries, call, layer, hearing, draft, textOnly, failure } = snapshot;
+  // PROTOTYPE（票 06）：假的好感度、冷却和通话，由原型面板驱动。
+  const proto = useAffinityPrototype(entries);
   // 她的声音：<audio> 交给它，什么时候拨号、播放、静音由 LiveConversation 告诉它。
   const [voice] = useState(() => new CharacterVoice());
   const outfits = useStandOutfits(character);
   const [pickingOutfit, setPickingOutfit] = useState(false);
   const subtree = useRef<HTMLDivElement>(null);
+  const fakeLayerRef = useRef<HTMLElement>(null);
   // 电话本身的声音（铃声、接通音、挂断音）：像她的声音一样交给 LiveConversation。
   const tones = useCallTones();
 
@@ -155,7 +171,7 @@ export function ConversationView({
         size="icon-lg"
         className={headerKey}
         aria-label={t.call(character.name)}
-        disabled={!snapshot.canDial}
+        disabled={!snapshot.canDial || proto.cooldownUntil !== null}
         focusableWhenDisabled
         onClick={dial}
       >
@@ -171,8 +187,13 @@ export function ConversationView({
           <BackIcon className="size-6" />
         </Button>
       )}
-      <h1 className="min-w-0 flex-1 truncate px-2 text-header">{character.name}</h1>
+      {proto.variant === "B" ? (
+        <TitleWithTier p={proto} character={character} subtree={subtree} />
+      ) : (
+        <h1 className="min-w-0 flex-1 truncate px-2 text-header">{character.name}</h1>
+      )}
       {phoneKey}
+      <HeaderBadge p={proto} character={character} subtree={subtree} className={headerKey} />
       <DropdownMenu>
         <DropdownMenuTrigger
           render={<Button variant="ghost" size="icon-lg" className={headerKey} aria-label={t.menu} />}
@@ -214,7 +235,9 @@ export function ConversationView({
   }
 
   const canSend = isOpen && draft.trim() !== "";
-  const composer = ownLLMMissing ? (
+  const composer = proto.cooldownUntil ? (
+    <CooldownComposer p={proto} character={character} />
+  ) : ownLLMMissing ? (
     // 输入框和电话键换成一句提示和去设置的链接；后端的 403 仍是兜底。
     <div inert={isCovered} className="shrink-0 border-t bg-background px-3 py-2">
       <FailureNotice failure={{ message: t.ownLLMRequired, signedOut: false, toOwnKeys: true }} />
@@ -258,6 +281,12 @@ export function ConversationView({
   return (
     <Frame character={character} subtree={subtree} header={header}>
       {barShown && <CallBar ref={focus.note} call={call} onExpand={() => live?.expand()} />}
+      {proto.call?.collapsed && !proto.call.ended && (
+        <CallBar
+          call={{ phase: "connected", dial: 1, since: Date.now() - 83_000, maxSeconds: null }}
+          onExpand={() => proto.call && proto.setCall({ ...proto.call, collapsed: false })}
+        />
+      )}
       <div inert={isCovered} className="min-h-0 flex-1">
         {/* 开新对话的过程中也是 opening：旧对话留在原处，只是发送键和电话键禁用 */}
         {!isOpen && entries.length === 0 ? (
@@ -273,7 +302,7 @@ export function ConversationView({
             </EmptyHeader>
           </Empty>
         ) : (
-          <Messages entries={entries} hearing={hearing} character={character} />
+          <Messages entries={entries} hearing={hearing} character={character} proto={proto} />
         )}
       </div>
       {composer}
@@ -305,6 +334,35 @@ export function ConversationView({
           onOwnKeys={() => leave(() => router.push(settingsHref("own-keys")))}
         />
       )}
+      {proto.call && (
+        <CallLayer
+          character={character}
+          call={fakeShownCall(proto.call, proto.cooldownText, character.name)}
+          isCollapsed={proto.call.collapsed}
+          layerRef={fakeLayerRef}
+          isFullScreen={isFullScreen}
+          isReducedMotion={isReducedMotion}
+          micMuted={false}
+          micNotice={null}
+          textOnly={proto.call.textOnly}
+          line={FAKE_LINE}
+          previousLine={FAKE_LINE}
+          hearing=""
+          standDirection={snapshot.stand}
+          standOutfits={outfits?.toTry ?? []}
+          onCollapse={() => proto.call && proto.setCall({ ...proto.call, collapsed: true })}
+          onHangUp={() => proto.setCall(null)}
+          onToggleMic={() => {}}
+          onSwitchMic={() => {}}
+          onToggleTextOnly={() => proto.call && proto.setCall({ ...proto.call, textOnly: !proto.call.textOnly })}
+          onRedial={() => proto.setCall({ collapsed: false, ended: null, textOnly: false })}
+          onDismiss={() => proto.setCall(null)}
+          onOwnKeys={() => {}}
+          affinityCue={callCues(proto, character.name)}
+          inCooldown={proto.cooldownUntil !== null}
+        />
+      )}
+      <PrototypePanel p={proto} />
       <MicSheet
         isOpen={snapshot.pickingMic}
         onOpenChange={(open) => (open ? live?.openMicPicker() : live?.closeMicPicker())}
@@ -404,7 +462,17 @@ function dayLabel(at: Date, now: Date): string {
  * 消息区：官方 Message Scroller，打开时停在最底，新消息和她正在说的话跟着往下滚（制作人往上翻时不抢）。
  * 消息从顶部开始排；气泡之间 4px，换人时多 8px。
  */
-function Messages({ entries, hearing, character }: { entries: Entry[]; hearing: string; character: Character }) {
+function Messages({
+  entries,
+  hearing,
+  character,
+  proto,
+}: {
+  entries: Entry[];
+  hearing: string;
+  character: Character;
+  proto: AffinityPrototype;
+}) {
   const lines = linesOf(entries, new Date());
   return (
     <MessageScrollerProvider autoScroll defaultScrollPosition="end">
@@ -419,9 +487,24 @@ function Messages({ entries, hearing, character }: { entries: Entry[]; hearing: 
                   </span>
                 </MessageScrollerItem>
               ) : (
-                <MessageScrollerItem key={line.entry.key} messageId={line.entry.key} className={cn(line.first && "mt-2")}>
-                  <Bubbled line={line} character={character} />
-                </MessageScrollerItem>
+                <Fragment key={line.entry.key}>
+                  <MessageScrollerItem messageId={line.entry.key} className={cn(line.first && "mt-2")}>
+                    <Bubbled
+                      line={line}
+                      character={character}
+                      mark={
+                        proto.variant === "C" && proto.history[line.entry.key] ? (
+                          <BubbleMark cue={proto.history[line.entry.key]} name={character.name} />
+                        ) : null
+                      }
+                    />
+                  </MessageScrollerItem>
+                  {proto.variant === "B" && proto.history[line.entry.key] && (
+                    <MessageScrollerItem className="my-2 flex justify-center">
+                      <StreamCue cue={proto.history[line.entry.key]} name={character.name} />
+                    </MessageScrollerItem>
+                  )}
+                </Fragment>
               ),
             )}
             {hearing && (
@@ -450,9 +533,11 @@ function Messages({ entries, hearing, character }: { entries: Entry[]; hearing: 
 function Bubbled({
   line: { entry, first, last },
   character,
+  mark,
 }: {
   line: Extract<Line, { kind: "entry" }>;
   character: Character;
+  mark?: ReactNode;
 }) {
   const time = <time className="shrink-0 pb-0.5 text-meta text-muted-foreground tabular-nums">{clock(entry.at)}</time>;
   if (entry.kind === "user") {
@@ -497,6 +582,7 @@ function Bubbled({
               )}
             </BubbleContent>
           </Bubble>
+          {mark}
           {last && !entry.pending && time}
         </div>
       </MessageContent>

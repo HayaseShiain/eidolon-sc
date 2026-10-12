@@ -164,6 +164,9 @@ export const zh = {
     redial: "重拨",
     toOwnKeys: "去设置自带密钥",
     endings: {
+      // PROTOTYPE（票 06）：标题带名字，由 CallLayer 自己拼；冷却版的说明放在 detail。
+      out_of_line: { title: "挂断了电话。", body: "" },
+      cooldown: { title: "挂断了电话。", body: "" },
       not_connected: {
         title: "没能接通",
         body: "通话没有连上，可能是网络或语音服务出了问题。可以稍后重拨。",

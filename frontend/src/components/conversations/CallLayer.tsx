@@ -22,11 +22,15 @@ import {
   TextOnlyIcon,
 } from "@/theme/icons";
 import { Ja } from "@/theme/Ja";
+import { Gift as GiftIcon } from "lucide-react";
 
 import { Stand } from "./stand/Stand";
 import { useCallTime } from "./useCallTime";
 
 const t = copy.call;
+
+/** PROTOTYPE（票 06）：status 跟在状态行旁边，statusReplace 暂时换掉状态行，aboveLine 浮在台词卡上方。 */
+export type AffinityCallCue = { status?: ReactNode; statusReplace?: ReactNode; aboveLine?: ReactNode };
 
 type Props = {
   character: Character;
@@ -62,6 +66,10 @@ type Props = {
   onDismiss: () => void;
   /** 结束页上「去设置自带密钥」。 */
   onOwnKeys: () => void;
+  /** PROTOTYPE（票 06）：好感度变化的提示，换掉状态行，或者浮在台词卡上方。 */
+  affinityCue?: AffinityCallCue;
+  /** PROTOTYPE（票 06）：冷却中结束页的主操作换成「送她一件礼物」。 */
+  inCooldown?: boolean;
 };
 
 /**
@@ -138,7 +146,7 @@ export function CallLayer(props: Props) {
           {hasStand && (
             <>
               <h2 className="truncate text-header font-bold">{character.name}</h2>
-              <Status call={call} />
+              <Status call={call} cue={ended ? undefined : props.affinityCue} />
             </>
           )}
         </div>
@@ -163,7 +171,7 @@ export function CallLayer(props: Props) {
             <MarkedAvatar name={character.name} src={character.avatar_url} size="call" />
           </Ripple>
           <h2 className="mt-2 text-call-name">{character.name}</h2>
-          <Status call={call} />
+          <Status call={call} cue={ended ? undefined : props.affinityCue} />
         </div>
       )}
 
@@ -180,6 +188,7 @@ export function CallLayer(props: Props) {
             <p role="status" className="text-center text-sm text-white/80">
               {props.micNotice && t.micNotices[props.micNotice]}
             </p>
+            {props.affinityCue?.aboveLine}
             {/* 台词卡在接通前不出现 */}
             {call.phase === "connected" && <LineCard {...props} />}
           </>
@@ -258,8 +267,9 @@ function StandStage(props: Props) {
  * 状态行（名字下面）：呼叫中是「正在呼叫」加三个依次闪的小点，通话中是计时，结束后是挂断图标加
  * 「通话已结束 · mm:ss」（没接通过就不带时长）。只用文字和图标，不再用线形。
  */
-function Status({ call }: { call: ShownCall }) {
+function Status({ call, cue }: { call: ShownCall; cue?: AffinityCallCue }) {
   const time = useCallTime(call);
+  if (cue?.statusReplace) return cue.statusReplace;
   return (
     <p className="flex items-center justify-center gap-1.5 text-sm text-white/80 tabular-nums">
       {call.phase === "dialing" && (
@@ -278,6 +288,7 @@ function Status({ call }: { call: ShownCall }) {
         </>
       )}
       {call.phase === "connected" && time && showTime(time)}
+      {cue?.status}
       {call.phase === "ended" && (
         <>
           <HangUpIcon aria-hidden className="size-3.5" />
@@ -340,8 +351,41 @@ function LineCard({ line, previousLine, hearing, textOnly }: Props) {
 }
 
 /** 结束卡：原因、后端多说的话、说明、是否计入限额，以及「回到对话」和主操作（重拨或「去设置自带密钥」）。 */
-function Ended({ end, onRedial, onDismiss, onOwnKeys }: Props & { end: CallEnd }) {
+function Ended({ end, onRedial, onDismiss, onOwnKeys, character, inCooldown }: Props & { end: CallEnd }) {
   const ending = t.endings[end.reason];
+  // PROTOTYPE（票 06）：她挂断时标题带名字，说明只有冷却版有（在 detail 里）；冷却中主操作换成送礼。
+  const hungUp = end.reason === "out_of_line" || end.reason === "cooldown";
+  if (hungUp) {
+    return (
+      <div
+        role="alert"
+        className="flex w-full max-w-[34em] flex-col items-center gap-2 rounded-3xl bg-white/12 px-5 py-6 text-center text-balance backdrop-blur-md"
+      >
+        <h3 className="text-lg font-semibold">
+          {character.name}
+          {ending.title}
+        </h3>
+        {end.detail && <p className="text-sm text-white/80">{end.detail}</p>}
+        <p className="text-meta text-white/60">{end.counts ? t.counted : t.notCounted}</p>
+        <div className="mt-3 flex flex-wrap justify-center gap-2">
+          <Button variant="call-glass" size="call" onClick={onDismiss}>
+            {t.backToConversation}
+          </Button>
+          {inCooldown ? (
+            <Button variant="call-solid" size="call" onClick={() => alert("原型：跳到礼物页")}>
+              <GiftIcon aria-hidden />
+              送她一件礼物
+            </Button>
+          ) : (
+            <Button variant="call-solid" size="call" onClick={onRedial}>
+              <PhoneIcon aria-hidden />
+              {t.redial}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
   const toOwnKeys = end.reason === "over_limit" || end.reason === "own_llm_required" || end.reason === "own_key";
   return (
     <div

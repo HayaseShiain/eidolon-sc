@@ -11,7 +11,8 @@ import { ApiError, type BackendEndReason, type CallEvent } from "@/lib/api";
  * LLM and the call brought none (GLOSSARY.md「必须自带 LLM」), or the browser would not let the
  * call use the microphone (or there is none).
  */
-export type EndReason = BackendEndReason | "over_limit" | "own_llm_required" | "mic_denied";
+// PROTOTYPE（票 06）：她挂断的两种原因，原型里先在前端认。
+export type EndReason = BackendEndReason | "over_limit" | "own_llm_required" | "mic_denied" | "out_of_line" | "cooldown";
 
 export type CallEnd = {
   reason: EndReason;
