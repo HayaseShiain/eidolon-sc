@@ -24,7 +24,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { prototypeEnabled, PrototypeSwitcher } from "@/components/app/PrototypeSwitcher";
+import { prototypeEnabled } from "@/components/app/PrototypeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { Character } from "@/lib/api";
@@ -82,7 +82,7 @@ export function cueText(cue: Cue, name: string): string {
 }
 
 export function useAffinityPrototype(entries: Entry[]) {
-  const [variant, setVariantState] = useState<Variant>("A");
+  const [variant, setVariantState] = useState<Variant>("D");
   const [tier, setTier] = useState<Tier>("信任");
   const [cooldownUntil, setCooldownUntil] = useState<Date | null>(null);
   const [history, setHistory] = useState<Record<string, Cue>>({});
@@ -93,7 +93,8 @@ export function useAffinityPrototype(entries: Entry[]) {
 
   useEffect(() => {
     const v = new URLSearchParams(window.location.search).get("variant");
-    if (v === "A" || v === "B" || v === "C" || v === "D") setVariantState(v);
+    // PROTOTYPE（票 15）：这条分支固定用定稿的 D，?variant= 不再切换。
+    void v;
   }, []);
   const setVariant = useCallback((v: string) => {
     setVariantState(v as Variant);
@@ -390,7 +391,7 @@ export const FAKE_LINE = { ja: "プロデューサーさん、今日もお疲れ
 
 /** 右上角的原型面板：切档位、模拟变化、冷却、通话。明显不是设计的一部分。 */
 export function PrototypePanel({ p }: { p: AffinityPrototype }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   if (!p.enabled) return null;
   const btn = "rounded border border-white/30 px-2 py-1 text-left hover:bg-white/20 disabled:opacity-40";
   return (
@@ -479,7 +480,6 @@ export function PrototypePanel({ p }: { p: AffinityPrototype }) {
           </div>
         )}
       </div>
-      <PrototypeSwitcher variants={VARIANTS} current={p.variant} onChange={p.setVariant} />
     </>
   );
 }

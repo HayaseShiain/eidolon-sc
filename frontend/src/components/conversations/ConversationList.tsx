@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { copy } from "@/i18n";
 import type { Character } from "@/lib/api";
 import { showTime } from "@/lib/callTime";
+import { useListEvent } from "./prototype-events/EventsPrototype";
 import { arrange, dayOf, previewOf, type ListRow, type Preview } from "@/lib/conversationList";
 import { pin, setShown, unpin } from "@/lib/listPreferences";
 import { REPOSITORY_URL } from "@/lib/repository";
@@ -190,13 +191,17 @@ function Row({
   onToggleHidden: () => void;
 }) {
   const time = useCallTime(call?.state);
+  // PROTOTYPE（票 15）：最后是一条对话事件时，描述和时间换成原型面板选的写法。
+  const listEvent = useListEvent(character);
   // 长按打开菜单后，松手时浏览器可能还会补发一次点击；菜单打开之后、下一次按下之前的点击不打开对话。
   const openedMenu = useRef(false);
   const description = call
     ? time
       ? copy.call.listConnected(showTime(time))
       : copy.call.dialing
-    : !preview
+    : listEvent
+      ? listEvent.text
+      : !preview
       ? t.neverTalked
       : preview.from === "you"
         ? t.you(preview.text)
@@ -226,9 +231,9 @@ function Row({
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="flex items-baseline gap-2">
             <span className="min-w-0 flex-1 truncate text-row-name">{character.name}</span>
-            {((preview && !call) || isPinned) && (
+            {((preview && !call) || (listEvent && !call) || isPinned) && (
               <span className="flex shrink-0 items-center gap-1 text-meta text-muted-foreground tabular-nums">
-                {preview && !call && listTime(new Date(preview.at), now)}
+                {!call && (listEvent ? listTime(listEvent.at, now) : preview && listTime(new Date(preview.at), now))}
                 {isPinned && (
                   <>
                     <PinIcon aria-hidden className="size-3" />
@@ -238,7 +243,10 @@ function Row({
               </span>
             )}
           </span>
-          <span className="truncate text-preview text-muted-foreground tabular-nums">{description}</span>
+          <span className="flex min-w-0 items-center gap-1 text-preview text-muted-foreground tabular-nums">
+            {!call && listEvent?.icon}
+            <span className="truncate">{description}</span>
+          </span>
         </span>
       </ContextMenuTrigger>
       <ContextMenuContent>

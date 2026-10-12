@@ -63,6 +63,7 @@ import {
   useAffinityPrototype,
   type AffinityPrototype,
 } from "./prototype-affinity/AffinityPrototype";
+import { EventLine, EventsPanel, shownEvents, useEvents, type EventVariant, type FakeEvent } from "./prototype-events/EventsPrototype";
 
 const t = copy.conversation;
 
@@ -302,7 +303,7 @@ export function ConversationView({
             </EmptyHeader>
           </Empty>
         ) : (
-          <Messages entries={entries} hearing={hearing} character={character} proto={proto} />
+          <Messages entries={entries} hearing={hearing} character={character} proto={proto} callOpen={proto.call !== null} />
         )}
       </div>
       {composer}
@@ -363,6 +364,7 @@ export function ConversationView({
         />
       )}
       <PrototypePanel p={proto} />
+      <EventsPanel p={proto} character={character} lastKey={entries.at(-1)?.key ?? null} />
       <MicSheet
         isOpen={snapshot.pickingMic}
         onOpenChange={(open) => (open ? live?.openMicPicker() : live?.closeMicPicker())}
@@ -426,7 +428,7 @@ type Line =
   | { kind: "entry"; entry: Entry; first: boolean; last: boolean };
 
 /** 按日期和说话的人把消息排成行：换了一天先放日期条；同一个人连着发、中间没有日期条的算一组。 */
-function linesOf(entries: Entry[], now: Date): Line[] {
+function linesOf(entries: Entry[], now: Date, breaks: Set<string> = new Set()): Line[] {
   const days = entries.map((e) => new Date(e.at).toDateString());
   const lines: Line[] = [];
   entries.forEach((entry, i) => {
@@ -436,8 +438,9 @@ function linesOf(entries: Entry[], now: Date): Line[] {
     lines.push({
       kind: "entry",
       entry,
-      first: newDay || entries[i - 1].kind !== entry.kind,
-      last: !next || days[i + 1] !== days[i] || next.kind !== entry.kind,
+      // PROTOTYPE（票 15）：对话事件夹在中间时，前后两条不算一组。
+      first: newDay || entries[i - 1].kind !== entry.kind || breaks.has(entries[i - 1].key),
+      last: !next || days[i + 1] !== days[i] || next.kind !== entry.kind || breaks.has(entry.key),
     });
   });
   return lines;
@@ -467,18 +470,34 @@ function Messages({
   hearing,
   character,
   proto,
+  callOpen,
 }: {
   entries: Entry[];
   hearing: string;
   character: Character;
   proto: AffinityPrototype;
+  callOpen: boolean;
 }) {
-  const lines = linesOf(entries, new Date());
+  // PROTOTYPE（票 15）：假的对话事件，按「跟在哪条消息后面」插进去。
+  const ev = useEvents();
+  const only = !!ev.onlyEvents[character.id];
+  const events = shownEvents(ev, character.id, callOpen);
+  const after = new Map<string | null, FakeEvent[]>();
+  for (const e of events) after.set(only ? null : e.afterKey, [...(after.get(only ? null : e.afterKey) ?? []), e]);
+  if (only) entries = [];
+  const lines = linesOf(entries, new Date(), new Set([...after.keys()].filter((k): k is string => k !== null)));
+  const eventsAfter = (key: string | null) =>
+    (after.get(key) ?? []).map((e) => (
+      <MessageScrollerItem key={`ev-${e.id}`}>
+        <EventLine e={e} variant={ev.variant as EventVariant} character={character} />
+      </MessageScrollerItem>
+    ));
   return (
     <MessageScrollerProvider autoScroll defaultScrollPosition="end">
       <MessageScroller>
         <MessageScrollerViewport>
-          <MessageScrollerContent className="gap-1 px-3 pt-2 pb-4">
+          <MessageScrollerContent className="gap-1 px-3 pt-2 pb-24">
+            {eventsAfter(null)}
             {lines.map((line) =>
               line.kind === "day" ? (
                 <MessageScrollerItem key={line.key} className="my-3 flex justify-center">
@@ -504,6 +523,7 @@ function Messages({
                       <StreamCue cue={proto.history[line.entry.key]} name={character.name} />
                     </MessageScrollerItem>
                   )}
+                  {eventsAfter(line.entry.key)}
                 </Fragment>
               ),
             )}
