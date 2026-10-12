@@ -38,8 +38,9 @@ export const VARIANTS = [
   { key: "A", name: "心形键" },
   { key: "B", name: "名字下的副行" },
   { key: "C", name: "信号格" },
+  { key: "D", name: "定稿组合：A 页首 + B 提示" },
 ];
-export type Variant = "A" | "B" | "C";
+export type Variant = "A" | "B" | "C" | "D";
 
 export const TIERS = ["冷淡", "疏远", "信任", "亲近", "亲密"] as const;
 export type Tier = (typeof TIERS)[number];
@@ -92,7 +93,7 @@ export function useAffinityPrototype(entries: Entry[]) {
 
   useEffect(() => {
     const v = new URLSearchParams(window.location.search).get("variant");
-    if (v === "A" || v === "B" || v === "C") setVariantState(v);
+    if (v === "A" || v === "B" || v === "C" || v === "D") setVariantState(v);
   }, []);
   const setVariant = useCallback((v: string) => {
     setVariantState(v as Variant);
@@ -188,18 +189,23 @@ export function HeaderBadge({
   const cue = p.liveCue;
   const cooling = p.cooldownUntil !== null;
   let face: ReactNode;
-  if (p.variant === "A") {
+  if (p.variant === "A" || p.variant === "D") {
     const Icon = cooling ? Hourglass : HEART[p.tier];
     face = (
       <span className="relative flex items-center gap-1">
-        <Icon
-          className={cn(
-            "size-5",
-            cooling ? "text-muted-foreground" : "text-her-mark",
-            !cooling && p.tier !== "信任" && (p.tier === "亲近" || p.tier === "亲密") && "fill-current",
-            cue && "motion-safe:animate-bounce",
+        <span className={cn("relative flex", cue && "motion-safe:animate-bounce")}>
+          <Icon
+            className={cn(
+              "size-5",
+              cooling ? "text-muted-foreground" : "text-her-mark",
+              !cooling && p.tier === "亲密" && "fill-current",
+            )}
+          />
+          {/* 亲近：同一个 Lucide Heart 叠一层实心的，只露下半 */}
+          {!cooling && p.tier === "亲近" && (
+            <Heart aria-hidden className="absolute inset-0 size-5 fill-current text-her-mark [clip-path:inset(50%_0_0_0)]" />
           )}
-        />
+        </span>
         <span className={cn("text-sm", cooling && "text-muted-foreground")}>{cooling ? p.cooldownText : p.tier}</span>
         {cue && !cue.cooldown && <CueArrow up={cue.up} className="absolute -top-1.5 left-3" />}
       </span>
@@ -220,8 +226,8 @@ export function HeaderBadge({
         render={
           <Button
             variant="ghost"
-            size={p.variant === "A" ? "lg" : "icon-lg"}
-            className={cn(className, p.variant === "A" && "px-2")}
+            size={p.variant === "C" ? "icon-lg" : "lg"}
+            className={cn(className, p.variant !== "C" && "px-2")}
             aria-label={cooling ? `${character.name}现在不想说话` : `你们的关系：${p.tier}`}
           />
         }
@@ -324,7 +330,7 @@ export function callCues(p: AffinityPrototype, name: string): AffinityCallCue {
       ) : undefined,
     };
   }
-  if (p.variant === "B") {
+  if (p.variant === "B" || p.variant === "D") {
     return {
       statusReplace: cue ? (
         <p className="flex items-center justify-center gap-1 text-sm text-white">

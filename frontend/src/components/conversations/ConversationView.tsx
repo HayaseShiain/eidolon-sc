@@ -499,7 +499,7 @@ function Messages({
                       }
                     />
                   </MessageScrollerItem>
-                  {proto.variant === "B" && proto.history[line.entry.key] && (
+                  {(proto.variant === "B" || proto.variant === "D") && proto.history[line.entry.key] && (
                     <MessageScrollerItem className="my-2 flex justify-center">
                       <StreamCue cue={proto.history[line.entry.key]} name={character.name} />
                     </MessageScrollerItem>
