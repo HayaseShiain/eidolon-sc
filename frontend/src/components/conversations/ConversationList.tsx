@@ -7,12 +7,6 @@ import { SignInButton } from "@/components/app/FailureNotice";
 import { MarkedAvatar } from "@/components/app/MarkedAvatar";
 import { Button } from "@/components/ui/button";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { copy } from "@/i18n";
@@ -20,9 +14,10 @@ import type { Character } from "@/lib/api";
 import { showTime } from "@/lib/callTime";
 import { arrange, dayOf, previewOf, type ListRow, type Preview } from "@/lib/conversationList";
 import { pin, setShown, unpin } from "@/lib/listPreferences";
-import { REPOSITORY_URL } from "@/lib/repository";
 import { cn } from "@/lib/utils";
-import { GitHubIcon, MoreIcon, PinIcon, SearchIcon } from "@/theme/icons";
+import { PinIcon, SearchIcon } from "@/theme/icons";
+
+import { useNavVariant } from "@/components/prototype-nav/NavPrototype";
 
 import { Announcements } from "./Announcements";
 import { useDirectory, type CallInList } from "./ConversationDirectory";
@@ -43,6 +38,7 @@ export function ConversationList({ selectedId }: { selectedId: string | null }) 
   const router = useRouter();
   const { account, characters, latest, preferences, tidy, failure, reload, call, leave } = useDirectory();
   const now = useMinute();
+  const variant = useNavVariant();
   const [query, setQuery] = useState("");
   const [isFilterOpen, setFilterOpen] = useState(false);
   const keep = [selectedId, call?.characterId].filter((id): id is string => !!id);
@@ -55,26 +51,13 @@ export function ConversationList({ selectedId }: { selectedId: string | null }) 
     <div className="flex h-full flex-col bg-background text-foreground">
       <header className="flex shrink-0 items-center gap-2 pt-3 pr-2 pb-2 pl-4">
         <h1 className="flex-1 text-list-title">{t.title}</h1>
-        {/* 新标签页打开：离开这一页会挂断进行中的通话。 */}
-        <Button
-          variant="ghost"
-          size="icon-lg"
-          aria-label={copy.app.repositoryLabel}
-          nativeButton={false}
-          render={<a href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer" />}
-        >
-          <GitHubIcon />
-        </Button>
-        <Announcements userId={account?.id ?? null} />
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="icon-lg" aria-label={t.menu} />}>
-            <MoreIcon />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => leave(() => router.push("/memories"))}>{t.memories}</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => leave(() => router.push("/settings"))}>{t.settings}</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* PROTOTYPE（票 12）：GitHub 和「…」菜单搬走了；铃铛 A 留着，B 搬进导航栏，C 只在手机上留着。 */}
+        {variant === "A" && <Announcements userId={account?.id ?? null} />}
+        {variant === "C" && (
+          <span className="md:hidden">
+            <Announcements userId={account?.id ?? null} />
+          </span>
+        )}
       </header>
 
       <div className="flex shrink-0 items-center gap-1 pr-2 pb-2 pl-4">

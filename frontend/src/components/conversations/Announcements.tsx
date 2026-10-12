@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement, type ReactNode } from "react";
 
 import { AnnouncementBody } from "@/components/app/AnnouncementBody";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +28,14 @@ const t = copy.conversationList;
  * 弹窗开着时列表定在打开那一刻（期间拉到的新公告等收起之后才算），「已读」也就不会记上打开之后才发布的。
  * `userId` 还在载入时为 null，这时不知道读过什么，不显示点。
  */
-export function Announcements({ userId }: { userId: string | null }) {
+export function Announcements({
+  userId,
+  renderTrigger,
+}: {
+  userId: string | null;
+  /** PROTOTYPE（票 12）：导航栏、dock 里换一种触发器。 */
+  renderTrigger?: (hasUnread: boolean, label: string) => { render: ReactElement; children: ReactNode };
+}) {
   // 最近一次拉到的；一次都没拉到时为 null，`loadFailed` 说明是还在拉还是拉不到。
   const [announcements, setAnnouncements] = useState<Announcement[] | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -77,19 +84,25 @@ export function Announcements({ userId }: { userId: string | null }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={openChange}>
-      <DialogTrigger
-        render={
-          <Button
-            variant="ghost"
-            size="icon-lg"
-            aria-label={hasUnread ? t.announcementsUnread : t.announcements}
-            className="relative"
-          />
-        }
-      >
-        <AnnouncementsBellIcon />
-        {hasUnread && <span aria-hidden className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-foreground" />}
-      </DialogTrigger>
+      {renderTrigger ? (
+        <DialogTrigger render={renderTrigger(hasUnread, hasUnread ? t.announcementsUnread : t.announcements).render}>
+          {renderTrigger(hasUnread, "").children}
+        </DialogTrigger>
+      ) : (
+        <DialogTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon-lg"
+              aria-label={hasUnread ? t.announcementsUnread : t.announcements}
+              className="relative"
+            />
+          }
+        >
+          <AnnouncementsBellIcon />
+          {hasUnread && <span aria-hidden className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-foreground" />}
+        </DialogTrigger>
+      )}
       {/* 矮屏上整个弹窗不超出视口，挤的是列表，底栏的两个键始终看得见。 */}
       <DialogContent showCloseButton={false} className="flex max-h-[calc(100dvh-2rem)] flex-col sm:max-w-md">
         <DialogHeader>

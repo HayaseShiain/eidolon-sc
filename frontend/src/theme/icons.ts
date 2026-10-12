@@ -45,5 +45,18 @@ export { ArrowDown as SortedIcon, ArrowUpDown as SortableIcon } from "lucide-rea
 // 通话层右上角的「只看文字」胶囊。
 export { Captions as TextOnlyIcon } from "lucide-react";
 
+// PROTOTYPE（票 12「原型：应用导航外壳」）：导航栏和 dock、设置一级页面的图标。
+export {
+  BookHeart as MemoriesIcon,
+  CircleUser as ProfileIcon,
+  Gift as GiftIcon,
+  Info as AboutIcon,
+  KeyRound as OwnKeysIcon,
+  LogIn as SignInIcon,
+  MessageCircle as ConversationsIcon,
+  PanelLeft as SidebarToggleIcon,
+  Settings as SettingsIcon,
+} from "lucide-react";
+
 // 对话列表页首的 GitHub 仓库链接；品牌标志 Lucide 不收，是 The Library Icon Rule 的例外。
 export { GitHubIcon } from "./GitHubIcon";

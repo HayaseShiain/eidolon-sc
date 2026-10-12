@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { PageShell } from "@/components/app/PageShell";
-import { DirectoryProvider, useWide } from "@/components/conversations/ConversationDirectory";
+import { useWide } from "@/components/conversations/ConversationDirectory";
 import { ConversationList } from "@/components/conversations/ConversationList";
 import { useSavedSize } from "@/components/conversations/useSavedSize";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -30,8 +30,9 @@ export default function ConversationsLayout({ children }: { children: ReactNode 
   const column = useSavedSize("list", hydrated && wide);
   const list = <ConversationList selectedId={wide ? (characterId ?? null) : null} />;
 
+  // PROTOTYPE（票 12）：DirectoryProvider 提到了 (nav) 的外壳里，礼物、设置页也拿得到。
   return (
-    <DirectoryProvider>
+    <>
       <PageShell width="full" isScrollable={false}>
         {hydrated ? (
           <ResizablePanelGroup orientation="horizontal" className="min-h-0 flex-1">
@@ -70,6 +71,6 @@ export default function ConversationsLayout({ children }: { children: ReactNode 
           </div>
         )}
       </PageShell>
-    </DirectoryProvider>
+    </>
   );
 }
