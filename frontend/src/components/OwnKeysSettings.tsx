@@ -38,6 +38,7 @@ import {
   type LocalLLM,
   type LocalOwnKeys,
   type LocalTtsKey,
+  type OwnService,
   type SttProvider,
 } from "@/lib/localOwnKeys";
 import { cn } from "@/lib/utils";
@@ -54,7 +55,12 @@ function exemptionNote({ turns, calls }: LimitExemption): string {
  * 用户自带、自己付费的密钥。三项都只存在这个浏览器里，按登录的用户分开存；填写时服务器只试调、
  * 不保存。浏览器存不了时如实说，表单停用，不退而存在内存里。
  */
-export function OwnKeysSettings() {
+export function OwnKeysSettings({
+  only,
+}: {
+  /** PROTOTYPE（票 13）：设置变体 B、C 里每项服务单独一页，只放这一项的表单。 */
+  only?: OwnService;
+} = {}) {
   const [account, setAccount] = useState<Account | null>(null);
   const userId = account?.id ?? null;
   // 这位用户现在必须自带 LLM（GLOSSARY.md「必须自带 LLM」）：LLM 标成必填，并说明通话怎么计数。
@@ -142,37 +148,43 @@ export function OwnKeysSettings() {
       </p>
       {ownLLMRequired && <p className="text-body">{t.ownLLMRequired}</p>}
       <div className="flex flex-col gap-4">
-        <OwnLLMForm
-          current={kept.llm}
-          required={ownLLMRequired}
-          disabled={!canKeep}
-          onChecked={(llm) => change(() => keepOwnKey(userId, "llm", llm))}
-          onDelete={() => change(() => forgetOwnKey(userId, "llm"))}
-        />
-        <Separator />
-        <OwnSpeechKeyForm
-          title={t.ttsTitle}
-          current={kept.tts}
-          disabled={!canKeep}
-          onSubmit={async (apiKey) => {
-            await checkOwnSpeechKey("tts", apiKey);
-            change(() => keepOwnKey(userId, "tts", { api_key: apiKey }));
-          }}
-          onDelete={() => change(() => forgetOwnKey(userId, "tts"))}
-        />
-        <Separator />
-        <OwnSpeechKeyForm
-          title={t.sttTitle}
-          current={kept.stt}
-          provider={kept.stt?.provider ?? "soniox"}
-          disabled={!canKeep}
-          onSubmit={async (apiKey, provider = "soniox") => {
-            // 百炼的 key 连同试调判断出的地域一起存，通话时随 key 带上。
-            const { region } = await checkOwnSpeechKey("stt", apiKey, provider);
-            change(() => keepOwnKey(userId, "stt", { api_key: apiKey, provider, ...(region ? { region } : {}) }));
-          }}
-          onDelete={() => change(() => forgetOwnKey(userId, "stt"))}
-        />
+        {(!only || only === "llm") && (
+          <OwnLLMForm
+            current={kept.llm}
+            required={ownLLMRequired}
+            disabled={!canKeep}
+            onChecked={(llm) => change(() => keepOwnKey(userId, "llm", llm))}
+            onDelete={() => change(() => forgetOwnKey(userId, "llm"))}
+          />
+        )}
+        {!only && <Separator />}
+        {(!only || only === "tts") && (
+          <OwnSpeechKeyForm
+            title={t.ttsTitle}
+            current={kept.tts}
+            disabled={!canKeep}
+            onSubmit={async (apiKey) => {
+              await checkOwnSpeechKey("tts", apiKey);
+              change(() => keepOwnKey(userId, "tts", { api_key: apiKey }));
+            }}
+            onDelete={() => change(() => forgetOwnKey(userId, "tts"))}
+          />
+        )}
+        {!only && <Separator />}
+        {(!only || only === "stt") && (
+          <OwnSpeechKeyForm
+            title={t.sttTitle}
+            current={kept.stt}
+            provider={kept.stt?.provider ?? "soniox"}
+            disabled={!canKeep}
+            onSubmit={async (apiKey, provider = "soniox") => {
+              // 百炼的 key 连同试调判断出的地域一起存，通话时随 key 带上。
+              const { region } = await checkOwnSpeechKey("stt", apiKey, provider);
+              change(() => keepOwnKey(userId, "stt", { api_key: apiKey, provider, ...(region ? { region } : {}) }));
+            }}
+            onDelete={() => change(() => forgetOwnKey(userId, "stt"))}
+          />
+        )}
       </div>
     </SettingsSection>
   );

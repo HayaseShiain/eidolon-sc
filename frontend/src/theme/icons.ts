@@ -60,3 +60,14 @@ export {
 
 // 对话列表页首的 GitHub 仓库链接；品牌标志 Lucide 不收，是 The Library Icon Rule 的例外。
 export { GitHubIcon } from "./GitHubIcon";
+
+// PROTOTYPE（票 13「原型：像手机设置那样的一级、二级设置页面」）：设置列表里新出现的几个图标。
+export {
+  AudioLines as TtsIcon,
+  Bot as LlmIcon,
+  Check as CheckIcon,
+  ExternalLink as ExternalLinkIcon,
+  FileText as TermsIcon,
+  LogOut as SignOutIcon,
+  Shield as PrivacyIcon,
+} from "lucide-react";

@@ -14,7 +14,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
-import { PrototypeSwitcher } from "@/components/app/PrototypeSwitcher";
 import { Announcements } from "@/components/conversations/Announcements";
 import { useDirectory } from "@/components/conversations/ConversationDirectory";
 import { Button } from "@/components/ui/button";
@@ -61,8 +60,8 @@ const KEY = "prototype-nav-variant";
 const listeners = new Set<() => void>();
 
 function readVariant(): NavVariant {
-  const raw = new URLSearchParams(location.search).get("variant") ?? sessionStorage.getItem(KEY) ?? "A";
-  return VARIANTS.some((v) => v.key === raw) ? (raw as NavVariant) : "A";
+  const raw = new URLSearchParams(location.search).get("variant") ?? sessionStorage.getItem(KEY) ?? "D";
+  return VARIANTS.some((v) => v.key === raw) ? (raw as NavVariant) : "D";
 }
 
 function subscribe(listener: () => void) {
@@ -71,10 +70,10 @@ function subscribe(listener: () => void) {
 }
 
 export function useNavVariant(): NavVariant {
-  return useSyncExternalStore(subscribe, readVariant, () => "A");
+  return useSyncExternalStore(subscribe, readVariant, () => "D");
 }
 
-function chooseVariant(v: string) {
+export function chooseVariant(v: string) {
   sessionStorage.setItem(KEY, v);
   const url = new URL(location.href);
   url.searchParams.set("variant", v);
@@ -150,7 +149,8 @@ export function NavShell({ children }: { children: ReactNode }) {
   // 每页最外层是 PageShell 那样占满视口（h-dvh）的 div；在外壳里压成占满给它的那一块。
   const content = <div className="relative min-h-0 min-w-0 flex-1 [&>div]:h-full">{children}</div>;
   const dock = !dockHidden && <Dock variant={variant} tab={tab} go={go} userId={userId} />;
-  const switcher = <PrototypeSwitcher variants={VARIANTS} current={variant} onChange={chooseVariant} />;
+  // 票 13：导航固定用定稿的 D，切换条让给设置的变体。
+  const switcher = null;
 
   if (variant === "C") {
     return (
