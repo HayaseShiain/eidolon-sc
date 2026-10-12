@@ -51,8 +51,8 @@ export function ConversationList({ selectedId }: { selectedId: string | null }) 
     <div className="flex h-full flex-col bg-background text-foreground">
       <header className="flex shrink-0 items-center gap-2 pt-3 pr-2 pb-2 pl-4">
         <h1 className="flex-1 text-list-title">{t.title}</h1>
-        {/* PROTOTYPE（票 12）：GitHub 和「…」菜单搬走了；铃铛 A 留着，B 搬进导航栏，C 只在手机上留着。 */}
-        {variant === "A" && <Announcements userId={account?.id ?? null} />}
+        {/* PROTOTYPE（票 12）：GitHub 和「…」菜单搬走了；铃铛 A、D 留着，B 搬进导航栏，C 只在手机上留着。 */}
+        {(variant === "A" || variant === "D") && <Announcements userId={account?.id ?? null} />}
         {variant === "C" && (
           <span className="md:hidden">
             <Announcements userId={account?.id ?? null} />
@@ -144,7 +144,8 @@ export function ConversationList({ selectedId }: { selectedId: string | null }) 
         )}
       </div>
 
-      <p className="shrink-0 px-4 py-3 text-meta text-muted-foreground">{t.disclaimer}</p>
+      {/* PROTOTYPE（票 12）：D 拿掉免责声明，搬进设置的「关于」。 */}
+      {variant !== "D" && <p className="shrink-0 px-4 py-3 text-meta text-muted-foreground">{t.disclaimer}</p>}
     </div>
   );
 }

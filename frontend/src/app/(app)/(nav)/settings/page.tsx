@@ -88,6 +88,7 @@ const PANELS: Record<Category, ReactNode> = {
       <AppLink href="/terms" isStandalone>
         使用条款
       </AppLink>
+      <p className="text-meta text-muted-foreground">{copy.conversationList.disclaimer}</p>
     </div>
   ),
 };

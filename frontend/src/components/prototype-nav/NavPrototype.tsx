@@ -8,6 +8,8 @@
 //   只有输入框拿到焦点（键盘弹起）时藏起来。对话列表页首只剩标题。
 // - C「可收起侧栏」：shadcn Sidebar，展开 16rem 带字、收起成 3rem 图标（底部的键或 Ctrl/⌘+B），上面对话、礼物、设置，
 //   下面「更多」一组：记忆、公告、GitHub。手机 dock 三项，进了对话页和设置的二级页面都藏起来；手机上铃铛留在列表页首。
+// - D「定稿」（2026-10-12 看原型后定）：B 的窄栏和 dock，但公告不进导航栏和 dock，铃铛照 A 留在列表页首；
+//   列表底部的免责声明拿掉，搬进设置的「关于」。
 
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
@@ -44,12 +46,13 @@ import {
   SettingsIcon,
 } from "@/theme/icons";
 
-export type NavVariant = "A" | "B" | "C";
+export type NavVariant = "A" | "B" | "C" | "D";
 
 const VARIANTS: { key: NavVariant; name: string }[] = [
   { key: "A", name: "图标窄栏" },
   { key: "B", name: "带字窄栏" },
   { key: "C", name: "可收起侧栏" },
+  { key: "D", name: "定稿：B，公告照 A" },
 ];
 
 // ---- 变体记在地址和 sessionStorage 里 ----
@@ -141,7 +144,7 @@ export function NavShell({ children }: { children: ReactNode }) {
   };
 
   const dockHidden =
-    variant === "B" ? typing : inConversation || (variant === "C" && tab === "settings" && isSubpage);
+    variant === "B" || variant === "D" ? typing : inConversation || (variant === "C" && tab === "settings" && isSubpage);
   const userId = account?.id ?? null;
 
   // 每页最外层是 PageShell 那样占满视口（h-dvh）的 div；在外壳里压成占满给它的那一块。
@@ -167,7 +170,11 @@ export function NavShell({ children }: { children: ReactNode }) {
   return (
     <SubpageContext.Provider value={setSubpage}>
       <div className="flex h-dvh overflow-hidden bg-background text-foreground max-md:flex-col">
-        {variant === "A" ? <IconRail tab={tab} go={go} /> : <LabelRail tab={tab} go={go} userId={userId} />}
+        {variant === "A" ? (
+          <IconRail tab={tab} go={go} />
+        ) : (
+          <LabelRail tab={tab} go={go} userId={userId} withAnnouncements={variant === "B"} />
+        )}
         {content}
         {dock}
       </div>
@@ -232,7 +239,17 @@ function LabelInner({ Icon, label, isActive, dot }: { Icon: typeof GiftIcon; lab
   );
 }
 
-function LabelRail({ tab, go, userId }: { tab: Tab; go: (t: Tab) => void; userId: string | null }) {
+function LabelRail({
+  tab,
+  go,
+  userId,
+  withAnnouncements,
+}: {
+  tab: Tab;
+  go: (t: Tab) => void;
+  userId: string | null;
+  withAnnouncements: boolean;
+}) {
   const item = (t: Tab) => {
     const x = tabOf(t);
     return (
@@ -251,13 +268,15 @@ function LabelRail({ tab, go, userId }: { tab: Tab; go: (t: Tab) => void; userId
     <nav aria-label="应用" className="flex w-18 shrink-0 flex-col items-center gap-2 border-r py-3 max-md:hidden">
       {item("conversations")}
       {item("gifts")}
-      <Announcements
-        userId={userId}
-        renderTrigger={(unread, label) => ({
-          render: <button type="button" aria-label={label} className={cn("group", labelItem)} />,
-          children: <LabelInner Icon={AnnouncementsBellIcon} label="公告" isActive={false} dot={unread} />,
-        })}
-      />
+      {withAnnouncements && (
+        <Announcements
+          userId={userId}
+          renderTrigger={(unread, label) => ({
+            render: <button type="button" aria-label={label} className={cn("group", labelItem)} />,
+            children: <LabelInner Icon={AnnouncementsBellIcon} label="公告" isActive={false} dot={unread} />,
+          })}
+        />
+      )}
       {item("settings")}
       <div className="flex-1" />
       <Button
