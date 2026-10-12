@@ -7,6 +7,7 @@
 //   电脑上三级页占右栏，页首有返回键回到二级。
 // - C「节即一级」：现在的四个标签变成一级列表的分组小标题，每节单独一页（LLM、语音合成、语音识别各一页，退出登录、
 //   删除数据各一页）；「关于」的几项直接在一级列表里，点了就走，只有两级。
+// - D「定稿」（2026-10-12 看原型后定）：A 的一级、二级，一级每行加 B 那样的当前值摘要。
 // 三个变体都：记忆是设置的二级页、留在外壳里（去记忆不挂断通话）；旧的 /settings?tab=… 跳到对应的路径。
 
 import NextLink from "next/link";
@@ -69,11 +70,12 @@ type IconType = ComponentType<{ className?: string }>;
 
 // ---- 变体记在地址和 sessionStorage 里 ----
 
-type SettingsVariant = "A" | "B" | "C";
+type SettingsVariant = "A" | "B" | "C" | "D";
 const VARIANTS: { key: SettingsVariant; name: string }[] = [
   { key: "A", name: "一类一页" },
   { key: "B", name: "iOS 式逐项" },
   { key: "C", name: "节即一级" },
+  { key: "D", name: "定稿：A 加摘要" },
 ];
 const KEY = "prototype-settings-variant";
 const listeners = new Set<() => void>();
@@ -118,6 +120,7 @@ export function SettingsPrototype() {
       {variant === "A" && <VariantA path={path} />}
       {variant === "B" && <VariantB path={path} />}
       {variant === "C" && <VariantC path={path} />}
+      {variant === "D" && <VariantA path={path} withSummaries />}
       <PrototypeSwitcher variants={VARIANTS} current={variant} onChange={chooseVariant} />
     </div>
   );
@@ -347,7 +350,8 @@ const PANELS_A: Record<Exclude<CategoryA, "memories">, ReactNode> = {
   about: <AboutRows />,
 };
 
-function VariantA({ path }: { path: string[] }) {
+function VariantA({ path, withSummaries = false }: { path: string[]; withSummaries?: boolean }) {
+  const subtitles = useSubtitles();
   const selected = (GROUPS_A.flat().some((x) => x.key === path[0]) ? path[0] : null) as CategoryA | null;
   const shown = selected ?? "profile"; // 电脑上没选时右边是档案；手机上没选就只有一级列表
   return (
@@ -357,7 +361,13 @@ function VariantA({ path }: { path: string[] }) {
         <Group key={i} separated={i > 0}>
           {group.map(({ key, label, Icon }) => (
             <li key={key}>
-              <Row href={`/settings/${key}`} Icon={Icon} label={label} isCurrent={key === shown} />
+              <Row
+                href={`/settings/${key}`}
+                Icon={Icon}
+                label={label}
+                subtitle={withSummaries ? subtitles[key] : undefined}
+                isCurrent={key === shown}
+              />
             </li>
           ))}
         </Group>
@@ -422,15 +432,11 @@ function useCurrentValues() {
 
 type CategoryB = CategoryA;
 
-function VariantB({ path }: { path: string[] }) {
-  const v = useCurrentValues();
-  const { account, profile, memoryCount, call, keys } = v;
-  const selected = (GROUPS_A.flat().some((x) => x.key === path[0]) ? path[0] : null) as CategoryB | null;
-  const shown = selected ?? "profile";
-  const item = path[1] ?? null;
-
+/** 一级每行下面的当前值摘要（B 和定稿 D）。 */
+function useSubtitles(): Record<CategoryB, string | undefined> {
+  const { account, profile, memoryCount, call, keys } = useCurrentValues();
   const owned = (["llm", "tts", "stt"] as OwnService[]).filter((s) => keys[s]);
-  const subtitles: Record<CategoryB, string | undefined> = {
+  return {
     profile: profile ? `${addressLabel(profile)} · ${timezoneLabel(profile)}` : undefined,
     memories: memoryCount === null ? undefined : memoryCount === 0 ? "还没有记忆" : `${memoryCount} 条`,
     call: call ? `${t.call.qualities[call.quality]} · 电话质感${call.phoneTexture ? "开" : "关"}` : undefined,
@@ -438,6 +444,15 @@ function VariantB({ path }: { path: string[] }) {
     "sign-in": account ? account.sign_in_methods.map((m) => PROVIDER_LABELS[m.provider]).join("、") : undefined,
     about: undefined,
   };
+}
+
+function VariantB({ path }: { path: string[] }) {
+  const v = useCurrentValues();
+  const selected = (GROUPS_A.flat().some((x) => x.key === path[0]) ? path[0] : null) as CategoryB | null;
+  const shown = selected ?? "profile";
+  const item = path[1] ?? null;
+
+  const subtitles = useSubtitles();
 
   const list = GROUPS_A.map((group, i) => (
     <Group key={i} separated={i > 0}>
