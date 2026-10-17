@@ -1,0 +1,248 @@
+{
+ "mano__selfie__v45c-ref": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-4-5-curated",
+  "seconds": 7.6,
+  "ref": true
+ },
+ "mano__selfie__v5c-name": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 11.7,
+  "ref": false
+ },
+ "mano__office__v5c-name": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 9.0,
+  "ref": false
+ },
+ "mano__outdoor__v5c-name": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 13.0,
+  "ref": false
+ },
+ "mano__stage__v5c-name": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 14.1,
+  "ref": false
+ },
+ "asahi__selfie__v5c-name": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 14.9,
+  "ref": false
+ },
+ "asahi__office__v5c-name": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 11.7,
+  "ref": false
+ },
+ "asahi__outdoor__v5c-name": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 18.8,
+  "ref": false
+ },
+ "asahi__stage__v5c-name": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 13.8,
+  "ref": false
+ },
+ "natsuha__selfie__v5c-name": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 14.0,
+  "ref": false
+ },
+ "natsuha__office__v5c-name": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 15.1,
+  "ref": false
+ },
+ "natsuha__outdoor__v5c-name": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 12.2,
+  "ref": false
+ },
+ "natsuha__stage__v5c-name": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 15.7,
+  "ref": false
+ },
+ "chiyoko__selfie__v5c-name": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 10.7,
+  "ref": false
+ },
+ "chiyoko__office__v5c-name": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 13.5,
+  "ref": false
+ },
+ "chiyoko__outdoor__v5c-name": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 14.9,
+  "ref": false
+ },
+ "chiyoko__stage__v5c-name": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 15.0,
+  "ref": false
+ },
+ "haruki__selfie__v5c-name": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 9.5,
+  "ref": false
+ },
+ "haruki__office__v5c-name": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 12.0,
+  "ref": false
+ },
+ "haruki__outdoor__v5c-name": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 14.0,
+  "ref": false
+ },
+ "haruki__stage__v5c-name": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 11.8,
+  "ref": false
+ },
+ "mano__selfie__v5c-look": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, brown hair, medium hair, brown eyes, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 10.3,
+  "ref": false
+ },
+ "mano__office__v5c-look": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, brown hair, medium hair, brown eyes, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 7.2,
+  "ref": false
+ },
+ "mano__outdoor__v5c-look": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, brown hair, medium hair, brown eyes, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 9.8,
+  "ref": false
+ },
+ "mano__stage__v5c-look": {
+  "prompt": "1girl, solo, sakuragi mano, idolmaster shiny colors, brown hair, medium hair, brown eyes, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 7.4,
+  "ref": false
+ },
+ "asahi__selfie__v5c-look": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, grey hair, short hair, blue eyes, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 8.0,
+  "ref": false
+ },
+ "asahi__office__v5c-look": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, grey hair, short hair, blue eyes, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 9.7,
+  "ref": false
+ },
+ "asahi__outdoor__v5c-look": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, grey hair, short hair, blue eyes, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 9.5,
+  "ref": false
+ },
+ "asahi__stage__v5c-look": {
+  "prompt": "1girl, solo, serizawa asahi, idolmaster shiny colors, grey hair, short hair, blue eyes, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 7.5,
+  "ref": false
+ },
+ "natsuha__selfie__v5c-look": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, orange hair, long hair, wavy hair, swept bangs, grey eyes, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 7.0,
+  "ref": false
+ },
+ "natsuha__office__v5c-look": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, orange hair, long hair, wavy hair, swept bangs, grey eyes, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 8.5,
+  "ref": false
+ },
+ "natsuha__outdoor__v5c-look": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, orange hair, long hair, wavy hair, swept bangs, grey eyes, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 9.7,
+  "ref": false
+ },
+ "natsuha__stage__v5c-look": {
+  "prompt": "1girl, solo, arisugawa natsuha, idolmaster shiny colors, orange hair, long hair, wavy hair, swept bangs, grey eyes, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 9.6,
+  "ref": false
+ },
+ "chiyoko__selfie__v5c-look": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, brown hair, double bun, twintails, red eyes, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 7.8,
+  "ref": false
+ },
+ "chiyoko__office__v5c-look": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, brown hair, double bun, twintails, red eyes, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 13.0,
+  "ref": false
+ },
+ "chiyoko__outdoor__v5c-look": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, brown hair, double bun, twintails, red eyes, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 15.0,
+  "ref": false
+ },
+ "chiyoko__stage__v5c-look": {
+  "prompt": "1girl, solo, sonoda chiyoko, idolmaster shiny colors, brown hair, double bun, twintails, red eyes, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 13.9,
+  "ref": false
+ },
+ "haruki__selfie__v5c-look": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, brown hair, short hair, yellow eyes, selfie, looking at viewer, upper body, cafe, indoors, window, sunlight, casual, sweater, smile, peace sign, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 6.6,
+  "ref": false
+ },
+ "haruki__office__v5c-look": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, brown hair, short hair, yellow eyes, looking at viewer, cowboy shot, office, indoors, sofa, evening, white shirt, skirt, sitting, holding cup, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 12.6,
+  "ref": false
+ },
+ "haruki__outdoor__v5c-look": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, brown hair, short hair, yellow eyes, looking at viewer, full body, street, outdoors, autumn, sunset, coat, scarf, walking, looking back, open mouth, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 10.3,
+  "ref": false
+ },
+ "haruki__stage__v5c-look": {
+  "prompt": "1girl, solo, ikuta haruki, idolmaster shiny colors, brown hair, short hair, yellow eyes, looking at viewer, cowboy shot, stage, concert, stage lights, night, idol clothes, waving, smile, rating:general, very aesthetic, masterpiece, no text",
+  "model": "nai-diffusion-5-curated",
+  "seconds": 7.8,
+  "ref": false
+ }
+}
