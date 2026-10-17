@@ -92,6 +92,9 @@ type Props = {
   onGift: () => void;
   /** 这个部署的免限额密钥：超限的结束卡点名它们；账号还没读到时为 null。 */
   exemptingKeys: readonly OwnService[] | null;
+  /** PROTOTYPE（photos 票 12）：台词卡（或结束卡）上方、右上角的照片。 */
+  protoAbove?: ReactNode;
+  protoCorner?: ReactNode;
 };
 
 const notOpen = () => NOT_OPEN;
@@ -209,6 +212,7 @@ export function CallLayer(props: Props) {
     >
       <Backdrop character={character} />
       {hasStand && <StandStage {...props} />}
+      {props.protoCorner}
 
       <header className="relative grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 pt-4">
         <div className="flex justify-start">
@@ -270,6 +274,7 @@ export function CallLayer(props: Props) {
           ended ? "justify-center py-6" : "justify-end pb-5",
         )}
       >
+        {props.protoAbove}
         {call.phase === "ended" ? (
           <Ended {...props} end={call.end} />
         ) : (

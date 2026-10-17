@@ -18,6 +18,7 @@ import { HideIcon, PinIcon, SearchIcon, ShowIcon, UnpinIcon } from "@/theme/icon
 
 import { Announcements } from "./Announcements";
 import { PreviewText } from "./PreviewText";
+import { useListPreview } from "./prototype-photos/PhotosPrototype";
 import { useDirectory, type CallInList } from "./ConversationDirectory";
 import { ListFilter } from "./ListFilter";
 import { useCallTime } from "./useCallTime";
@@ -160,6 +161,8 @@ function Row({
   onToggleHidden: () => void;
 }) {
   const time = useCallTime(call?.state);
+  // PROTOTYPE（photos 票 12）：最后一个假回合带照片时，最后一句按原型面板的写法。
+  const protoPreview = useListPreview(character.id);
   // 长按打开菜单后，松手时浏览器可能还会补发一次点击；菜单打开之后、下一次按下之前的点击不打开对话。
   const openedMenu = useRef(false);
   const description = call ? (
@@ -168,6 +171,8 @@ function Row({
     ) : (
       copy.call.dialing
     )
+  ) : protoPreview !== null ? (
+    protoPreview
   ) : !preview ? (
     t.neverTalked
   ) : (

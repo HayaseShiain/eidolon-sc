@@ -1,6 +1,6 @@
 "use client";
 
-import type { Ref } from "react";
+import type { ReactNode, Ref } from "react";
 
 import { copy } from "@/i18n";
 import { showTime } from "@/lib/callTime";
@@ -22,7 +22,10 @@ export function CallBar({
   name,
   onExpand,
   ref,
+  extra,
 }: {
+  /** PROTOTYPE（photos 票 12）：状态后面多一句。 */
+  extra?: ReactNode;
   call: LiveCall;
   /** 在和谁通话：不在她的对话页上时写在状态前面。 */
   name?: string;
@@ -44,6 +47,7 @@ export function CallBar({
       <span className="flex min-w-0 flex-1 gap-2 text-sm font-medium tabular-nums">
         {name && <span className="truncate">{name}</span>}
         <span className="shrink-0">{time ? copy.call.listConnected(showTime(time)) : copy.call.dialing}</span>
+        {extra}
       </span>
       <span className="flex shrink-0 items-center text-sm text-white/80">
         {copy.call.expand}

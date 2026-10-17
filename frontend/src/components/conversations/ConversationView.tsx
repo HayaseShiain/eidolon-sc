@@ -2,6 +2,7 @@
 
 import NextLink from "next/link";
 import {
+  Fragment,
   useEffect,
   useRef,
   useState,
@@ -71,6 +72,28 @@ import { useFocusBack } from "./useFocusBack";
 import { usePastConversation, type Viewing } from "./usePastConversation";
 import { useProducerTimezone } from "./useProducerTimezone";
 import { useStandOutfits } from "./useStandOutfits";
+import { CallLayer } from "./CallLayer";
+import { PrototypeSwitcher } from "@/components/app/PrototypeSwitcher";
+import {
+  callActions,
+  CallBarHint,
+  callLine,
+  CallPhoto,
+  fakeShownCall,
+  Lightbox,
+  PhotoAfter,
+  PhotoBefore,
+  PhotoInside,
+  PhotosPanel,
+  QuotaCue,
+  QuotaStrip,
+  QuotaToast,
+  setVariant,
+  turnOf,
+  usePhotos,
+  VARIANTS,
+  withFakeTurns,
+} from "./prototype-photos/PhotosPrototype";
 
 const t = copy.conversation;
 
@@ -122,6 +145,11 @@ export function ConversationView({
   const { affinity, affinityCue, cooling, ended } = snapshot;
   // 解除时刻按制作人的时区写成今天或明天。
   const timeZone = useProducerTimezone();
+  // PROTOTYPE（photos 票 12）：假的要照片回合排在真记录后面，假通话由原型面板驱动。
+  const photos = usePhotos();
+  const shownEntries = withFakeTurns(entries, character.id, photos.turns);
+  const fakeCall = photos.call?.characterId === character.id ? photos.call : null;
+  const fakeLayerRef = useRef<HTMLElement>(null);
 
   // 向外壳要她的对话（外壳里留着她的通话就用那一份，否则打开她最新的一个，从没聊过就开一个新的）；
   // 离开这一页时交回：通话还在进行就留在外壳里，否则就此告别。
@@ -329,6 +357,13 @@ export function ConversationView({
   return (
     <Frame character={character} subtree={subtree} header={header}>
       {barShown && <CallBar ref={focus.note} call={call} onExpand={() => live?.expand()} />}
+      {fakeCall?.collapsed && !fakeCall.ended && (
+        <CallBar
+          call={{ phase: "connected", dial: 1, since: fakeCall.since, maxSeconds: null }}
+          onExpand={callActions.expand}
+          extra={<CallBarHint />}
+        />
+      )}
       <div inert={isCovered} className="min-h-0 flex-1">
         {/* 历史对话：读到之前转圈；换一段时消息区重来，停在最底 */}
         {viewing ? (
@@ -353,11 +388,11 @@ export function ConversationView({
             </div>
           )
         ) : /* 开新对话的过程中也是 opening：旧对话留在原处，只是发送键和电话键禁用 */
-        !isOpen && entries.length === 0 ? (
+        !isOpen && shownEntries.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <Spinner className="size-6 text-muted-foreground" aria-label={t.loading} />
           </div>
-        ) : entries.length === 0 && !hearing ? (
+        ) : shownEntries.length === 0 && !hearing ? (
           <Empty className="h-full">
             <EmptyHeader>
               <EmptyTitle>{t.emptyTitle(character.name)}</EmptyTitle>
@@ -366,10 +401,12 @@ export function ConversationView({
             </EmptyHeader>
           </Empty>
         ) : (
-          <Messages entries={entries} hearing={hearing} character={character} affinityOn={affinity !== null} />
+          <Messages entries={shownEntries} hearing={hearing} character={character} affinityOn={affinity !== null} />
         )}
       </div>
+      <QuotaStrip characterId={character.id} />
       {composer}
+      <QuotaToast characterId={character.id} />
       <PastConversations
         isOpen={pickingPast}
         onOpenChange={setPickingPast}
@@ -399,6 +436,41 @@ export function ConversationView({
           exemptingKeys={account?.exempting_keys ?? null}
         />
       )}
+      {fakeCall && (
+        <CallLayer
+          character={character}
+          call={fakeShownCall(fakeCall)}
+          isCollapsed={fakeCall.collapsed}
+          layerRef={fakeLayerRef}
+          isFullScreen={isFullScreen}
+          isReducedMotion={isReducedMotion}
+          micMuted={false}
+          micNotice={null}
+          textOnly={false}
+          line={callLine(photos)}
+          previousLine={null}
+          hearing=""
+          affinityCue={null}
+          standDirection={snapshot.stand}
+          standOutfits={outfits?.toTry ?? []}
+          onCollapse={callActions.collapse}
+          onHangUp={callActions.hangUp}
+          onToggleMic={() => {}}
+          onSwitchMic={() => {}}
+          onToggleTextOnly={() => {}}
+          onRedial={() => {}}
+          onDismiss={callActions.dismiss}
+          onOwnKeys={() => {}}
+          giftsOpen={false}
+          onGift={() => {}}
+          exemptingKeys={null}
+          protoAbove={<CallPhoto where="above" />}
+          protoCorner={<CallPhoto where="corner" />}
+        />
+      )}
+      <Lightbox />
+      <PhotosPanel characterId={character.id} />
+      <PrototypeSwitcher variants={VARIANTS} current={photos.variant} onChange={setVariant} />
       {outfits && (
         <OutfitPicker
           isOpen={pickingOutfit}
@@ -518,6 +590,7 @@ function Messages({
   affinityOn: boolean;
 }) {
   const lines = linesOf(entries, new Date(), affinityOn);
+  const photos = usePhotos();
   return (
     <MessageScrollerProvider autoScroll defaultScrollPosition="end">
       <MessageScroller>
@@ -543,9 +616,17 @@ function Messages({
                   <EventLine entry={line.entry} name={character.name} />
                 </MessageScrollerItem>
               ) : (
-                <MessageScrollerItem key={line.entry.key} messageId={line.entry.key} className={cn(line.first && "mt-2")}>
-                  <Bubbled line={line} entry={line.entry} character={character} />
-                </MessageScrollerItem>
+                <Fragment key={line.entry.key}>
+                  <MessageScrollerItem messageId={line.entry.key} className={cn(line.first && "mt-2")}>
+                    <Bubbled line={line} entry={line.entry} character={character} />
+                  </MessageScrollerItem>
+                  {/* PROTOTYPE：次数用完（对话里的胶囊）：她推掉的那条回复后面一行 */}
+                  {photos.quota === "cue" && turnOf(line.entry.key, photos.turns)?.retryAt && (
+                    <MessageScrollerItem className="mt-2 flex justify-center">
+                      <QuotaCue retryAt={turnOf(line.entry.key, photos.turns)!.retryAt!} />
+                    </MessageScrollerItem>
+                  )}
+                </Fragment>
               ),
             )}
             {hearing && (
@@ -597,6 +678,10 @@ function Bubbled({
   character: Character;
 }) {
   const time = <time className="shrink-0 pb-0.5 text-meta text-muted-foreground tabular-nums">{clock(entry.at)}</time>;
+  // PROTOTYPE：这条回复带的照片，按变体放。
+  const photos = usePhotos();
+  const photo = turnOf(entry.key, photos.turns)?.photo ?? null;
+  const variant = photos.variant;
   if (entry.kind === "user") {
     return (
       <Message align="end">
@@ -620,6 +705,7 @@ function Bubbled({
       )}
       <MessageContent className="gap-1">
         {first && <MessageHeader className="px-1">{character.name}</MessageHeader>}
+        {photo && variant === "A" && <PhotoBefore photo={photo} />}
         <div className="flex min-w-0 items-end gap-1.5">
           <Bubble variant="her" joinsPrevious={!first} joinsNext={!last}>
             <BubbleContent>
@@ -635,12 +721,19 @@ function Bubbled({
                       {segment.zh && <p className="text-subtitle text-muted-foreground">{segment.zh}</p>}
                     </div>
                   ))}
+                  {photo && variant === "B" && <PhotoInside photo={photo} />}
                 </div>
               )}
             </BubbleContent>
           </Bubble>
-          {last && !entry.pending && time}
+          {last && !entry.pending && !(photo && variant === "C") && time}
         </div>
+        {photo && variant === "C" && (
+          <div className="flex min-w-0 items-end gap-1.5">
+            <PhotoAfter photo={photo} />
+            {last && !entry.pending && time}
+          </div>
+        )}
       </MessageContent>
     </Message>
   );
