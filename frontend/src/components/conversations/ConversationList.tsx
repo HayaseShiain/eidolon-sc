@@ -22,6 +22,7 @@ import { ServiceStatusButton } from "./ServiceStatusButton";
 import { useDirectory, type CallInList } from "./ConversationDirectory";
 import { ListFilter } from "./ListFilter";
 import { useCallTime } from "./useCallTime";
+import { RowMark, useFakeLatest, useRowEmphasis } from "./prototype-reachouts/ReachOutsPrototype";
 
 const t = copy.conversationList;
 
@@ -33,7 +34,9 @@ const t = copy.conversationList;
  * 列表栏是实底，不在她的子树里。宽屏时在左栏，窄屏时占满一页。
  */
 export function ConversationList({ selectedId }: { selectedId: string | null }) {
-  const { account, characters, latest, preferences, tidy, failure, reload, call, go } = useDirectory();
+  const { account, characters, latest: realLatest, preferences, tidy, failure, reload, call, go } = useDirectory();
+  // PROTOTYPE（proactive-messages 票 06）：假搭话换掉最后一句，她跟着排上去。
+  const latest = useFakeLatest(realLatest);
   const now = useMinute();
   const [query, setQuery] = useState("");
   const [isFilterOpen, setFilterOpen] = useState(false);
@@ -162,6 +165,7 @@ function Row({
   onToggleHidden: () => void;
 }) {
   const time = useCallTime(call?.state);
+  const emphasized = useRowEmphasis(character.id);
   // 长按打开菜单后，松手时浏览器可能还会补发一次点击；菜单打开之后、下一次按下之前的点击不打开对话。
   const openedMenu = useRef(false);
   const description = call ? (
@@ -200,6 +204,7 @@ function Row({
             <span className="min-w-0 flex-1 truncate text-row-name">{character.name}</span>
             {((preview && !call) || isPinned) && (
               <span className="flex shrink-0 items-center gap-1 text-meta text-muted-foreground tabular-nums">
+                <RowMark character={character} where="time" />
                 {preview && !call && listTime(new Date(preview.at), now)}
                 {isPinned && (
                   <>
@@ -210,7 +215,17 @@ function Row({
               </span>
             )}
           </span>
-          <span className="truncate text-preview text-muted-foreground tabular-nums">{description}</span>
+          <span className="flex items-center gap-2">
+            <span
+              className={cn(
+                "min-w-0 flex-1 truncate text-preview tabular-nums",
+                emphasized ? "font-medium text-foreground" : "text-muted-foreground",
+              )}
+            >
+              {description}
+            </span>
+            <RowMark character={character} where="preview" />
+          </span>
         </span>
       </ContextMenuTrigger>
       <ContextMenuContent>

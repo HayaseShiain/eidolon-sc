@@ -10,6 +10,7 @@ import { copy } from "@/i18n";
 import { currentNavItem, FIRST_LEVEL, isTyping, NAV_ITEMS, navDestination, type NavItem } from "@/lib/navShell";
 import { REPOSITORY_URL } from "@/lib/repository";
 import { cn } from "@/lib/utils";
+import { NavDot } from "@/components/conversations/prototype-reachouts/ReachOutsPrototype";
 import { ConversationsIcon, GiftIcon, GitHubIcon, SettingsIcon } from "@/theme/icons";
 
 const ICONS: Record<NavItem, typeof SettingsIcon> = {
@@ -98,11 +99,13 @@ function NavLinks({ className }: { className: string }) {
       >
         <span
           className={cn(
-            "flex h-8 w-12 items-center justify-center rounded-full transition-colors",
+            "relative flex h-8 w-12 items-center justify-center rounded-full transition-colors",
             isCurrent ? "bg-muted text-foreground" : "text-muted-foreground group-hover:bg-muted/60",
           )}
         >
           <Icon aria-hidden className="size-5" />
+          {/* PROTOTYPE（proactive-messages 票 06）：B 有没看过的搭话时的小点 */}
+          {item === "conversations" && <NavDot />}
         </span>
         <span className={isCurrent ? "font-medium text-foreground" : "text-muted-foreground"}>{copy.nav[item]}</span>
       </NextLink>

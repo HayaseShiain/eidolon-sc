@@ -519,6 +519,7 @@ export const zh = {
       memories: "记忆",
       stats: "统计",
       call: "通话",
+      "reach-outs": "搭话",
       appearance: "外观",
       "own-keys": "自带密钥",
       "sign-in": "登录与数据",

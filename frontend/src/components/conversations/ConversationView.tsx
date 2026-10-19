@@ -2,6 +2,7 @@
 
 import NextLink from "next/link";
 import {
+  Fragment,
   useEffect,
   useRef,
   useState,
@@ -74,6 +75,14 @@ import { useFocusBack } from "./useFocusBack";
 import { usePastConversation, type Viewing } from "./usePastConversation";
 import { useProducerTimezone } from "./useProducerTimezone";
 import { useStandOutfits } from "./useStandOutfits";
+import {
+  isDividerBefore,
+  NewDivider,
+  splitReachOuts,
+  useReachOuts,
+  useSeenOnOpen,
+  withFakeReachOuts,
+} from "./prototype-reachouts/ReachOutsPrototype";
 
 const t = copy.conversation;
 
@@ -115,7 +124,11 @@ export function ConversationView({
   const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)", false);
   const [live, setLive] = useState<LiveConversation | null>(null);
   const snapshot = useSyncExternalStore(live?.subscribe ?? noSubscription, live?.snapshot ?? notOpen, notOpen);
-  const { conversation, entries, call, layer, hearing, draft, failure } = snapshot;
+  const { conversation, entries: realEntries, call, layer, hearing, draft, failure } = snapshot;
+  // PROTOTYPE（proactive-messages 票 06）：假搭话按时间插进当前对话；打开这一页就算看过。
+  const reachOuts = useReachOuts();
+  const entries = withFakeReachOuts(realEntries, character.id, reachOuts);
+  useSeenOnOpen(character.id);
   const outfits = useStandOutfits(character);
   const [pickingOutfit, setPickingOutfit] = useState(false);
   const [pickingPast, setPickingPast] = useState(false);
@@ -543,7 +556,9 @@ function Messages({
   affinityOn: boolean;
   timeZone: string;
 }) {
-  const lines = linesOf(entries, new Date(), affinityOn);
+  // PROTOTYPE：B、C 搭话另起一组；C 没看过的搭话上面一条「新消息」分隔线。
+  const reachOuts = useReachOuts();
+  const lines = splitReachOuts(linesOf(entries, new Date(), affinityOn), reachOuts);
   return (
     <MessageScrollerProvider autoScroll defaultScrollPosition="end">
       <MessageScroller>
@@ -577,9 +592,16 @@ function Messages({
                   <EventLine entry={line.entry} name={character.name} />
                 </MessageScrollerItem>
               ) : (
-                <MessageScrollerItem key={line.entry.key} messageId={line.entry.key} className={cn(line.first && "mt-2")}>
-                  <Bubbled line={line} entry={line.entry} character={character} />
-                </MessageScrollerItem>
+                <Fragment key={line.entry.key}>
+                  {isDividerBefore(line.entry.key, character.id, reachOuts) && (
+                    <MessageScrollerItem className="my-3">
+                      <NewDivider />
+                    </MessageScrollerItem>
+                  )}
+                  <MessageScrollerItem messageId={line.entry.key} className={cn(line.first && "mt-2")}>
+                    <Bubbled line={line} entry={line.entry} character={character} />
+                  </MessageScrollerItem>
+                </Fragment>
               ),
             )}
             {hearing && (

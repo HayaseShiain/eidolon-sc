@@ -13,12 +13,19 @@ import { SettingsPane } from "@/components/settings/SettingsPane";
 import { SignInSettings } from "@/components/SignInSettings";
 import { SignOutSettings } from "@/components/SignOutSettings";
 import { StatsSettings } from "@/components/StatsSettings";
+import { ReachOutsSettings } from "@/components/conversations/prototype-reachouts/ReachOutsSettings";
 import type { SettingsCategory } from "@/lib/settingsCategory";
 
 /** 各类二级页面的内容，按 spec「设置：二级」。记忆和统计自己带页首末端的「清空」「分享」，整页由它们画。 */
 const PANELS: Record<Exclude<SettingsCategory, "memories" | "stats">, ReactNode> = {
-  profile: <ProducerProfileSettings />,
+  profile: (
+    <>
+      <ProducerProfileSettings />
+      <ReachOutsSettings only="profile" />
+    </>
+  ),
   call: <CallSettings />,
+  "reach-outs": <ReachOutsSettings />,
   appearance: <AppearanceSettings />,
   "own-keys": <OwnKeysSettings />,
   "sign-in": (

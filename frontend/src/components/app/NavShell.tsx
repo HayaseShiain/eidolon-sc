@@ -13,6 +13,14 @@ import type { Character } from "@/lib/api";
 import { NOT_OPEN, type LiveConversation } from "@/lib/liveConversation";
 import { showsShellCallBar } from "@/lib/navShell";
 import { herVars } from "@/theme/herVars";
+import { PrototypeSwitcher } from "@/components/app/PrototypeSwitcher";
+import {
+  ReachOutsPanel,
+  ReachOutToast,
+  setVariant,
+  useReachOuts,
+  VARIANTS,
+} from "@/components/conversations/prototype-reachouts/ReachOutsPrototype";
 
 const notOpen = () => NOT_OPEN;
 const noSubscription = () => () => {};
@@ -39,6 +47,8 @@ export function NavShell({ children }: { children: ReactNode }) {
   const isCovered = layer !== null && isLayerOpen;
   const barShown = call !== null && layer?.collapsed === true && showsShellCallBar(pathname, call.characterId);
   const focus = useFocusBack({ layerOpen: isCovered, noteShown: barShown });
+  // PROTOTYPE（proactive-messages 票 06）：变体、原型面板和 B 的提示。
+  const reachOuts = useReachOuts();
 
   return (
     <div className="flex h-dvh flex-col md:flex-row">
@@ -60,9 +70,12 @@ export function NavShell({ children }: { children: ReactNode }) {
             {children}
           </div>
           {character && held && <HeldLayer live={held} character={character} layerRef={focus.layer} />}
+          <ReachOutToast />
         </div>
       </div>
       <NavDock isInert={isLayerOpen} />
+      <ReachOutsPanel />
+      <PrototypeSwitcher variants={VARIANTS} current={reachOuts.variant} onChange={setVariant} />
     </div>
   );
 }

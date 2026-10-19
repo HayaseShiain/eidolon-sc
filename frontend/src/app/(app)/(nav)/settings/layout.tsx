@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { copy } from "@/i18n";
 import { SETTINGS_GROUPS, settingsCategory, settingsHref, shownCategory } from "@/lib/settingsCategory";
 import { cn } from "@/lib/utils";
+import { useReachOuts } from "@/components/conversations/prototype-reachouts/ReachOutsPrototype";
 import {
   AboutIcon,
   AppearanceIcon,
@@ -17,6 +18,7 @@ import {
   OwnKeysIcon,
   PhoneIcon,
   ProfileIcon,
+  ReachOutsIcon,
   SignInIcon,
   StatsIcon,
 } from "@/theme/icons";
@@ -28,6 +30,7 @@ const ICONS = {
   memories: MemoriesIcon,
   stats: StatsIcon,
   call: PhoneIcon,
+  "reach-outs": ReachOutsIcon,
   appearance: AppearanceIcon,
   "own-keys": OwnKeysIcon,
   "sign-in": SignInIcon,
@@ -57,6 +60,8 @@ function SettingsLevels({ children }: { children: ReactNode }) {
   const named = settingsCategory(pathname);
   const isFirstLevel = named === null;
   const current = shownCategory(pathname);
+  // PROTOTYPE（proactive-messages 票 06）：开关放在档案页时没有「搭话」这一类。
+  const reachOuts = useReachOuts();
 
   return (
     <div className="flex h-full bg-background text-foreground">
@@ -75,12 +80,12 @@ function SettingsLevels({ children }: { children: ReactNode }) {
             <Fragment key={group[0]}>
               {i > 0 && <Separator className="my-1" />}
               <ul>
-                {group.map((category) => (
+                {group.filter((category) => category !== "reach-outs" || reachOuts.toggleAt === "category").map((category) => (
                   <li key={category}>
                     <SettingsRow
                       href={settingsHref(category)}
                       label={t.categories[category]}
-                      summary={summaries[category]}
+                      summary={category === "reach-outs" ? (reachOuts.enabled ? "开" : "关") : summaries[category]}
                       Icon={ICONS[category]}
                       isCurrent={category === current}
                       isCurrentPage={category === named}

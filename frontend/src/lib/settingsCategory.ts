@@ -15,7 +15,8 @@ import { PROVIDER_LABELS, type Provider } from "@/lib/signIn";
 /** The first level's groups, top to bottom, with a separator between each two. */
 export const SETTINGS_GROUPS = [
   ["profile", "memories", "stats"],
-  ["call", "appearance", "own-keys"],
+  // PROTOTYPE（proactive-messages 票 06）：单独一类「搭话」。
+  ["call", "reach-outs", "appearance", "own-keys"],
   ["sign-in", "data-package"],
   ["about"],
 ] as const;
