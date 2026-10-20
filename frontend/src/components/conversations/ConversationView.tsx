@@ -68,6 +68,9 @@ import { EVENT_ICONS, eventText } from "./EventIcon";
 import { LiveCallLayer } from "./CallLayer";
 import { OutfitPicker } from "./OutfitPicker";
 import { PastConversations } from "./PastConversations";
+// PROTOTYPE（daily-tasks-and-achievements 票 09）
+import { HeaderCueB, HerDotB, HerSheetB, MoreDotB, useIsB } from "@/components/prototype-achievements/AchievementsPrototype";
+import { AchievementsIcon } from "@/theme/icons";
 import { PhotoBlock } from "./PhotoBlock";
 import { useDirectory, useWide } from "./ConversationDirectory";
 import { useFocusBack } from "./useFocusBack";
@@ -119,6 +122,8 @@ export function ConversationView({
   const outfits = useStandOutfits(character);
   const [pickingOutfit, setPickingOutfit] = useState(false);
   const [pickingPast, setPickingPast] = useState(false);
+  const [pickingAchievements, setPickingAchievements] = useState(false); // PROTOTYPE
+  const isB = useIsB(); // PROTOTYPE
   const { viewing, view, backToCurrent } = usePastConversation(character.id);
   const subtree = useRef<HTMLDivElement>(null);
   // 她现在对制作人的好感度；读不到（好感度关着、没配判断模型或请求失败）就不显示标识，也不出变化胶囊。
@@ -209,6 +214,7 @@ export function ConversationView({
         )}
       </div>
       {phoneKey}
+      <HeaderCueB character={character} />
       {affinity && (
         <AffinityBadge
           status={affinity}
@@ -221,9 +227,10 @@ export function ConversationView({
       )}
       <DropdownMenu>
         <DropdownMenuTrigger
-          render={<Button variant="ghost" size="icon-lg" className={headerKey} aria-label={t.menu} />}
+          render={<Button variant="ghost" size="icon-lg" className={`${headerKey} relative`} aria-label={t.menu} />}
         >
           <MoreIcon className="size-5" />
+          <MoreDotB character={character} />
         </DropdownMenuTrigger>
         <DropdownMenuContent container={subtree} align="end">
           {/* 菜单项里的图标默认 16px、跟着菜单文字的颜色，不用她的颜色 */}
@@ -239,6 +246,13 @@ export function ConversationView({
             <DropdownMenuItem onClick={() => setPickingOutfit(true)}>
               <OutfitIcon aria-hidden />
               {t.outfits.open}
+            </DropdownMenuItem>
+          )}
+          {isB && (
+            <DropdownMenuItem onClick={() => setPickingAchievements(true)}>
+              <AchievementsIcon aria-hidden />
+              成就
+              <HerDotB character={character} />
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -399,6 +413,7 @@ export function ConversationView({
         )}
       </div>
       {composer}
+      <HerSheetB character={character} isOpen={pickingAchievements} onOpenChange={setPickingAchievements} container={subtree} />
       <PastConversations
         isOpen={pickingPast}
         onOpenChange={setPickingPast}

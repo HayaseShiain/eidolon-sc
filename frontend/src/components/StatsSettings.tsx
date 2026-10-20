@@ -36,6 +36,8 @@ import {
 } from "@/lib/stats";
 import { cn } from "@/lib/utils";
 import { herVars } from "@/theme/herVars";
+// PROTOTYPE（daily-tasks-and-achievements 票 09）
+import { StatsBlockC } from "@/components/prototype-achievements/AchievementsPrototype";
 
 const t = copy.settings.stats;
 
@@ -120,6 +122,7 @@ export function StatsSettings() {
     >
       <div className="flex flex-col gap-8">
         {shareFailure && <FailureNotice failure={shareFailure} />}
+        <StatsBlockC />
         <div className="flex flex-col gap-4">
           {shown.portrait && <p className="text-header">{portrait(stats.all_hours)}</p>}
           <dl className="grid grid-cols-3 gap-3">

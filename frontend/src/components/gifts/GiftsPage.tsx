@@ -40,6 +40,8 @@ import {
 } from "@/lib/gifts";
 import { cn } from "@/lib/utils";
 import { CloseIcon, DrawIcon, GiftIcon } from "@/theme/icons";
+// PROTOTYPE（daily-tasks-and-achievements 票 09）
+import { GiftsPageBits, useAchievementDraws } from "@/components/prototype-achievements/AchievementsPrototype";
 
 const t = copy.gifts;
 
@@ -72,6 +74,7 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
   const timeZone = useProducerTimezone();
   const { characters, latest, preferences, go, refresh } = useDirectory();
   const router = useRouter();
+  const bonus = useAchievementDraws();
   // 点过 ✕ 的预选：地址换掉以前（重新渲染要等一下）就不再显示。地址换回 /gifts 以后忘掉，
   // 这一页没卸下又从结束卡带着她跳来时（通话层由外壳画在礼物页上）照样预选。
   const [dropped, setDropped] = useState<string | null>(null);
@@ -194,12 +197,13 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
               />
             )}
             <DrawDesk
-              draws={state.draws}
+              draws={state.draws + bonus}
               max={state.max_draws}
               next={nextDraw}
               isDrawing={drawing !== null}
               onDraw={draw}
             />
+            <GiftsPageBits />
             {state.reset_cards > 0 && (
               <ResetCards
                 count={state.reset_cards}
@@ -318,6 +322,7 @@ function DrawDesk({
           {Array.from({ length: max }, (_, i) => (
             <span key={i} className={cn("size-2 rounded-full", i < draws ? "bg-foreground" : "bg-foreground/15")} />
           ))}
+          {draws > max && <span className="-mt-1.5 text-meta leading-none text-muted-foreground tabular-nums">+{draws - max}</span>}
         </span>
         <p className="text-subtitle text-muted-foreground">{drawNote(draws, max, next)}</p>
       </div>

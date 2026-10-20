@@ -11,6 +11,8 @@ import { hasUnseen } from "@/lib/conversationList";
 import { currentNavItem, FIRST_LEVEL, isTyping, NAV_ITEMS, navDestination, type NavItem } from "@/lib/navShell";
 import { REPOSITORY_URL } from "@/lib/repository";
 import { cn } from "@/lib/utils";
+// PROTOTYPE（daily-tasks-and-achievements 票 09）
+import { GiftsNavDot } from "@/components/prototype-achievements/AchievementsPrototype";
 import { ConversationsIcon, GiftIcon, GitHubIcon, SettingsIcon } from "@/theme/icons";
 
 const ICONS: Record<NavItem, typeof SettingsIcon> = {
@@ -110,6 +112,7 @@ function NavLinks({ className }: { className: string }) {
           {item === "conversations" && unseen && (
             <span aria-hidden className="absolute top-1 right-2.5 size-1.5 rounded-full bg-foreground" />
           )}
+          {item === "gifts" && <GiftsNavDot />}
         </span>
         <span className={isCurrent ? "font-medium text-foreground" : "text-muted-foreground"}>{copy.nav[item]}</span>
       </NextLink>
