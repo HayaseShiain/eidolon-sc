@@ -4,6 +4,7 @@
 // each turn leaves it, and the photos she sent as they come out, kept outside React so the page
 // only renders a snapshot and passes on clicks.
 
+import { turn as dailyTasksTurn } from "@/components/prototype-daily-tasks/store";
 import type { AffinityChange, AffinityStatus } from "@/lib/affinity";
 import {
   ApiError,
@@ -716,6 +717,7 @@ export class LiveConversation {
     else this.update({ ...change, log });
     // Recorded: the list's line for her now ends with it, even if the page has been left.
     if (event.type === "done") {
+      dailyTasksTurn(); // PROTOTYPE（daily-tasks-and-achievements 票 04）
       this.ports.onListChanged();
       this.affinityLeft(event.affinity, event.message.affinity);
     }

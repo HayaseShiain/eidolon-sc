@@ -101,3 +101,6 @@ export { Camera as PhotoIcon, CameraOff as PhotosUsedUpIcon, ImageOff as PhotoFa
 
 // 导航栏底部（电脑）的 GitHub 仓库链接；品牌标志 Lucide 不收，是 The Library Icon Rule 的例外。
 export { GitHubIcon } from "./GitHubIcon";
+
+// PROTOTYPE（daily-tasks-and-achievements 票 04）：每日任务。
+export { Circle as TaskOpenIcon, ListChecks as DailyTasksIcon } from "lucide-react";

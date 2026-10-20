@@ -13,6 +13,8 @@ import type { Character } from "@/lib/api";
 import { NOT_OPEN, type LiveConversation } from "@/lib/liveConversation";
 import { showsShellCallBar } from "@/lib/navShell";
 import { herVars } from "@/theme/herVars";
+// PROTOTYPE（daily-tasks-and-achievements 票 04）
+import { DailyTasksPrototypeBits, DoneToast } from "@/components/prototype-daily-tasks/DailyTasksPrototype";
 
 const notOpen = () => NOT_OPEN;
 const noSubscription = () => () => {};
@@ -60,9 +62,11 @@ export function NavShell({ children }: { children: ReactNode }) {
             {children}
           </div>
           {character && held && <HeldLayer live={held} character={character} layerRef={focus.layer} />}
+          <DoneToast isCovered={isLayerOpen} />
         </div>
       </div>
       <NavDock isInert={isLayerOpen} />
+      <DailyTasksPrototypeBits />
     </div>
   );
 }

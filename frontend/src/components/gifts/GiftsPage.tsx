@@ -40,6 +40,9 @@ import {
 } from "@/lib/gifts";
 import { cn } from "@/lib/utils";
 import { CloseIcon, DrawIcon, GiftIcon } from "@/theme/icons";
+// PROTOTYPE（daily-tasks-and-achievements 票 04）
+import { TasksButton, TasksSection, useBonusDraws } from "@/components/prototype-daily-tasks/DailyTasksPrototype";
+import { gave } from "@/components/prototype-daily-tasks/store";
 
 const t = copy.gifts;
 
@@ -72,6 +75,7 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
   const timeZone = useProducerTimezone();
   const { characters, latest, preferences, go, refresh } = useDirectory();
   const router = useRouter();
+  const bonus = useBonusDraws();
   // 点过 ✕ 的预选：地址换掉以前（重新渲染要等一下）就不再显示。地址换回 /gifts 以后忘掉，
   // 这一页没卸下又从结束卡带着她跳来时（通话层由外壳画在礼物页上）照样预选。
   const [dropped, setDropped] = useState<string | null>(null);
@@ -141,6 +145,7 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
     setSending(true);
     try {
       const given = await giveGift(to.id, giving.gift.id);
+      gave();
       setGiveOpen(false);
       setState((s) => s && afterGiving(s, giving.gift.id, to.id, given));
       setNotice({
@@ -175,7 +180,12 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
   const nextDraw = state?.next_draw_at ? nextDrawText(state.next_draw_at, new Date(), timeZone) : "";
 
   return (
-    <PageShell width="full" isInShell header={<h1 className="text-list-title">{t.title}</h1>}>
+    <PageShell width="full" isInShell header={
+        <div className="flex items-center gap-2">
+          <h1 className="flex-1 text-list-title">{t.title}</h1>
+          <TasksButton />
+        </div>
+      }>
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-6">
         {failure && <FailureNotice failure={failure} />}
         {state === null || catalog === null ? (
@@ -194,12 +204,13 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
               />
             )}
             <DrawDesk
-              draws={state.draws}
+              draws={state.draws + bonus}
               max={state.max_draws}
               next={nextDraw}
               isDrawing={drawing !== null}
               onDraw={draw}
             />
+            <TasksSection hasGifts={state.backpack.length > 0} />
             {state.reset_cards > 0 && (
               <ResetCards
                 count={state.reset_cards}
@@ -318,6 +329,7 @@ function DrawDesk({
           {Array.from({ length: max }, (_, i) => (
             <span key={i} className={cn("size-2 rounded-full", i < draws ? "bg-foreground" : "bg-foreground/15")} />
           ))}
+          {draws > max && <span className="-mt-1.5 text-meta leading-none text-muted-foreground tabular-nums">+{draws - max}</span>}
         </span>
         <p className="text-subtitle text-muted-foreground">{drawNote(draws, max, next)}</p>
       </div>

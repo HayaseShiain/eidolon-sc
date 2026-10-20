@@ -23,6 +23,8 @@ import { ServiceStatusButton } from "./ServiceStatusButton";
 import { useDirectory, type CallInList } from "./ConversationDirectory";
 import { ListFilter } from "./ListFilter";
 import { useCallTime } from "./useCallTime";
+// PROTOTYPE（daily-tasks-and-achievements 票 04）
+import { TasksButton, TasksStrip } from "@/components/prototype-daily-tasks/DailyTasksPrototype";
 
 const t = copy.conversationList;
 
@@ -49,6 +51,7 @@ export function ConversationList({ selectedId }: { selectedId: string | null }) 
       <header className="flex shrink-0 items-center gap-2 pt-3 pr-2 pb-2 pl-4">
         <h1 className="flex-1 text-list-title">{t.title}</h1>
         <ServiceStatusButton />
+        <TasksButton />
         <Announcements userId={account?.id ?? null} />
       </header>
 
@@ -66,6 +69,7 @@ export function ConversationList({ selectedId }: { selectedId: string | null }) 
         </label>
         <ListFilter isOpen={isFilterOpen} onOpenChange={setFilterOpen} hiddenCount={hiddenCount} />
       </div>
+      <TasksStrip />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {failure ? (
