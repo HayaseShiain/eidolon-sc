@@ -66,6 +66,9 @@ export { ArrowDown as SortedIcon, ArrowUpDown as SortableIcon } from "lucide-rea
 // 通话层右上角的「只看文字」胶囊。
 export { Captions as TextOnlyIcon } from "lucide-react";
 
+// 原型：通话层底栏的「打字」键。
+export { Keyboard as TypeIcon } from "lucide-react";
+
 // 导航栏（电脑）和 dock（手机）的三项。
 export { Gift as GiftIcon, MessageCircle as ConversationsIcon, Settings as SettingsIcon } from "lucide-react";
 

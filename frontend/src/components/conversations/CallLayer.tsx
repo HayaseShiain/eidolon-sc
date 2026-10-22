@@ -35,6 +35,7 @@ import {
 import type { StandDirection } from "@/lib/standAnimations";
 import { cn } from "@/lib/utils";
 import {
+  CloseIcon,
   CollapseIcon,
   GiftIcon,
   HangUpIcon,
@@ -44,7 +45,9 @@ import {
   PhoneIcon,
   PhotoFailedIcon,
   PhotoIcon,
+  SendIcon,
   TextOnlyIcon,
+  TypeIcon,
 } from "@/theme/icons";
 import { Ja } from "@/theme/Ja";
 
@@ -100,7 +103,61 @@ type Props = {
   onGift: () => void;
   /** 这个部署的免限额密钥：超限的结束卡点名它们；账号还没读到时为 null。 */
   exemptingKeys: readonly OwnService[] | null;
+  /** PROTOTYPE（prototype/call-typing）：通话层里打字。没有时和原来一样。 */
+  typing?: ProtoTyping;
 };
+
+/**
+ * PROTOTYPE：通话层里打字的状态。`keyboard` 是在比的键盘处理办法：
+ * - A：什么都不做（浏览器默认）。
+ * - B：整层缩到键盘上方（页面的 viewport 带 interactive-widget=resizes-content，由原型页给）。
+ * - C：键盘盖在内容上（VirtualKeyboard API 的 overlaysContent，没有时退到 visualViewport），
+ *   只把台词卡和输入栏抬到键盘上方，立绘原地不动。
+ * - D：同 B，打字时手机上的立绘取景从到膝换成到腰，脸大一些。
+ */
+export type ProtoTyping = {
+  keyboard: "A" | "B" | "C" | "D";
+  open: boolean;
+  draft: string;
+  /** 刚发出去、她还没开口的那句。 */
+  sent: string | null;
+  onOpen: () => void;
+  onClose: () => void;
+  onDraft: (draft: string) => void;
+  onSend: () => void;
+};
+
+/** PROTOTYPE：键盘盖住了底部多高（办法 C）；没开或者不是 C 时为 0。 */
+function useKeyboardInset(isOn: boolean): number {
+  const [inset, setInset] = useState(0);
+  useEffect(() => {
+    if (!isOn) return;
+    const vk = (navigator as Navigator & { virtualKeyboard?: VirtualKeyboardLike }).virtualKeyboard;
+    if (vk) {
+      vk.overlaysContent = true;
+      const onChange = () => setInset(vk.boundingRect.height);
+      vk.addEventListener("geometrychange", onChange);
+      return () => {
+        vk.removeEventListener("geometrychange", onChange);
+        vk.overlaysContent = false;
+        setInset(0);
+      };
+    }
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onChange = () => setInset(Math.max(0, window.innerHeight - vv.height - vv.offsetTop));
+    vv.addEventListener("resize", onChange);
+    vv.addEventListener("scroll", onChange);
+    return () => {
+      vv.removeEventListener("resize", onChange);
+      vv.removeEventListener("scroll", onChange);
+      setInset(0);
+    };
+  }, [isOn]);
+  return inset;
+}
+
+type VirtualKeyboardLike = EventTarget & { overlaysContent: boolean; boundingRect: DOMRect };
 
 const notOpen = () => NOT_OPEN;
 
@@ -183,6 +240,8 @@ export function CallLayer(props: Props) {
   const { character, call, isCollapsed, isFullScreen, isReducedMotion, layerRef } = props;
   const ended = call.phase === "ended";
   const hasStand = Boolean(character.stand);
+  const typingOpen = Boolean(props.typing?.open) && !ended;
+  const keyboardInset = useKeyboardInset(typingOpen && props.typing?.keyboard === "C");
 
   // Esc 收起（结束页上是回到对话）；按键时取最新的回调。
   const onEscape = useRef(() => {});
@@ -216,6 +275,8 @@ export function CallLayer(props: Props) {
           : "transition-[translate,visibility] duration-410 ease-call starting:translate-y-full",
         isCollapsed ? "invisible translate-y-full" : "translate-y-0",
       )}
+      // PROTOTYPE 办法 C：底部让出键盘的高度；立绘绝对定位到底边（含 padding），不跟着动。
+      style={keyboardInset ? { paddingBottom: keyboardInset } : undefined}
     >
       <Backdrop character={character} />
       {hasStand && <StandStage {...props} />}
@@ -296,7 +357,11 @@ export function CallLayer(props: Props) {
         )}
       </div>
 
-      {!ended && <Dock {...props} isConnected={call.phase === "connected"} />}
+      {typingOpen && props.typing ? (
+        <TypingBar typing={props.typing} />
+      ) : (
+        !ended && <Dock {...props} isConnected={call.phase === "connected"} />
+      )}
     </section>
   );
 }
@@ -349,7 +414,7 @@ function StandStage(props: Props) {
           // 每拨一次重新载入：上一通失败了，这一通再试一次（通话状态带着这是第几次拨号）。
           key={call.dial}
           outfits={standOutfits}
-          framing={isFullScreen ? "knees" : "waist"}
+          framing={isFullScreen && !(props.typing?.open && props.typing.keyboard === "D") ? "knees" : "waist"}
           isPaused={isCollapsed}
           entrance={isFullScreen && !isReducedMotion ? "rise" : "fade"}
           direction={standDirection}
@@ -430,7 +495,7 @@ function Ripple({ isOn, children }: { isOn: boolean; children: ReactNode }) {
  * 台词卡：她当前这句的日语原文在上、字幕在下；「只看文字」开着时上一句以 45% 不透明度留在上面。
  * 她还没开口时是一句提示。用户正在说、还没定稿的话放在最下面。
  */
-function LineCard({ line, previousLine, hearing, textOnly }: Props) {
+function LineCard({ line, previousLine, hearing, textOnly, typing }: Props) {
   return (
     <div className="w-full max-w-[34em] rounded-3xl bg-white/12 px-5 py-4 text-center text-balance backdrop-blur-md">
       <div aria-live="polite">
@@ -450,10 +515,12 @@ function LineCard({ line, previousLine, hearing, textOnly }: Props) {
             {line.zh && <p className="mt-1 text-sm text-white/80">{line.zh}</p>}
           </>
         ) : (
-          <p className="text-sm text-white/80">{textOnly ? t.repliesInText : t.speakFreely}</p>
+          !typing?.sent && <p className="text-sm text-white/80">{textOnly ? t.repliesInText : t.speakFreely}</p>
         )}
       </div>
       {hearing && <p className="mt-3 text-sm text-white/80">{t.hearing(hearing)}</p>}
+      {/* PROTOTYPE：刚打出去的话，她开口前留在卡底 */}
+      {!hearing && typing?.sent && <p className="mt-3 text-sm text-white/80">你：{typing.sent}</p>}
     </div>
   );
 }
@@ -583,7 +650,14 @@ function Ended({
  * 底栏：一条毛玻璃胶囊。静音、切换麦克风是 56px 圆形图标键（静音按下时白底黑图标），
  * 挂断是带「挂断」二字的挂断红胶囊。呼叫中静音和切换麦克风置灰，只能挂断。
  */
-function Dock({ isConnected, micMuted, onToggleMic, onHangUp, onSwitchMic }: Props & { isConnected: boolean }) {
+function Dock({
+  isConnected,
+  micMuted,
+  onToggleMic,
+  onHangUp,
+  onSwitchMic,
+  typing,
+}: Props & { isConnected: boolean }) {
   return (
     <footer className="relative flex justify-center px-4 pt-2 pb-8">
       <div className="flex items-center gap-2 rounded-full bg-white/12 p-2 backdrop-blur-md">
@@ -595,11 +669,72 @@ function Dock({ isConnected, micMuted, onToggleMic, onHangUp, onSwitchMic }: Pro
           onClick={onToggleMic}
         />
         <RoundKey label={t.switchMic} icon={MicSwitchIcon} isDisabled={!isConnected} onClick={onSwitchMic} />
+        {typing && <RoundKey label="打字" icon={TypeIcon} isDisabled={!isConnected} onClick={typing.onOpen} />}
         <Button variant="hangup" size="call-dock" onClick={onHangUp} className="ml-2">
           <HangUpIcon aria-hidden />
           {t.hangUp}
         </Button>
       </div>
+    </footer>
+  );
+}
+
+/**
+ * PROTOTYPE：打字时底栏换成的输入栏：收起键盘（✕）、输入框、白底发送键，同一条毛玻璃胶囊。
+ * 回车发送、Shift+回车换行，输入法选字时的回车不算；Esc 回到底栏（不收起通话层）。
+ * 发送键按下时不抢焦点，键盘不收。
+ */
+function TypingBar({ typing }: { typing: ProtoTyping }) {
+  const canSend = typing.draft.trim() !== "";
+  return (
+    <footer className="relative flex justify-center px-4 pt-2 pb-3">
+      <form
+        className="flex w-full max-w-[34em] items-end gap-1.5 rounded-[28px] bg-white/12 p-1.5 backdrop-blur-md"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (canSend) typing.onSend();
+        }}
+      >
+        <Button
+          type="button"
+          variant="call-round"
+          size="icon-lg"
+          className="size-11 shrink-0"
+          aria-label="回到按键"
+          onClick={typing.onClose}
+        >
+          <CloseIcon aria-hidden className="size-5" />
+        </Button>
+        <textarea
+          autoFocus
+          rows={1}
+          value={typing.draft}
+          onChange={(e) => typing.onDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              if (canSend) typing.onSend();
+            } else if (e.key === "Escape") {
+              e.preventDefault();
+              typing.onClose();
+            }
+          }}
+          placeholder="打字和她说"
+          aria-label="打字和她说"
+          className="max-h-32 min-h-11 flex-1 resize-none rounded-[22px] bg-white/15 px-4 py-2.5 text-body leading-6 text-white outline-none field-sizing-content placeholder:text-white/60 focus-visible:ring-3 focus-visible:ring-white/60"
+        />
+        <Button
+          type="submit"
+          variant="call-solid"
+          size="icon-lg"
+          className="size-11 shrink-0"
+          aria-label="发送"
+          disabled={!canSend}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          <SendIcon aria-hidden className="size-5" />
+        </Button>
+      </form>
     </footer>
   );
 }
