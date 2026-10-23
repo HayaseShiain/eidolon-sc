@@ -432,28 +432,28 @@ function WeekHeader({ s, end }: { s: Schedule; end?: ReactNode }) {
   );
 }
 
-function JobLine({ job, className, withAvatar }: { job: Job; className?: string; withAvatar?: boolean }) {
+/** 一项工作的一行：头像、名字、类别图标、工作名。谁的工作由头像说，不靠颜色。 */
+function JobLine({ job, className }: { job: Job; className?: string }) {
   const Icon = CAT_ICON[job.cat];
   const look = useLook(job.idol);
   return (
     <span className={cn("flex min-w-0 items-center gap-1.5", className)}>
-      {withAvatar && (
-        <span className="shrink-0 max-md:hidden">
-          <MarkedAvatar name={look.full} src={look.avatar} size="sm" />
-        </span>
-      )}
-      <Icon aria-label={job.cat} className="size-3.5 shrink-0" />
+      <MarkedAvatar name={look.full} src={look.avatar} size="sm" />
       <span className="shrink-0 font-medium">{job.idol}</span>
+      <Icon aria-label={job.cat} className="size-3.5 shrink-0 text-muted-foreground" />
       <span className="truncate">{job.name}</span>
     </span>
   );
 }
 
-/** 格子里的一项：保存过的实底带锁，草稿虚线；草稿已经开始（保存不了）的标出来。 */
+/**
+ * 格子里的一项。保存过的铺她的壁纸色（这一格归她了），草稿只有一圈中性虚线、不上色；
+ * 正在进行的外面一圈她的记号色（同统计页头像外那一圈）；做完的淡下去。是谁看头像。
+ */
 function Block({ s, p, isSaved, onClick, isDim }: { s: Schedule; p: Placement; isSaved: boolean; onClick?: () => void; isDim?: boolean }) {
   const job = jobOf(s.week, p.jobId);
+  const Icon = CAT_ICON[job.cat];
   const isStarted = !isSaved && s.hasStarted(s.week, p);
-  const t = timeOf(s.store.now, s.week, p.day, p.slot);
   const isDone = isSaved && cellsOf(s.week, p).every((c) => timeOf(s.store.now, s.week, c.day, c.slot) === "past");
   const isNow = isSaved && cellsOf(s.week, p).some((c) => timeOf(s.store.now, s.week, c.day, c.slot) === "now");
   const look = useLook(job.idol);
@@ -462,20 +462,30 @@ function Block({ s, p, isSaved, onClick, isDim }: { s: Schedule; p: Placement; i
       type="button"
       onClick={onClick}
       style={{ ...look.style, gridColumn: `${p.slot + 2} / span ${job.len}` }}
+      aria-label={`${look.full} ${job.name}${isSaved ? "，已保存" : "，草稿"}${isDone ? "，做完了" : ""}`}
       className={cn(
-        "flex min-h-14 min-w-0 flex-col items-start justify-center gap-0.5 rounded-md px-2 py-1 text-left text-meta outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-        isSaved ? "border-l-4 border-l-her-mark bg-her-wall" : "border-2 border-dashed border-her-mark bg-background",
-        isStarted && "border-destructive text-destructive",
-        isDone && "opacity-60",
-        isNow && "ring-2 ring-foreground",
+        "flex min-h-16 min-w-0 flex-col justify-center gap-1 rounded-lg px-2 py-1.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        isSaved ? "bg-her-wall" : "border border-dashed border-foreground/40 bg-background",
+        isStarted && "border-destructive",
+        isNow && "ring-2 ring-her-mark ring-offset-2 ring-offset-background",
+        isDone && "opacity-55",
         isDim && "opacity-40",
       )}
     >
-      <JobLine job={job} className="w-full" withAvatar />
-      <span className="flex items-center gap-1 text-muted-foreground">
-        {isSaved && <LockedIcon aria-label="已保存" className="size-3" />}
-        {isStarted ? "已经开始，保存不了" : isDone ? "做完了" : isNow ? "正在进行" : isSaved ? "" : t === "future" ? "草稿" : ""}
+      <span className="flex min-w-0 items-center gap-1.5">
+        <MarkedAvatar name={look.full} src={look.avatar} size="sm" />
+        <span className="truncate text-subtitle font-medium">{job.idol}</span>
+        {isSaved && <LockedIcon aria-hidden className="ml-auto size-3 shrink-0 text-muted-foreground" />}
       </span>
+      <span className="flex min-w-0 items-center gap-1 text-meta text-muted-foreground">
+        <Icon aria-hidden className="size-3 shrink-0" />
+        <span className="truncate">{job.name}</span>
+      </span>
+      {(isStarted || isNow) && (
+        <span className={cn("text-meta", isStarted ? "text-destructive" : "text-foreground")}>
+          {isStarted ? "开始了，存不了" : "进行中"}
+        </span>
+      )}
     </button>
   );
 }
@@ -528,7 +538,7 @@ function WeekGrid({
             cells.push(
               <span
                 key={slot}
-                className="flex min-h-14 items-center justify-center rounded-md bg-muted/40 text-meta text-muted-foreground"
+                className="flex min-h-16 items-center justify-center rounded-lg bg-muted/40 text-meta text-muted-foreground"
               >
                 {t === "now" ? "进行中" : "已过"}
               </span>,
@@ -543,8 +553,8 @@ function WeekGrid({
                 aria-label={`${dayLabel(w, day)} ${SLOTS[slot].name}`}
                 style={lit === true ? litStyle : undefined}
                 className={cn(
-                  "flex min-h-14 items-center justify-center rounded-md border text-muted-foreground outline-none hover:bg-muted/60 focus-visible:ring-3 focus-visible:ring-ring/50",
-                  lit === true && "border-2 border-her-mark bg-her-wall text-foreground",
+                  "flex min-h-16 items-center justify-center rounded-lg border text-muted-foreground outline-none hover:bg-muted/60 focus-visible:ring-3 focus-visible:ring-ring/50",
+                  lit === true && "border-her-mark bg-her-wall text-foreground",
                   lit === false && "opacity-30",
                 )}
               >
@@ -611,7 +621,7 @@ function PendingList({
   const idols = [...new Set(WEEK_JOBS[s.week].map((j) => j.idol))];
   if (jobs.length === 0) return <p className="text-body text-muted-foreground">这周的工作都排进去了。</p>;
   return (
-    <ul className="flex flex-col gap-3">
+    <ul className="flex flex-col gap-4">
       {idols.map((idol) => {
         const mine = jobs.filter((j) => j.idol === idol);
         if (mine.length === 0) return null;
@@ -624,9 +634,9 @@ function PendingList({
                 tabIndex={onJob ? 0 : undefined}
                 onClick={() => onJob?.(job)}
                 className={cn(
-                  "flex items-center gap-2 rounded-md border border-l-4 border-l-her-mark px-3 py-2 text-body",
+                  "flex items-center gap-2 rounded-lg px-2 py-2 text-body",
                   onJob && "cursor-pointer hover:bg-muted/60",
-                  selected === job.id && "bg-her-wall",
+                  selected === job.id && "bg-muted hover:bg-muted",
                 )}
               >
                 <JobRow job={job} />
@@ -643,23 +653,29 @@ function PendingList({
 function PendingGroup({ idol, children }: { idol: string; children: ReactNode }) {
   const look = useLook(idol);
   return (
-    <li style={look.style} className="flex flex-col gap-1">
-      <span className="flex items-center gap-2 text-subtitle">
+    <li className="flex flex-col gap-0.5">
+      <span className="flex items-center gap-2 py-1 text-subtitle font-medium">
         <MarkedAvatar name={look.full} src={look.avatar} size="sm" />
         {look.full}
       </span>
-      {children}
+      <div className="flex flex-col pl-6">{children}</div>
     </li>
   );
 }
 
-function JobRow({ job, reason }: { job: Job; reason?: string | null }) {
+function IdolAvatar({ idol, size = "sm" }: { idol: string; size?: "sm" | "bubble" }) {
+  const look = useLook(idol);
+  return <MarkedAvatar name={look.full} src={look.avatar} size={size} />;
+}
+
+function JobRow({ job, reason, withIdol }: { job: Job; reason?: string | null; withIdol?: boolean }) {
   const Icon = CAT_ICON[job.cat];
   return (
     <span className="flex min-w-0 flex-1 flex-col">
       <span className="flex items-center gap-2">
-        <Icon aria-label={job.cat} className="size-4 shrink-0" />
-        <span className="font-medium">{job.name}</span>
+        {withIdol && <span className="shrink-0 font-medium">{job.idol}</span>}
+        <Icon aria-label={job.cat} className="size-4 shrink-0 text-muted-foreground" />
+        <span className={cn(!withIdol && "font-medium")}>{job.name}</span>
         <span className="text-meta text-muted-foreground">
           {job.len === 3 ? "全天" : `${job.len} 段`}
           {job.only && ` · 只排${job.only.map((x) => SLOTS[x].name).join("、")}`}
@@ -739,13 +755,16 @@ function BlockDrawer({ s, open, onClose }: { s: Schedule; open: { p: Placement; 
       <DrawerContent>
         {open && job && (
           <>
-            <DrawerHeader>
-              <DrawerTitle>
-                {job.idol} · {job.name}
-              </DrawerTitle>
-              <DrawerDescription>
-                {dayLabel(s.week, open.p.day)} {slotRange(job, open.p.slot)}
-              </DrawerDescription>
+            <DrawerHeader className="flex-row items-center gap-3">
+              <IdolAvatar idol={job.idol} size="bubble" />
+              <span className="flex flex-col gap-0.5 text-left">
+                <DrawerTitle>
+                  {job.idol} · {job.name}
+                </DrawerTitle>
+                <DrawerDescription>
+                  {dayLabel(s.week, open.p.day)} {slotRange(job, open.p.slot)}
+                </DrawerDescription>
+              </span>
             </DrawerHeader>
             <div className="flex flex-col gap-3 px-4 pb-6">
               <p className="text-body">{job.note}</p>
@@ -805,8 +824,8 @@ function CellDrawer({ s, cell, onClose }: { s: Schedule; cell: { day: number; sl
                     }}
                     className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left text-body hover:bg-muted/60 disabled:opacity-40"
                   >
-                    <span className="w-14 shrink-0 text-subtitle text-muted-foreground">{job.idol}</span>
-                    <JobRow job={job} reason={reason} />
+                    <IdolAvatar idol={job.idol} />
+                    <JobRow job={job} reason={reason} withIdol />
                   </button>
                 </li>
               ))}
@@ -863,10 +882,9 @@ function SchemeB({ s }: { s: Schedule }) {
               key={j.id}
               type="button"
               onClick={() => setSelected(selected === j.id ? null : j.id)}
-              style={looks(j.idol).style}
               className={cn(
-                "flex shrink-0 flex-col items-start rounded-md border border-l-4 border-l-her-mark px-3 py-1.5 text-meta",
-                selected === j.id && "bg-her-wall",
+                "flex shrink-0 flex-col items-start gap-0.5 rounded-lg border px-3 py-1.5 text-meta",
+                selected === j.id && "bg-muted",
               )}
             >
               <JobLine job={j} />
@@ -986,11 +1004,14 @@ function SlotsDrawer({ s, job, onClose }: { s: Schedule; job: Job | null; onClos
       <DrawerContent>
         {job && (
           <>
-            <DrawerHeader>
-              <DrawerTitle>
-                {job.idol} · {job.name} 排到…
-              </DrawerTitle>
-              <DrawerDescription>{job.note}</DrawerDescription>
+            <DrawerHeader className="flex-row items-center gap-3">
+              <IdolAvatar idol={job.idol} size="bubble" />
+              <span className="flex flex-col gap-0.5 text-left">
+                <DrawerTitle>
+                  {job.idol} · {job.name} 排到…
+                </DrawerTitle>
+                <DrawerDescription>{job.note}</DrawerDescription>
+              </span>
             </DrawerHeader>
             <ul className="flex flex-col gap-1 overflow-y-auto px-4 pb-6">
               {starts.length === 0 && <li className="text-body text-muted-foreground">这周没有能放下它的时间段了。</li>}
@@ -1129,7 +1150,14 @@ function eventsOn(s: Schedule, date: Date): DayEvent[] {
 }
 
 function EventIcon({ e, className }: { e: DayEvent; className?: string }) {
-  const Icon = e.kind === "holiday" ? HolidayIcon : e.kind === "schedule" ? CAT_ICON[e.job!.cat] : BirthdayIcon;
+  if (e.kind === "schedule")
+    return (
+      <span
+        aria-hidden
+        className={cn("size-2 shrink-0 rounded-full", e.isSaved ? "bg-her-mark" : "border border-her-mark", className && "size-2.5")}
+      />
+    );
+  const Icon = e.kind === "holiday" ? HolidayIcon : BirthdayIcon;
   return <Icon aria-hidden className={cn("size-3 shrink-0", e.kind === "birthday" && "text-her-mark", className)} />;
 }
 
@@ -1281,8 +1309,8 @@ function MonthView({
                       "flex items-center gap-1 truncate rounded px-1 text-meta",
                       e.kind === "schedule"
                         ? e.isSaved
-                          ? "border-l-2 border-l-her-mark bg-her-wall"
-                          : "border border-dashed border-her-mark"
+                          ? "bg-her-wall"
+                          : "border border-dashed border-foreground/40"
                         : "text-muted-foreground",
                     )}
                   >
