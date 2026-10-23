@@ -122,7 +122,7 @@ export function PlayPrototype({ pick }: { pick: GiftsFor | null }) {
       {col === "calendar" ? (
         <PrototypeSwitcher
           variants={CAL_VARIANTS}
-          current={params.get("cal") ?? "A"}
+          current={params.get("cal") ?? "D"}
           onChange={(key) => router.replace(href({ cal: key }), { scroll: false })}
         />
       ) : (
@@ -177,7 +177,7 @@ function ColumnPage({
 /** 票 07：日历子页换成日历和排日程的原型；SubpageHeader 的右端放月 / 周切换，页底放保存条。 */
 function CalendarColumn({ header, above }: { header: ReactNode; above?: ReactNode }) {
   const params = useSearchParams();
-  const cal = params.get("cal") ?? "A";
+  const cal = params.get("cal") ?? "D";
   return (
     <CalendarPrototype
       key={cal}

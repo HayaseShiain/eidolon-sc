@@ -10,7 +10,10 @@
 // C 月历为主：默认月视图，点一天在下面看这天的三个时间段，从那里排；周视图是一列一列的日程表，不是格子；
 //   待排的每一项有「排到…」，列出能放的时间段。
 
-import { useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type CSSProperties, type ReactNode } from "react";
+
+import { MarkedAvatar } from "@/components/app/MarkedAvatar";
+import { useDirectory } from "@/components/conversations/ConversationDirectory";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
+import { herVars } from "@/theme/herVars";
 import {
   AppearanceJobIcon,
   BackIcon,
@@ -48,6 +52,7 @@ import {
 } from "@/theme/icons";
 
 export const CAL_VARIANTS = [
+  { key: "D", name: "定稿：电脑 B、手机 A" },
   { key: "A", name: "点格子挑工作" },
   { key: "B", name: "先挑工作再放" },
   { key: "C", name: "月历为主，按天排" },
@@ -151,6 +156,44 @@ const cellsOf = (week: number, p: Placement) =>
   Array.from({ length: jobOf(week, p.jobId).len }, (_, k) => ({ day: p.day, slot: (p.slot + k) as Slot }));
 const slotRange = (job: Job, slot: Slot) =>
   job.len === 3 ? "全天" : job.len === 2 ? `${SLOTS[slot].name}和${SLOTS[slot + 1].name}` : SLOTS[slot].name;
+
+// ─── 她的颜色和头像 ─────────────────────────────────────────────────────────
+// 每一项单独注入一次 herVars(官方色)，用 her-wall 当底、her-mark 当竖条和圆点（同统计页的排行）。
+// 正式版要先改 DESIGN.md 的 The Her-Colour-Only-Here Rule，把日历加进去。
+
+/** 短名（工作里写的）和全名（生日里写的）→ 角色 id。 */
+const CID: Record<string, string> = {
+  真乃: "mano", 灯織: "hiori", めぐる: "meguru", 恋鐘: "kogane", 甜花: "tenka", 甘奈: "amana", あさひ: "asahi",
+  凛世: "rinze", 夏葉: "natsuha", 智代子: "chiyoko", 果穂: "kaho", 霧子: "kiriko", 透: "toru", 円香: "madoka",
+  緋田美琴: "mikoto", 幽谷霧子: "kiriko", 鈴木羽那: "hana", 杜野凛世: "rinze", 樋口円香: "madoka", 福丸小糸: "koito",
+  西城樹里: "juri", 黛冬優子: "fuyuko", 大崎甜花: "tenka", 大崎甘奈: "amana",
+};
+type Look = { style: CSSProperties | undefined; avatar: string | null; full: string };
+const LooksContext = createContext<(name: string) => Look>((name) => ({ style: undefined, avatar: null, full: name }));
+const useLook = (name: string) => useContext(LooksContext)(name);
+const useLooks = () => useContext(LooksContext);
+
+function LooksProvider({ children }: { children: ReactNode }) {
+  const { characters } = useDirectory();
+  const look = (name: string): Look => {
+    const c = characters?.find((x) => x.id === CID[name]);
+    return c ? { style: herVars(c.color), avatar: c.avatar_url, full: c.name } : { style: undefined, avatar: null, full: name };
+  };
+  return <LooksContext.Provider value={look}>{children}</LooksContext.Provider>;
+}
+
+/** 屏宽到 md（768px）没有。 */
+function useIsWide() {
+  const [isWide, setWide] = useState(true);
+  useEffect(() => {
+    const q = window.matchMedia("(min-width: 768px)");
+    setWide(q.matches);
+    const on = () => setWide(q.matches);
+    q.addEventListener("change", on);
+    return () => q.removeEventListener("change", on);
+  }, []);
+  return isWide;
+}
 
 // ─── 状态 ──────────────────────────────────────────────────────────────────
 
@@ -288,7 +331,10 @@ export function CalendarPrototype({
   );
   let body: ReactNode;
   let footer: ReactNode = null;
-  if (variant === "B") {
+  if (variant === "D") {
+    body = view === "month" ? month_ : <SchemeD s={s} />;
+    footer = <SaveBar s={s} mode="before" />;
+  } else if (variant === "B") {
     body = view === "month" ? month_ : <SchemeB s={s} />;
     footer = <SaveBar s={s} mode="after" />;
   } else if (variant === "C") {
@@ -300,13 +346,15 @@ export function CalendarPrototype({
   }
   return frame(
     viewToggle,
+    <LooksProvider>
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 py-4 pb-40">
       <SimPanel s={s} />
       {s.notice && <Notice text={s.notice} onDismiss={() => s.setNotice(null)} />}
       {body}
-      <ChatPreview s={s} />
-    </div>,
-    footer,
+      {variant !== "D" && <ChatPreview s={s} />}
+    </div>
+    </LooksProvider>,
+    <LooksProvider>{footer}</LooksProvider>,
   );
 }
 
@@ -384,10 +432,16 @@ function WeekHeader({ s, end }: { s: Schedule; end?: ReactNode }) {
   );
 }
 
-function JobLine({ job, className }: { job: Job; className?: string }) {
+function JobLine({ job, className, withAvatar }: { job: Job; className?: string; withAvatar?: boolean }) {
   const Icon = CAT_ICON[job.cat];
+  const look = useLook(job.idol);
   return (
     <span className={cn("flex min-w-0 items-center gap-1.5", className)}>
+      {withAvatar && (
+        <span className="shrink-0 max-md:hidden">
+          <MarkedAvatar name={look.full} src={look.avatar} size="sm" />
+        </span>
+      )}
       <Icon aria-label={job.cat} className="size-3.5 shrink-0" />
       <span className="shrink-0 font-medium">{job.idol}</span>
       <span className="truncate">{job.name}</span>
@@ -402,21 +456,22 @@ function Block({ s, p, isSaved, onClick, isDim }: { s: Schedule; p: Placement; i
   const t = timeOf(s.store.now, s.week, p.day, p.slot);
   const isDone = isSaved && cellsOf(s.week, p).every((c) => timeOf(s.store.now, s.week, c.day, c.slot) === "past");
   const isNow = isSaved && cellsOf(s.week, p).some((c) => timeOf(s.store.now, s.week, c.day, c.slot) === "now");
+  const look = useLook(job.idol);
   return (
     <button
       type="button"
       onClick={onClick}
-      style={{ gridColumn: `${p.slot + 2} / span ${job.len}` }}
+      style={{ ...look.style, gridColumn: `${p.slot + 2} / span ${job.len}` }}
       className={cn(
         "flex min-h-14 min-w-0 flex-col items-start justify-center gap-0.5 rounded-md px-2 py-1 text-left text-meta outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-        isSaved ? "bg-muted" : "border border-dashed border-foreground/50 bg-background",
+        isSaved ? "border-l-4 border-l-her-mark bg-her-wall" : "border-2 border-dashed border-her-mark bg-background",
         isStarted && "border-destructive text-destructive",
-        isDone && "text-muted-foreground",
+        isDone && "opacity-60",
         isNow && "ring-2 ring-foreground",
         isDim && "opacity-40",
       )}
     >
-      <JobLine job={job} className="w-full" />
+      <JobLine job={job} className="w-full" withAvatar />
       <span className="flex items-center gap-1 text-muted-foreground">
         {isSaved && <LockedIcon aria-label="已保存" className="size-3" />}
         {isStarted ? "已经开始，保存不了" : isDone ? "做完了" : isNow ? "正在进行" : isSaved ? "" : t === "future" ? "草稿" : ""}
@@ -432,6 +487,7 @@ function WeekGrid({
   onBlock,
   isLit,
   isDimBlock,
+  litStyle,
 }: {
   s: Schedule;
   onEmpty: (day: number, slot: Slot) => void;
@@ -439,6 +495,8 @@ function WeekGrid({
   /** B：选中一项工作时，能放的格子亮起来；返回 null 表示没在选。 */
   isLit?: (day: number, slot: Slot) => boolean | null;
   isDimBlock?: boolean;
+  /** 亮起来的格子用选中那位的颜色。 */
+  litStyle?: CSSProperties;
 }) {
   const w = s.week;
   return (
@@ -483,9 +541,10 @@ function WeekGrid({
                 disabled={lit === false}
                 onClick={() => onEmpty(day, slot)}
                 aria-label={`${dayLabel(w, day)} ${SLOTS[slot].name}`}
+                style={lit === true ? litStyle : undefined}
                 className={cn(
                   "flex min-h-14 items-center justify-center rounded-md border text-muted-foreground outline-none hover:bg-muted/60 focus-visible:ring-3 focus-visible:ring-ring/50",
-                  lit === true && "border-foreground bg-muted text-foreground",
+                  lit === true && "border-2 border-her-mark bg-her-wall text-foreground",
                   lit === false && "opacity-30",
                 )}
               >
@@ -557,8 +616,7 @@ function PendingList({
         const mine = jobs.filter((j) => j.idol === idol);
         if (mine.length === 0) return null;
         return (
-          <li key={idol} className="flex flex-col gap-1">
-            <span className="text-subtitle text-muted-foreground">{idol}</span>
+          <PendingGroup key={idol} idol={idol}>
             {mine.map((job) => (
               <div
                 key={job.id}
@@ -566,19 +624,32 @@ function PendingList({
                 tabIndex={onJob ? 0 : undefined}
                 onClick={() => onJob?.(job)}
                 className={cn(
-                  "flex items-center gap-2 rounded-md border px-3 py-2 text-body",
+                  "flex items-center gap-2 rounded-md border border-l-4 border-l-her-mark px-3 py-2 text-body",
                   onJob && "cursor-pointer hover:bg-muted/60",
-                  selected === job.id && "border-foreground bg-muted",
+                  selected === job.id && "bg-her-wall",
                 )}
               >
                 <JobRow job={job} />
                 {action?.(job)}
               </div>
             ))}
-          </li>
+          </PendingGroup>
         );
       })}
     </ul>
+  );
+}
+
+function PendingGroup({ idol, children }: { idol: string; children: ReactNode }) {
+  const look = useLook(idol);
+  return (
+    <li style={look.style} className="flex flex-col gap-1">
+      <span className="flex items-center gap-2 text-subtitle">
+        <MarkedAvatar name={look.full} src={look.avatar} size="sm" />
+        {look.full}
+      </span>
+      {children}
+    </li>
   );
 }
 
@@ -630,9 +701,7 @@ function SaveBar({ s, mode }: { s: Schedule; mode: "before" | "after" }) {
           </AlertDialogHeader>
           <ul className="flex flex-col gap-1 text-body">
             {listed.map((p) => (
-              <li key={p.jobId} className={cn(mode === "after" && s.hasStarted(w, p) && "text-destructive")}>
-                {describe(p)}
-              </li>
+              <ConfirmRow key={p.jobId} job={jobOf(w, p.jobId)} text={describe(p)} isBad={mode === "after" && s.hasStarted(w, p)} />
             ))}
           </ul>
           {mode === "before" && started.length > 0 && (
@@ -649,6 +718,16 @@ function SaveBar({ s, mode }: { s: Schedule; mode: "before" | "after" }) {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+function ConfirmRow({ job, text, isBad }: { job: Job; text: string; isBad: boolean }) {
+  const look = useLook(job.idol);
+  return (
+    <li style={look.style} className={cn("flex items-center gap-2", isBad && "text-destructive")}>
+      <MarkedAvatar name={look.full} src={look.avatar} size="sm" />
+      {text}
+    </li>
   );
 }
 
@@ -742,6 +821,10 @@ function CellDrawer({ s, cell, onClose }: { s: Schedule; cell: { day: number; sl
 // ─── A 点格子 ──────────────────────────────────────────────────────────────
 
 function SchemeA({ s }: { s: Schedule }) {
+  return <SchemeAWith s={s} />;
+}
+
+function SchemeAWith({ s, onJob }: { s: Schedule; onJob?: (job: Job) => void }) {
   const [cell, setCell] = useState<{ day: number; slot: Slot } | null>(null);
   const [block, setBlock] = useState<{ p: Placement; isSaved: boolean } | null>(null);
   return (
@@ -750,7 +833,7 @@ function SchemeA({ s }: { s: Schedule }) {
       <WeekGrid s={s} onEmpty={(day, slot) => setCell({ day, slot })} onBlock={(p, isSaved) => setBlock({ p, isSaved })} />
       <section className="flex flex-col gap-3">
         <PendingHeading s={s} />
-        <PendingList s={s} />
+        <PendingList s={s} onJob={onJob} />
       </section>
       <CellDrawer s={s} cell={cell} onClose={() => setCell(null)} />
       <BlockDrawer s={s} open={block} onClose={() => setBlock(null)} />
@@ -767,6 +850,7 @@ function SchemeB({ s }: { s: Schedule }) {
   const job = selected ? (s.pending(w).find((j) => j.id === selected) ?? null) : null;
   const isLit = (day: number, slot: Slot) => (job ? s.whyNot(w, job, day, slot) === null : null);
   const tray = s.pending(w);
+  const looks = useLooks();
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-start">
       {/* 手机：一排横滑的工作；电脑：左边一列。 */}
@@ -779,9 +863,10 @@ function SchemeB({ s }: { s: Schedule }) {
               key={j.id}
               type="button"
               onClick={() => setSelected(selected === j.id ? null : j.id)}
+              style={looks(j.idol).style}
               className={cn(
-                "flex shrink-0 flex-col items-start rounded-md border px-3 py-1.5 text-meta",
-                selected === j.id && "border-foreground bg-muted",
+                "flex shrink-0 flex-col items-start rounded-md border border-l-4 border-l-her-mark px-3 py-1.5 text-meta",
+                selected === j.id && "bg-her-wall",
               )}
             >
               <JobLine job={j} />
@@ -798,6 +883,7 @@ function SchemeB({ s }: { s: Schedule }) {
         <WeekGrid
           s={s}
           isLit={isLit}
+          litStyle={job ? looks(job.idol).style : undefined}
           isDimBlock={job !== null}
           onEmpty={(day, slot) => {
             if (!job) return;
@@ -816,6 +902,22 @@ function SchemeB({ s }: { s: Schedule }) {
       </section>
       <BlockDrawer s={s} open={block} onClose={() => setBlock(null)} />
     </div>
+  );
+}
+
+// ─── D 定稿：电脑 B、手机 A ────────────────────────────────────────────────
+// 电脑：B（左边待排一列，选中一项、能放的格子用她的颜色亮起来）。
+// 手机：A（点空格弹抽屉挑工作）；待排列表在格子下面，点一项弹「排到…」抽屉，不用横滑。
+
+function SchemeD({ s }: { s: Schedule }) {
+  const isWide = useIsWide();
+  const [job, setJob] = useState<Job | null>(null);
+  if (isWide) return <SchemeB s={s} />;
+  return (
+    <>
+      <SchemeAWith s={s} onJob={setJob} />
+      <SlotsDrawer s={s} job={job} onClose={() => setJob(null)} />
+    </>
   );
 }
 
@@ -1007,7 +1109,7 @@ const FILTERS: { key: Filter; name: string }[] = [
   { key: "schedule", name: "日程" },
 ];
 
-type DayEvent = { kind: Filter; text: string; job?: Job; isSaved?: boolean };
+type DayEvent = { kind: Filter; text: string; job?: Job; isSaved?: boolean; who?: string };
 
 function eventsOn(s: Schedule, date: Date): DayEvent[] {
   const key = ymd(date);
@@ -1016,19 +1118,31 @@ function eventsOn(s: Schedule, date: Date): DayEvent[] {
   const f = s.store.filters;
   if (f.has("holiday") && HOLIDAYS[key]) out.push({ kind: "holiday", text: HOLIDAYS[key] });
   if (f.has("producer") && md === PRODUCER_BIRTHDAY) out.push({ kind: "producer", text: "你的生日" });
-  if (f.has("birthday")) for (const name of BIRTHDAYS[md] ?? []) out.push({ kind: "birthday", text: `${name}的生日` });
+  if (f.has("birthday")) for (const name of BIRTHDAYS[md] ?? []) out.push({ kind: "birthday", text: `${name}的生日`, who: name });
   const at = weekDayOf(key);
   if (f.has("schedule") && at && (at.week === 0 || s.store.isWest))
     for (const p of s.placements(at.week).filter((p) => p.day === at.day).sort((a, b) => a.slot - b.slot)) {
       const job = jobOf(at.week, p.jobId);
-      out.push({ kind: "schedule", text: `${SLOTS[p.slot].name} ${job.idol} ${job.name}`, job, isSaved: p.isSaved });
+      out.push({ kind: "schedule", text: `${SLOTS[p.slot].name} ${job.idol} ${job.name}`, job, isSaved: p.isSaved, who: job.idol });
     }
   return out;
 }
 
 function EventIcon({ e, className }: { e: DayEvent; className?: string }) {
   const Icon = e.kind === "holiday" ? HolidayIcon : e.kind === "schedule" ? CAT_ICON[e.job!.cat] : BirthdayIcon;
-  return <Icon aria-hidden className={cn("size-3 shrink-0", className)} />;
+  return <Icon aria-hidden className={cn("size-3 shrink-0", e.kind === "birthday" && "text-her-mark", className)} />;
+}
+
+/** 手机上月历格子里的一个记号：日程是她颜色的圆点，角色生日是她颜色的蛋糕，其余中性。 */
+function EventMark({ e }: { e: DayEvent }) {
+  if (e.kind === "schedule")
+    return (
+      <span
+        aria-hidden
+        className={cn("size-2 rounded-full", e.isSaved ? "bg-her-mark" : "border border-her-mark")}
+      />
+    );
+  return <EventIcon e={e} />;
 }
 
 function MonthView({
@@ -1065,6 +1179,7 @@ function MonthView({
     setMonth({ y: d.getFullYear(), m: d.getMonth() });
   };
   const pickedEvents = eventsOn(s, new Date(picked + "T00:00:00"));
+  const looks = useLooks();
   const filterMenu = (
     <DropdownMenu>
       <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" aria-label="筛选" />}>
@@ -1151,17 +1266,24 @@ function MonthView({
               </span>
               {/* 手机：只有一排小图标；电脑：最多三行字。 */}
               <span className="flex flex-wrap gap-0.5 sm:hidden">
-                {evs.slice(0, 4).map((e, k) => (
-                  <EventIcon key={k} e={e} className={cn(e.kind === "schedule" && !e.isSaved && "opacity-50")} />
+                {evs.slice(0, 5).map((e, k) => (
+                  <span key={k} style={e.who ? looks(e.who).style : undefined} className="flex items-center">
+                    <EventMark e={e} />
+                  </span>
                 ))}
               </span>
               <span className="flex flex-col gap-0.5 max-sm:hidden">
                 {evs.slice(0, 3).map((e, k) => (
                   <span
                     key={k}
+                    style={e.who ? looks(e.who).style : undefined}
                     className={cn(
                       "flex items-center gap-1 truncate rounded px-1 text-meta",
-                      e.kind === "schedule" ? (e.isSaved ? "bg-muted" : "border border-dashed") : "text-muted-foreground",
+                      e.kind === "schedule"
+                        ? e.isSaved
+                          ? "border-l-2 border-l-her-mark bg-her-wall"
+                          : "border border-dashed border-her-mark"
+                        : "text-muted-foreground",
                     )}
                   >
                     <EventIcon e={e} />
@@ -1176,7 +1298,7 @@ function MonthView({
       </div>
       <ul className="flex flex-col gap-1">
         {pickedEvents.map((e, k) => (
-          <li key={k} className="flex items-center gap-2 text-body">
+          <li key={k} style={e.who ? looks(e.who).style : undefined} className="flex items-center gap-2 text-body">
             <EventIcon e={e} className="size-4" />
             {e.text}
             {e.kind === "schedule" && !e.isSaved && <span className="text-meta text-muted-foreground">草稿</span>}
