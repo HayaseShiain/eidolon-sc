@@ -354,7 +354,7 @@ export function CalendarPrototype({
       {variant !== "D" && <ChatPreview s={s} />}
     </div>
     </LooksProvider>,
-    <LooksProvider>{footer}</LooksProvider>,
+    s.store.drafts[s.week].length > 0 ? <LooksProvider>{footer}</LooksProvider> : undefined,
   );
 }
 
@@ -704,7 +704,7 @@ function SaveBar({ s, mode }: { s: Schedule; mode: "before" | "after" }) {
     if (back.length > 0) s.setNotice(`${back.map(describe).join("；")}：已经开始了，退回待排。`);
   };
   return (
-    <div className="flex items-center gap-3 border-t bg-background px-4 py-3">
+    <div className="flex items-center gap-3">
       <p className="flex-1 text-body">
         草稿 {drafts.length} 项<span className="ml-2 text-subtitle text-muted-foreground">保存后她才知道</span>
       </p>
