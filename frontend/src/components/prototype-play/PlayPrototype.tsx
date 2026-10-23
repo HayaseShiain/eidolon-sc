@@ -11,9 +11,10 @@
 
 import NextLink from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { cloneElement, isValidElement, useEffect, useState, type ReactNode } from "react";
 
 import { PageShell } from "@/components/app/PageShell";
+import { CAL_VARIANTS, CalendarPrototype } from "@/components/prototype-play/CalendarPrototype";
 import { PrototypeSwitcher } from "@/components/app/PrototypeSwitcher";
 import { SubpageHeader } from "@/components/app/SubpageHeader";
 import { useDirectory } from "@/components/conversations/ConversationDirectory";
@@ -46,7 +47,7 @@ type Column = {
 };
 
 /** 日历一栏的占位：内容由票 07 的原型定，这里只写一句看看位置。 */
-const CALENDAR_STATUS = "今天 10月23日 · 下一个：11月3日 文化の日";
+const CALENDAR_STATUS = "本周还有 14 项工作待排 · 下一个：10月27日 樋口円香的生日";
 
 /** 这些栏目各自的状态：礼物看抽奖次数和背包，每日任务看做完几项，成就看有没有新解锁。 */
 function useColumns(closed: boolean, merged: boolean): Column[] | null {
@@ -117,11 +118,20 @@ export function PlayPrototype({ pick }: { pick: GiftsFor | null }) {
       {variant === "B" && <VariantB {...props} />}
       {variant === "C" && <VariantC {...props} />}
       {variant === "D" && <VariantD {...props} />}
-      <PrototypeSwitcher
-        variants={VARIANTS}
-        current={variant}
-        onChange={(key) => router.replace(href({ variant: key, col: null, to: null }), { scroll: false })}
-      />
+      {/* 票 07：在日历子页上，切换条切的是日历的方案（?cal=）。 */}
+      {col === "calendar" ? (
+        <PrototypeSwitcher
+          variants={CAL_VARIANTS}
+          current={params.get("cal") ?? "A"}
+          onChange={(key) => router.replace(href({ cal: key }), { scroll: false })}
+        />
+      ) : (
+        <PrototypeSwitcher
+          variants={VARIANTS}
+          current={variant}
+          onChange={(key) => router.replace(href({ variant: key, col: null, to: null }), { scroll: false })}
+        />
+      )}
     </>
   );
 }
@@ -150,14 +160,7 @@ function ColumnPage({
   onPickGift: () => void;
 }) {
   if (column.col === "calendar")
-    return (
-      <PageShell width="full" isInShell header={header}>
-        <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-6">
-          {above}
-          <CalendarPlaceholder />
-        </div>
-      </PageShell>
-    );
+    return <CalendarColumn header={header} above={above} />;
   return (
     <GiftsPage
       key={column.col}
@@ -171,7 +174,30 @@ function ColumnPage({
   );
 }
 
-function CalendarPlaceholder() {
+/** 票 07：日历子页换成日历和排日程的原型；SubpageHeader 的右端放月 / 周切换，页底放保存条。 */
+function CalendarColumn({ header, above }: { header: ReactNode; above?: ReactNode }) {
+  const params = useSearchParams();
+  const cal = params.get("cal") ?? "A";
+  return (
+    <CalendarPrototype
+      key={cal}
+      variant={cal}
+      frame={(end, body, footer) => (
+        <PageShell
+          width="full"
+          isInShell
+          header={isValidElement<{ end?: ReactNode }>(header) ? cloneElement(header, { end }) : header}
+          footer={footer}
+        >
+          {above}
+          {body}
+        </PageShell>
+      )}
+    />
+  );
+}
+
+export function CalendarPlaceholder() {
   return (
     <Empty className="border">
       <EmptyHeader>

@@ -113,3 +113,15 @@ export { GitHubIcon } from "./GitHubIcon";
 
 // PROTOTYPE（play-and-schedule 票 02）：导航「玩法」、玩法页的日历一栏。
 export { CalendarDays as CalendarIcon, Shapes as PlayIcon } from "lucide-react";
+
+// PROTOTYPE（play-and-schedule 票 07）：日历和日程用的图标。工作的四个类别、生日、节假日、锁住的工作、往格子里加。
+export {
+  Briefcase as BusinessJobIcon,
+  Cake as BirthdayIcon,
+  Camera as AppearanceJobIcon,
+  Coffee as PrivateJobIcon,
+  Flag as HolidayIcon,
+  Lock as LockedIcon,
+  Music as PracticeJobIcon,
+  Plus as AddIcon,
+} from "lucide-react";
