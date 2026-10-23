@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { FailureNotice } from "@/components/app/FailureNotice";
 import { MarkedAvatar } from "@/components/app/MarkedAvatar";
@@ -73,7 +73,26 @@ const NONE: ReadonlySet<string> = new Set();
  * 从对话页跳来（`pick`）时页首下面一条「给{角色名}挑一件礼物」：点哪件礼物，面板里都已选好她、排在第一个，
  * 送出的礼物和别处送的一样记进她的当前对话；点 ✕ 取消预选，地址里的也去掉。地址里的角色不存在时当作没有预选。
  */
-export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
+// PROTOTYPE（play-and-schedule 票 02）：玩法页的各个变体只摆这一页的某几块（parts），页首换成变体自己的（header），
+// 内容最上面可以先放变体的东西（above）；closed 模拟好感度和礼物没开放；onPickGift 是「挑一件」不在同一页时去哪。
+export type GiftsPart = "gifts" | "tasks" | "achievements";
+const ALL_PARTS: GiftsPart[] = ["gifts", "tasks", "achievements"];
+
+export function GiftsPage({
+  pick,
+  parts = ALL_PARTS,
+  header,
+  above,
+  closed = false,
+  onPickGift,
+}: {
+  pick: GiftsFor | null;
+  parts?: GiftsPart[];
+  header?: ReactNode;
+  above?: ReactNode;
+  closed?: boolean;
+  onPickGift?: () => void;
+}) {
   const [state, setState] = useState<GiftState | null>(null);
   const [catalog, setCatalog] = useState<GiftInfo[] | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
@@ -129,10 +148,11 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
   /** 读到的礼物状态：这一页照它显示，开关和最近一次到账也告诉外壳（在这一页上就记成看过，「礼物」上不出点）。 */
   const applyGiftState = useCallback(
     (s: GiftState) => {
-      setState(s);
-      giftsRead(s);
+      const shown = closed ? { ...s, open: false } : s;
+      setState(shown);
+      giftsRead(shown);
     },
-    [giftsRead],
+    [giftsRead, closed],
   );
 
   // 别处（通话里、别的设备）到账了，这一页读到的落后了：重读一遍，那一节跟着更新。每个时刻只重读一次。
@@ -233,8 +253,9 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
   const nextDraw = state?.next_draw_at ? nextDrawText(state.next_draw_at, new Date(), timeZone) : "";
 
   return (
-    <PageShell width="full" isInShell header={<h1 className="text-list-title">{t.title}</h1>}>
+    <PageShell width="full" isInShell header={header ?? <h1 className="text-list-title">{t.title}</h1>}>
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-6">
+        {above}
         {failure && <FailureNotice failure={failure} />}
         {state === null || catalog === null ? (
           !failure && <p className="text-body text-muted-foreground">{t.loading}</p>
@@ -242,23 +263,26 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
           <GiftsEmpty title={t.closed.title} description={t.closed.description} />
         ) : (
           <>
-            {chosen && (
+            {parts.includes("gifts") && chosen && (
               <PickedFor
                 character={chosen}
                 onCancel={() => {
                   setDropped(chosen.id);
-                  router.replace("/gifts", { scroll: false });
+                  // PROTOTYPE：留着变体和栏目参数，只去掉预选的她。
+                  const params = new URLSearchParams(window.location.search);
+                  params.delete("to");
+                  router.replace(`/gifts?${params}`, { scroll: false });
                 }}
               />
             )}
-            <DrawDesk
+            {parts.includes("gifts") && <DrawDesk
               draws={state.draws}
               max={state.max_draws}
               next={nextDraw}
               isDrawing={drawing !== null}
               onDraw={draw}
-            />
-            {state.daily_tasks && (
+            />}
+            {parts.includes("tasks") && state.daily_tasks && (
               <DailyTasksSection
                 view={dailyTasksView(
                   state.daily_tasks,
@@ -268,6 +292,7 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
                 justDone={justDone}
                 onAction={(action) => {
                   if (action === "converse") go("/conversations");
+                  else if (!parts.includes("gifts")) onPickGift?.();
                   else
                     document
                       .getElementById(MY_GIFTS_ID)
@@ -275,13 +300,13 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
                 }}
               />
             )}
-            {state.achievements && (
+            {parts.includes("achievements") && state.achievements && (
               <AchievementsSection
                 achievements={state.achievements}
                 unseen={seen ? unseenRows({ achievements: state.achievements }, seen.at) : NONE}
               />
             )}
-            {state.reset_cards > 0 && (
+            {parts.includes("gifts") && state.reset_cards > 0 && (
               <ResetCards
                 count={state.reset_cards}
                 resettable={state.resettable}
@@ -289,7 +314,7 @@ export function GiftsPage({ pick }: { pick: GiftsFor | null }) {
                 onUse={spendCard}
               />
             )}
-            {state.backpack.length > 0 ? (
+            {!parts.includes("gifts") ? null : state.backpack.length > 0 ? (
               <MyGifts backpack={state.backpack} catalog={catalog} onGive={(held) => startGiving(held.gift)} />
             ) : (
               <>

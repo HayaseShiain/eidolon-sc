@@ -32,9 +32,10 @@ export const zh = {
     conversations: "对话",
     /** 「对话」图标上有点时读屏读的名字：列表里有一行有没看过的搭话。 */
     conversationsUnseen: "对话，有没看过的搭话",
-    gifts: "礼物",
+    // PROTOTYPE（play-and-schedule 票 02）：导航中间那一项改叫「玩法」。
+    gifts: "玩法",
     /** 「礼物」图标上有点时读屏读的名字：有新到的抽奖次数。 */
-    giftsRewarded: "礼物，有新到的抽奖次数",
+    giftsRewarded: "玩法，有新到的抽奖次数",
     settings: "设置",
   },
   /** 落地页的链接贴到聊天软件、社交网站时预览卡片上的文字（Open Graph、Twitter 卡片）。页面上不显示，不进字体子集。 */

@@ -110,3 +110,6 @@ export { Camera as PhotoIcon, CameraOff as PhotosUsedUpIcon, ImageOff as PhotoFa
 
 // 导航栏底部（电脑）的 GitHub 仓库链接；品牌标志 Lucide 不收，是 The Library Icon Rule 的例外。
 export { GitHubIcon } from "./GitHubIcon";
+
+// PROTOTYPE（play-and-schedule 票 02）：导航「玩法」、玩法页的日历一栏。
+export { CalendarDays as CalendarIcon, Shapes as PlayIcon } from "lucide-react";

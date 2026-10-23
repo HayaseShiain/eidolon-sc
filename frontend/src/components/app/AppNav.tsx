@@ -11,11 +11,12 @@ import { hasUnseen } from "@/lib/conversationList";
 import { currentNavItem, FIRST_LEVEL, isTyping, NAV_ITEMS, navDestination, type NavItem } from "@/lib/navShell";
 import { REPOSITORY_URL } from "@/lib/repository";
 import { cn } from "@/lib/utils";
-import { ConversationsIcon, GiftIcon, GitHubIcon, SettingsIcon } from "@/theme/icons";
+import { ConversationsIcon, GitHubIcon, PlayIcon, SettingsIcon } from "@/theme/icons";
 
 const ICONS: Record<NavItem, typeof SettingsIcon> = {
   conversations: ConversationsIcon,
-  gifts: GiftIcon,
+  // PROTOTYPE（play-and-schedule 票 02）：「玩法」的图标。
+  gifts: PlayIcon,
   settings: SettingsIcon,
 };
 
