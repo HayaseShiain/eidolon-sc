@@ -1,7 +1,7 @@
 # 01: 调研：参考网站和医学资料
 
 Type: research
-Status: open
+Status: claimed
 Blocked by: none
 
 ## Question
