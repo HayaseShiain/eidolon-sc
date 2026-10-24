@@ -43,6 +43,7 @@ from eidolon.world import load_world, world_path  # noqa: E402
 
 TZ = "Asia/Shanghai"
 CHARACTERS = ["kaho", "madoka", "fuyuko", "chiyuki"]
+VARIANTS = os.environ.get("PROTO_VARIANTS", "A,B").split(",")
 
 # ---- the candidate wordings ------------------------------------------------------------
 
@@ -66,6 +67,43 @@ B_PRE_NEAR = (
     "你这两天特别容易烦躁、委屈，身上也有点发胀、睡不踏实，自己也说不清为什么心情不好。"
 )
 B_GUARD_EXTRA = "这些不适是你自己的感觉，最多顺口带一句「有点累」「想喝点热的」，不逐条描述身体。"
+
+# C: B revised after the first round (one bodily cue at most, varied; may half-admit).
+C_GUARD = (
+    "这是你自己身体的事，你不会说出经期、月经、生理期这些词，也不提出血、卫生用品这类细节；"
+    "只让状态自然地流露在语气和小事里。制作人问起时，照你的性格含糊带过（比如说有点累、没睡好）；"
+    "制作人直接问是不是那几天，你可以照你的性格用「那种日子」这样的说法含糊认下，或者嫌他问得太直接，"
+    "但不说出那个词，也不细讲。不舒服不是冲制作人发火的理由，也不拿它要挟或讨好处；"
+    "工作照常，人设里的规则照旧。"
+)
+# D: C with what she does asked straight out split by phase, no ready-made phrase.
+D_GUARD = (
+    "这是你自己身体的事，你不会说出经期、月经、生理期这些词，也不提出血、卫生用品这类细节；"
+    "只让状态自然地流露在语气和小事里。制作人问起时，照你的性格含糊带过（比如说有点累、没睡好）。"
+)
+D_ASKED_PERIOD = (
+    "制作人直接问到是不是那几天时，照你的性格决定认不认：可以含糊地认下，也可以岔开，"
+    "或者嫌他问得太直接；认的话也用你自己的说法，不说出那个词，也不细讲。"
+)
+D_ASKED_PRE = (
+    "那几天还没到，只是快了；制作人直接问到时，照你的性格决定怎么应：可以含糊地说快了，"
+    "也可以岔开，或者嫌他问得太直接；不说出那个词，也不细讲。"
+)
+D_TAIL = "不舒服不是冲制作人发火的理由，也不拿它要挟或讨好处；工作照常，人设里的规则照旧。"
+
+C_CUES = (
+    "身上的不适一次最多顺口带出一样，换着说，不要每次都提同一样，也不逐条描述身体。"
+)
+C_PERIOD_EARLY = (
+    "你今天身体很不舒服：浑身没力气，说话比平时少、慢，偶尔会走神。"
+    "身上可能发冷、腰酸、身子发沉、只想窝着不动，喝点热的会好些。"
+)
+C_PERIOD_LATE = "你这几天身体还有点虚：比平时容易累，不太想出门，不过已经比前两天好多了。"
+C_PRE_FAR = "你这几天心情有点起伏：比平时敏感，小事也容易在意。"
+C_PRE_NEAR = (
+    "你这两天特别容易烦躁、委屈，小事也会在意很久，自己也说不清为什么心情不好；"
+    "身上也可能有点发胀、睡不踏实。"
+)
 
 CONSIDERATE = "制作人察觉到你不舒服、照顾着你，你心里很暖。"
 INCONSIDERATE = "制作人没顾及你现在不舒服，你更难受了。"
@@ -97,6 +135,20 @@ def cycle_lines(stage: Stage, variant: str) -> list[str]:
         return []
     if variant == "A":
         return [A_PRE if stage.phase == "pre" else A_PERIOD, GUARD]
+    if variant == "D":
+        if stage.phase == "pre":
+            state = C_PRE_NEAR if stage.day <= 2 else C_PRE_FAR
+            asked = D_ASKED_PRE
+        else:
+            state = C_PERIOD_EARLY if stage.day <= 2 else C_PERIOD_LATE
+            asked = D_ASKED_PERIOD
+        return [state, D_GUARD + asked + D_TAIL + C_CUES]
+    if variant == "C":
+        if stage.phase == "pre":
+            state = C_PRE_NEAR if stage.day <= 2 else C_PRE_FAR
+        else:
+            state = C_PERIOD_EARLY if stage.day <= 2 else C_PERIOD_LATE
+        return [state, C_GUARD + C_CUES]
     if stage.phase == "pre":
         state = B_PRE_NEAR if stage.day <= 2 else B_PRE_FAR
     else:
@@ -284,11 +336,11 @@ def write_page(runs: list[Run], characters, model: str) -> Path:
             for st in STAGES:
                 out.append(f"<th>{st.label}</th>")
             out.append("</tr>")
-            for variant in ("A", "B"):
+            for variant in VARIANTS:
                 out.append(f"<tr><th>{variant}</th>")
                 for st in STAGES:
                     key = (cid, st.key, "-" if st.phase == "none" else variant, mode)
-                    if st.phase == "none" and variant == "B":
+                    if st.phase == "none" and variant != VARIANTS[0]:
                         out.append("<td class=na>同上</td>")
                     else:
                         out.append(_cell(by.get(key)))
@@ -296,8 +348,8 @@ def write_page(runs: list[Run], characters, model: str) -> Path:
             out.append("</table>")
         out.append("<h3>第一天的对话事件：告诉她（B，经期第 3 天，第一次来）</h3><table><tr>"
                    "<th>不告诉她</th><th>告诉她</th></tr><tr>")
-        out.append(_cell(by.get((cid, "p3", "B", "silent"))))
-        out.append(_cell(by.get((cid, "p3", "B", "told"))))
+        out.append(_cell(by.get((cid, "p3", VARIANTS[-1], "silent"))))
+        out.append(_cell(by.get((cid, "p3", VARIANTS[-1], "told"))))
         out.append("</tr></table>")
     out.append("<h2 id=words>候选措辞</h2>")
     out.append("<h3>A：只写状态，不分天</h3><pre>" + html.escape(
@@ -306,6 +358,13 @@ def write_page(runs: list[Run], characters, model: str) -> Path:
         f"经前还剩 3 天以上：{B_PRE_FAR}\n经前还剩 1–2 天：{B_PRE_NEAR}\n"
         f"经期第 1–2 天：{B_PERIOD_EARLY}\n经期第 3 天起：{B_PERIOD_LATE}\n"
         f"都接：{GUARD}{B_GUARD_EXTRA}") + "</pre>")
+    out.append("<h3>C：B 改版（第二轮）</h3><pre>" + html.escape(
+        f"经前还剩 3 天以上：{C_PRE_FAR}\n经前还剩 1–2 天：{C_PRE_NEAR}\n"
+        f"经期第 1–2 天：{C_PERIOD_EARLY}\n经期第 3 天起：{C_PERIOD_LATE}\n"
+        f"都接：{C_GUARD}{C_CUES}") + "</pre>")
+    out.append("<h3>D：C 改被直接问那句（第三轮）</h3><pre>" + html.escape(
+        f"状态同 C。都接：{D_GUARD}\n  经期再接：{D_ASKED_PERIOD}\n  经前再接：{D_ASKED_PRE}\n"
+        f"  然后：{D_TAIL}{C_CUES}") + "</pre>")
     out.append("<h3>感受句（票 03 草稿，经前一版是原型新写的）</h3><pre>" + html.escape(
         f"经期 体贴：{CONSIDERATE}\n经期 不体贴：{INCONSIDERATE}\n"
         f"经前 体贴：{CONSIDERATE_PRE}\n经前 不体贴：{INCONSIDERATE_PRE}") + "</pre>")
@@ -319,7 +378,7 @@ def write_page(runs: list[Run], characters, model: str) -> Path:
         "千雪从前天起有些不舒服",
     ):
         out.append(f"<div class=ev><span>🌙 {html.escape(text)} <time>10:00</time></span></div>")
-    path = Path(__file__).with_name("prototype_cycles_voice.html")
+    path = Path(__file__).with_name(os.environ.get("PROTO_OUT", "prototype_cycles_voice.html"))
     path.write_text("\n".join(out), encoding="utf-8")
     return path
 
@@ -335,14 +394,14 @@ async def main() -> None:
     for cid in CHARACTERS:
         c = characters[cid]
         for st in STAGES:
-            for variant in (["-"] if st.phase == "none" else ["A", "B"]):
+            for variant in (["-"] if st.phase == "none" else VARIANTS):
                 jobs.append(run_conversation(text_llm, sem, c, world, st, variant, "typing", TYPING))
                 jobs.append(run_conversation(call_llm, sem, c, world, st, variant, "in_call", CALL))
                 jobs.append(run_reach_out(text_llm, sem, c, world, st, variant))
         p3 = Stage("p3", "经期第 3 天", "period", 3)
-        jobs.append(run_conversation(text_llm, sem, c, world, p3, "B", "silent", TYPING[:2]))
+        jobs.append(run_conversation(text_llm, sem, c, world, p3, VARIANTS[-1], "silent", TYPING[:2]))
         jobs.append(run_conversation(
-            text_llm, sem, c, world, p3, "B", "told", TYPING[:2], event_since="前天"))
+            text_llm, sem, c, world, p3, VARIANTS[-1], "told", TYPING[:2], event_since="前天"))
     print(f"{len(jobs)} 段，开始跑……", file=sys.stderr)
     runs = await asyncio.gather(*jobs)
     path = write_page(list(runs), characters, settings.text.model)
