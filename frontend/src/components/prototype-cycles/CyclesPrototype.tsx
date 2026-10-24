@@ -32,7 +32,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
   Drawer,
   DrawerContent,
@@ -521,15 +520,10 @@ function RecordDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5 text-sm font-medium">
+          <div className="flex flex-col gap-1.5 text-sm font-medium">
             第一天
-            <Input
-              type="date"
-              max={now}
-              value={start}
-              onChange={(e) => setStart(e.target.value)}
-            />
-          </label>
+            <DayPicker value={start} max={now} onChange={setStart} />
+          </div>
           <div className="flex flex-col gap-1.5 text-sm font-medium">
             天数
             <div className="flex items-center gap-3">
@@ -580,6 +574,81 @@ function RecordDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+const WEEKDAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
+/** 「2026年10月25日 周日」：不用原生日期框，它的年月日顺序跟着浏览器语言走（英文浏览器是月/日/年）。 */
+function fullDate(date: string): string {
+  const { year, month, day, weekday } = partsOf(date);
+  return `${year}年${month}月${day}日 ${WEEKDAYS[weekday]}`;
+}
+
+/** 第一天的选择：outline 按钮写着日期，点开一个小月历（周一在前），今天以后的日子不能选；选中的铺她的 primary。 */
+function DayPicker({ value, max, onChange }: { value: string; max: string; onChange: (date: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState<CalendarMonth>(monthOf(value));
+  const title = `${month.year}年${month.month}月`;
+  return (
+    <Popover
+      open={open}
+      onOpenChange={(o) => {
+        if (o) setMonth(monthOf(value));
+        setOpen(o);
+      }}
+    >
+      <PopoverTrigger
+        render={<Button variant="outline" size="lg" className="justify-start font-normal tabular-nums" />}
+      >
+        {fullDate(value)}
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-72">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="icon-sm" aria-label="上个月" onClick={() => setMonth(shiftMonth(month, -1))}>
+            <PreviousMonthIcon />
+          </Button>
+          <span className="text-sm font-medium tabular-nums">{title}</span>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="下个月"
+            disabled={monthCells(shiftMonth(month, 1), max)[0].date > max}
+            onClick={() => setMonth(shiftMonth(month, 1))}
+          >
+            <NextMonthIcon />
+          </Button>
+        </div>
+        <div role="group" aria-label={title} className="grid grid-cols-7 gap-0.5">
+          {["一", "二", "三", "四", "五", "六", "日"].map((h) => (
+            <span key={h} aria-hidden className="py-1 text-center text-meta text-muted-foreground">
+              {h}
+            </span>
+          ))}
+          {monthCells(month, max).map((cell) => (
+            <button
+              key={cell.date}
+              type="button"
+              disabled={cell.date > max}
+              aria-pressed={cell.date === value}
+              aria-label={fullDate(cell.date)}
+              onClick={() => {
+                onChange(cell.date);
+                setOpen(false);
+              }}
+              className={cn(
+                "flex size-9 items-center justify-center rounded-full text-sm tabular-nums hover:bg-muted/60 disabled:pointer-events-none disabled:opacity-30",
+                !cell.isInMonth && "text-muted-foreground",
+                cell.isToday && "ring-1 ring-foreground",
+                cell.date === value && "bg-primary text-primary-foreground hover:bg-primary",
+              )}
+            >
+              {partsOf(cell.date).day}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
