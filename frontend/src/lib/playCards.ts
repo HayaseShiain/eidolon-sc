@@ -29,6 +29,8 @@ export type PlayContext = {
   achievementsSeenAt: string | null;
   calendar: CalendarCardContext | null;
   schedulePending: number;
+  /** PROTOTYPE（cycles 票 06）：「周期」卡的状态，原型里由 PlayPage 按 ?card= 拼好。 */
+  cycles?: string;
 };
 
 /** A card as the page shows it: `status` is empty until the state has been read. */
@@ -99,6 +101,15 @@ const CARDS: Definition[] = [
       if (!calendar) return "";
       return join([schedulePending > 0 ? t.cards.calendar.pending(schedulePending) : null, nextText(calendar)]);
     },
+    hasDot: () => false,
+    dotLabel: "",
+  },
+  // PROTOTYPE（cycles 票 06）
+  {
+    id: "cycles",
+    name: "周期",
+    isShown: () => true,
+    status: ({ cycles }) => cycles ?? "",
     hasDot: () => false,
     dotLabel: "",
   },

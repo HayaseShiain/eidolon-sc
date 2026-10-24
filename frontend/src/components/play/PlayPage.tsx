@@ -1,6 +1,7 @@
 "use client";
 
 import { FailureNotice } from "@/components/app/FailureNotice";
+import { cyclesCardStatus } from "@/components/prototype-cycles/CyclesPrototype";
 import { useDirectory } from "@/components/conversations/ConversationDirectory";
 import { PlayCardLink } from "@/components/play/PlayCardLink";
 import { PlayHeader, PlayShell } from "@/components/play/PlayShell";
@@ -24,8 +25,8 @@ function calendarYears(today: string): number[] {
  * 卡的内容（名字、去哪、状态、点）由 `lib/playCards` 管，这里只管顺序和版式。
  * 只进这一级不算看过：「礼物」卡上的点留着，进了礼物子页才没有；「成就」卡上的点留到离开那个子页。
  */
-export function PlayPage() {
-  const { account, newRewards } = useDirectory();
+export function PlayPage({ card }: { card: string }) {
+  const { account, newRewards, characters } = useDirectory();
   const { state, failure } = usePlayState({ withCatalog: false });
   const achievementsSeenAt = account && state ? achievementsSeenUpTo(account.id, OF_ALL) : null;
   const { calendar, holidaysRead, schedule, scheduleNow, draftsOn } = useCalendar({ years: calendarYears });
@@ -39,6 +40,7 @@ export function PlayPage() {
     achievementsSeenAt,
     calendar: holidaysRead ? calendar : null,
     schedulePending,
+    cycles: cyclesCardStatus(card, characters),
   });
   return (
     <PlayShell header={<PlayHeader />}>

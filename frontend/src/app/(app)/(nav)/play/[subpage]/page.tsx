@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { AchievementsSubpage } from "@/components/play/AchievementsSubpage";
 import { CalendarSubpage } from "@/components/play/CalendarSubpage";
+import { CyclesPrototype } from "@/components/prototype-cycles/CyclesPrototype";
 import { GiftsSubpage } from "@/components/play/GiftsSubpage";
 import { giftsFor } from "@/lib/gifts";
 import { PLAY_SUBPAGES, type PlaySubpage } from "@/lib/playRoute";
@@ -37,4 +38,6 @@ const SUBPAGES: Record<PlaySubpage, (search: SearchParams) => ReactNode> = {
   gifts: (search) => <GiftsSubpage pick={giftsFor(search)} />,
   achievements: () => <AchievementsSubpage />,
   calendar: (search) => <CalendarSubpage who={calendarWho(search)} />,
+  // PROTOTYPE（cycles 票 06）
+  cycles: (search) => <CyclesPrototype search={search} />,
 };

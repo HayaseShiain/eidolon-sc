@@ -75,6 +75,8 @@ export { Gift as GiftIcon } from "lucide-react";
 
 // 日历：玩法页第一级「日历」卡；筛选、月视图和这一天的清单里我的生日（蛋糕，角色生日的蛋糕是她的颜色）和节假日（旗子）。
 export { CalendarDays as CalendarIcon } from "lucide-react";
+// PROTOTYPE（cycles 票 06）：玩法页「周期」卡。
+export { CalendarHeart as CyclesIcon } from "lucide-react";
 export { Cake as BirthdayIcon, Flag as HolidayIcon } from "lucide-react";
 // 日历子页月视图标题两边的上个月、下个月。
 export { ChevronLeft as PreviousMonthIcon, ChevronRight as NextMonthIcon } from "lucide-react";
