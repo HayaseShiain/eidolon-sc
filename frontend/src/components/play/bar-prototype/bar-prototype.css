@@ -1,7 +1,14 @@
 /* PROTOTYPE（bar 地图票 08）：酒吧像素画面的样式，只在 prototype/bar 分支。 */
 
+@font-face {
+  font-family: "BarFusionPixel";
+  src: url("/prototype-bar/fonts/fusion-pixel-12px-zh_hans.woff2") format("woff2");
+  font-display: swap;
+}
+
 .bar-px img,
-.bar-px .bar-sprite {
+.bar-px .bar-sprite,
+.bar-px canvas.bar-sprite {
   image-rendering: pixelated;
 }
 .bar-smooth img,

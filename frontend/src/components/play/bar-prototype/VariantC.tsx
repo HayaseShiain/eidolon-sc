@@ -10,7 +10,7 @@ import { useState } from "react";
 import { playHref } from "@/lib/playRoute";
 
 import { HER } from "./data";
-import { BarRoom, Door, EndPanel, INK, LineText, MixStation, Px, RecipeBook, Sprite, Stage, StandBox, useFont, type Knobs } from "./pieces";
+import { BarRoom, Door, EndPanel, INK, LineText, MixStation, Px, RecipeBook, Sprite, Stage, StandBox, Txt, type Knobs } from "./pieces";
 import type { Bar } from "./useBar";
 
 const BG_SCALE = 640 / 424;
@@ -21,7 +21,7 @@ export function VariantC({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
   const mixing = bar.phase === "mixing";
   return (
     <div className="fixed inset-0 z-[60]" style={{ background: "#000" }}>
-      <Stage w={640} h={360} smooth={knobs.smooth} minFont={knobs.minFont}>
+      <Stage w={640} h={360} smooth={knobs.smooth} minFont={knobs.minFont} font={knobs.font}>
         {/* 闲聊这一幕 */}
         <div className="absolute inset-0 transition-transform duration-300" style={{ transform: mixing ? "translateX(-100%)" : "none" }}>
           <Px>
@@ -34,7 +34,7 @@ export function VariantC({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
           )}
           <Px>
             <TalkBox bar={bar} />
-            <CornerButton x={588} y={8} onClick={leave}>
+            <CornerButton x={560} y={8} onClick={leave}>
               离开
             </CornerButton>
           </Px>
@@ -58,10 +58,10 @@ function TalkBox({ bar }: { bar: Bar }) {
       <button
         type="button"
         className="bar-hit pointer-events-auto absolute text-left"
-        style={{ left: 12, top: 262, width: 616, height: 88, background: "rgba(0,0,0,0.85)", border: `1px solid ${INK.sub}`, padding: "8px 12px" }}
+        style={{ left: 12, top: 262, width: 616, height: 88, background: "rgba(0,0,0,0.85)", border: `1px solid ${INK.sub}` }}
         onClick={bar.advance}
       >
-        {bar.line && bar.phase !== "door" && bar.phase !== "end" && <LineText line={bar.line} typed={bar.typed} size={14} />}
+        {bar.line && bar.phase !== "door" && bar.phase !== "end" && <LineText line={bar.line} typed={bar.typed} size={14} w={616} />}
       </button>
       {bar.phase === "talk" && bar.isLineDone && <Sprite name="ctc_0" x={606} y={330} w={15} h={15} className="bar-ctc" />}
     </>
@@ -69,22 +69,19 @@ function TalkBox({ bar }: { bar: Bar }) {
 }
 
 function MixScene({ bar, onLeave, cells }: { bar: Bar; onLeave: () => void; cells: Knobs["cells"] }) {
-  const font = useFont();
   const [book, setBook] = useState(false);
   return (
     <Px>
       <div className="absolute inset-0" style={{ background: INK.bg }} />
       <div className="absolute flex items-center gap-3" style={{ left: 0, top: 0, width: 640, height: 64, background: "#000", padding: "0 16px", color: "#fff" }}>
         <span style={{ width: 10, height: 10, borderRadius: 5, background: HER.color }} />
-        <div className="flex flex-col">
-          <span style={{ fontSize: font(9), color: INK.sub }}>{HER.name}的点单</span>
-          <span style={{ fontSize: font(15) }}>{bar.memo}</span>
-        </div>
+        <Txt x={34} y={14} runs={`${HER.name}的点单`} size={13} color={INK.sub} />
+        <Txt x={34} y={32} runs={bar.memo ?? ""} size={13} />
       </div>
-      <CornerButton x={498} y={20} onClick={() => setBook((b) => !b)}>
+      <CornerButton x={480} y={20} onClick={() => setBook((b) => !b)}>
         {book ? "收起配方" : "配方书"}
       </CornerButton>
-      <CornerButton x={588} y={20} onClick={onLeave}>
+      <CornerButton x={560} y={20} onClick={onLeave}>
         离开
       </CornerButton>
       <div className="absolute" style={{ left: 117, top: 80, width: 270, height: 176, transform: "scale(1.5)", transformOrigin: "0 0" }}>
@@ -96,15 +93,11 @@ function MixScene({ bar, onLeave, cells }: { bar: Bar; onLeave: () => void; cell
 }
 
 function CornerButton({ x, y, onClick, children }: { x: number; y: number; onClick: () => void; children: string }) {
-  const font = useFont();
   return (
-    <button
-      type="button"
-      className="bar-hit pointer-events-auto absolute"
-      style={{ left: x, top: y, fontSize: font(10), color: "#fff", border: `1px solid ${INK.sub}`, padding: "3px 8px", background: "rgba(0,0,0,0.6)" }}
-      onClick={onClick}
-    >
-      {children}
-    </button>
+    <>
+      <div className="absolute" style={{ left: x, top: y, width: 70, height: 22, border: `1px solid ${INK.sub}`, background: "rgba(0,0,0,0.6)" }} />
+      <Txt x={x} y={y + 3} w={70} runs={children} size={13} align="center" />
+      <button type="button" aria-label={children} className="bar-hit pointer-events-auto absolute" style={{ left: x, top: y, width: 70, height: 22 }} onClick={onClick} />
+    </>
   );
 }

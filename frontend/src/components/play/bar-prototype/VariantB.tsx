@@ -28,7 +28,7 @@ export function VariantB({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
     <div className="h-full" style={herVars(HER.color)}>
       <PageShell width="full" isInShell isScrollable={false} header={<PlaySubpageHeader title="VA-283" />}>
         <div className="relative flex min-h-0 flex-1 flex-col p-2">
-          <Stage w={W} h={H} integer={false} smooth={knobs.smooth} minFont={knobs.minFont}>
+          <Stage w={W} h={H} integer={false} smooth={knobs.smooth} minFont={knobs.minFont} font={knobs.font}>
             <Px w={W} h={H}>
               <div className="absolute inset-0" style={{ background: "#000" }} />
               <BarRoom x={0} y={0} />

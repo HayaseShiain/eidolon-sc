@@ -102,6 +102,13 @@ for i in range(6):
     COPY[f"148_news_channel_spr_{i:02d}.png"] = f"tv_{i}"
 for i in range(3):
     COPY[f"495_barintro_spr_{i:02d}.png"] = f"intro_{i}"
+# 电视的频道（bg_tv：点一下换台，共 10 台，第 10 台是关着）
+CHANNELS = {"145_burrito": 3, "146_wk": 7, "147_dollar": 2, "148_news": 6, "150_yiik": 3, "151_toku": 3, "152_mwj": 4, "154_ramen": 3, "155_wrestle": 2}
+for prefix, frames in CHANNELS.items():
+    name = prefix.split("_", 1)[1]
+    for i in range(frames):
+        COPY[f"{prefix}_channel_spr_{i:02d}.png"] = f"ch_{name}_{i}"
+COPY["153_hassy_channel_spr.png"] = "ch_hassy_0"
 for i in range(25):
     COPY[f"170_recipes_cn_{i:02d}.png"] = f"recipe_{i}"
 # 加料的光圈也是 72x68 +(20,6)

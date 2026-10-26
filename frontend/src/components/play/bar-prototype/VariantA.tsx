@@ -23,7 +23,7 @@ import {
   Stage,
   StandBox,
   TextBox,
-  useFont,
+  Txt,
   type Knobs,
 } from "./pieces";
 import type { Bar } from "./useBar";
@@ -33,7 +33,7 @@ export function VariantA({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
   const leave = () => router.push(playHref());
   return (
     <div className="fixed inset-0 z-[60]" style={{ background: INK.bg }}>
-      <Stage w={640} h={360} smooth={knobs.smooth} minFont={knobs.minFont}>
+      <Stage w={640} h={360} smooth={knobs.smooth} minFont={knobs.minFont} font={knobs.font}>
         <Px>
           <BarRoom />
         </Px>
@@ -65,31 +65,21 @@ export function VariantA({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
   );
 }
 
-/** 原版的侧边菜单（设置、读取、点唱机、退出）那格 (435,276) 190×65：上面是点单备忘，下面「离开」，安卓上多一个「全屏」。 */
+/** 原版的侧边菜单（设置 (445,285)、读取 (543,285)、点唱机 (445,312)、退出 (543,312)）那格：上面是点单备忘，「离开」在「退出」的位置，安卓上「全屏」在点唱机的位置。 */
 function SideMenu({ bar, onLeave }: { bar: Bar; onLeave: () => void }) {
-  const font = useFont();
   const [lockable, setLockable] = useState(false);
   useEffect(() => setLockable(canLockLandscape()), []);
+  const link = (label: string, lx: number, onClick: () => void) => (
+    <>
+      <Txt x={lx} y={312} runs={label} size={13} />
+      <button type="button" aria-label={label} className="bar-hit pointer-events-auto absolute" style={{ left: lx - 4, top: 308, width: 60, height: 22 }} onClick={onClick} />
+    </>
+  );
   return (
-    <div className="pointer-events-auto absolute flex flex-col justify-between" style={{ left: 437, top: 278, width: 186, height: 61, padding: "3px 6px", color: "#fff" }}>
-      <div style={{ fontSize: font(9), lineHeight: 1.35 }}>
-        {bar.memo ? (
-          <>
-            <span style={{ color: INK.sub }}>点单　</span>
-            {bar.memo}
-          </>
-        ) : null}
-      </div>
-      <div className="flex justify-end gap-4" style={{ fontSize: font(9) }}>
-        {lockable && (
-          <button type="button" className="bar-hit" style={{ color: "#fff" }} onClick={() => void fullscreenLandscape()}>
-            全屏
-          </button>
-        )}
-        <button type="button" className="bar-hit" style={{ color: "#fff" }} onClick={onLeave}>
-          离开
-        </button>
-      </div>
-    </div>
+    <>
+      {bar.memo && <Txt x={445} y={282} w={172} runs={[{ text: "点单　", color: INK.sub }, { text: bar.memo }]} size={13} lineHeight={16} />}
+      {lockable && link("全屏", 445, () => void fullscreenLandscape())}
+      {link("离开", 543, onLeave)}
+    </>
   );
 }

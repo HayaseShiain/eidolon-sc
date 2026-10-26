@@ -31,6 +31,7 @@ export function BarPrototype({ variant }: { variant: string }) {
     smooth: false,
     stand: "default",
     minFont: 13,
+    font: "fusion",
     cells: "outline",
     firstToday: true,
     door: true,
@@ -136,6 +137,14 @@ function KnobPanel({
               <option value="default">变体默认</option>
               <option value="hd">高清</option>
               <option value="pixel">像素化</option>
+            </select>
+          </label>
+          <label className={row}>
+            字体
+            <select className="bg-black" value={knobs.font} onChange={(e) => set("font", e.target.value as Knobs["font"])}>
+              <option value="fusion">像素：缝合像素 12px</option>
+              <option value="noto">像素：Noto 栅格化</option>
+              <option value="hd">高清</option>
             </select>
           </label>
           <label className={row}>
