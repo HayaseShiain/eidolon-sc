@@ -403,13 +403,22 @@ export function MixStation({
           </div>
         );
       })}
+      {/* 摇酒器下面的总份数槽（amounts_Draw_0）：前 10 份逐格点亮，11–20 份在同一格上叠一条；摇起来之后不画格子。 */}
+      <Sprite name="gauge" x={478} y={250} w={70} h={17} />
+      {mixer.shake === "idle" &&
+        Array.from({ length: Math.min(bar.total, 10) }, (_, i) => (
+          <Sprite key={`g${i}`} name="gauge_on" x={486 + (i % 5) * 11} y={253 + Math.floor(i / 5) * 6} w={10} h={5} />
+        ))}
+      {mixer.shake === "idle" &&
+        Array.from({ length: Math.max(0, bar.total - 10) }, (_, i) => (
+          <Sprite key={`gb${i}`} name="gauge_big" x={486 + (i % 5) * 11} y={253 + Math.floor(i / 5) * 6} w={10} h={5} />
+        ))}
       {/* 摇酒器 / 成品 */}
       {made ? (
         <Sprite name={made.drink ? `drink_${made.drink.id}` : "drink_glitch"} x={496} y={190} w={35} h={53} />
       ) : (
         <Sprite name={mixer.shake === "idle" ? "shaker" : "shaker_shake"} x={477} y={182} w={72} h={68} className={shakerClass} />
       )}
-      {made && label(made.drink ? `${made.drink.name}${made.big ? "（大）" : ""}` : "##20%!!", 513 - 34, 248, 7, made.drink ? INK.text : INK.pink)}
       {mixer.pulse && <Sprite key={mixer.pulse.id} name={`pulse_${mixer.pulse.key}`} x={477} y={182} w={72} h={68} className="bar-pulse" />}
       {mixer.float && (
         <Sprite key={mixer.float.id} name={mixer.float.ok ? "success" : "fail"} x={mixer.float.ok ? 484 : 492} y={166} className="bar-float" />
@@ -479,26 +488,26 @@ export function RecipeBook({ x, y }: { x: number; y: number }) {
     border: "1px solid #fff",
     padding: "2px 4px",
   });
+  // 照原版：白框里一条白底黑字的标签（左上 (22,29) 起），黑色卡片区在 (27,45)；看配方卡时，左右箭头和「n/24」在卡片底部。
   return (
     <div className="bar-wipe pointer-events-auto absolute" style={{ left: x, top: y, width: 420, height: 252 }}>
       <Sprite name="recipe_bg" x={0} y={0} w={420} h={252} />
-      <div className="absolute flex gap-1" style={{ left: 9, top: 6 }}>
-        {TABS.map(([key, name]) => (
-          <button
-            key={key}
-            type="button"
-            className="bar-hit"
-            style={btn(tab === key)}
-            onClick={() => {
-              setTab(key);
-              setCat(null);
-              setOpen(null);
-            }}
-          >
-            {name}
-          </button>
-        ))}
-      </div>
+      <div className="absolute" style={{ left: 4, top: 9, width: 324, height: 234, background: "#fff" }} />
+      {TABS.map(([key, name], i) => (
+        <button
+          key={key}
+          type="button"
+          className="bar-hit absolute whitespace-nowrap"
+          style={{ left: [11, 82, 142, 218][i], top: 10, fontSize: font(10), lineHeight: 1.3, color: tab === key ? "#2448ff" : "#000" }}
+          onClick={() => {
+            setTab(key);
+            setCat(null);
+            setOpen(null);
+          }}
+        >
+          {name}
+        </button>
+      ))}
       <div className="absolute overflow-hidden" style={{ left: 9, top: 25, width: 315, height: 214, background: "#000" }}>
         {open?.page != null ? (
           <Sprite name={`recipe_${open.page}`} x={0} y={0} w={315} h={214} />
@@ -533,19 +542,17 @@ export function RecipeBook({ x, y }: { x: number; y: number }) {
         )}
       </div>
       {open && (
-        <div className="absolute flex flex-col items-center gap-2" style={{ left: 334, top: 80, width: 80 }}>
-          <div className="flex gap-2">
-            <button type="button" className="bar-hit relative" style={{ width: 24, height: 24, transform: "scaleX(-1)" }} onClick={() => page(-1)} aria-label="上一页">
-              <Sprite name="arrow" x={0} y={0} w={24} h={24} />
-            </button>
-            <button type="button" className="bar-hit relative" style={{ width: 24, height: 24 }} onClick={() => page(1)} aria-label="下一页">
-              <Sprite name="arrow" x={0} y={0} w={24} h={24} />
-            </button>
-          </div>
-          <button type="button" className="bar-hit" style={btn(false)} onClick={() => setOpen(null)}>
-            返回
+        <>
+          <button type="button" className="bar-hit absolute" style={{ left: 22, top: 209, width: 24, height: 24, transform: "scaleX(-1)" }} onClick={() => page(-1)} aria-label="上一页">
+            <Sprite name="arrow" x={0} y={0} w={24} h={24} />
           </button>
-        </div>
+          <span className="absolute text-center" style={{ left: 142, top: 214, width: 60, fontSize: font(10), lineHeight: 1, color: "#fff" }}>
+            {MIXED.indexOf(open) + 1}/{MIXED.length}
+          </span>
+          <button type="button" className="bar-hit absolute" style={{ left: 290, top: 209, width: 24, height: 24 }} onClick={() => page(1)} aria-label="下一页">
+            <Sprite name="arrow" x={0} y={0} w={24} h={24} />
+          </button>
+        </>
       )}
     </div>
   );
