@@ -45,6 +45,8 @@ export type Knobs = {
   portrait: boolean;
   sound: boolean;
   bgm: boolean;
+  /** 开店前先在点唱机里选 12 首（原版第一次开店前必须选）；关掉时用默认歌单。 */
+  jukebox: boolean;
 };
 
 type StageInfo = { s: number; smooth: boolean; minFont: number; font: TextFont };
@@ -78,6 +80,7 @@ export function Stage({
 }) {
   const outer = useRef<HTMLDivElement>(null);
   const [s, setS] = useState(0);
+  const [pressed, setPressed] = useState(false);
   useEffect(() => {
     const el = outer.current;
     if (!el) return;
@@ -98,8 +101,11 @@ export function Stage({
       {s > 0 && (
         <StageContext.Provider value={{ s, smooth, minFont, font }}>
           <div
-            className={cn("bar-font relative", smooth ? "bar-smooth" : "bar-px", overflow ? "" : "overflow-hidden")}
-            style={{ width: w * s, height: h * s }}
+            className={cn("bar-font bar-cursor relative", smooth ? "bar-smooth" : "bar-px", overflow ? "" : "overflow-hidden")}
+            style={{ width: w * s, height: h * s, ...cursorVars(s, pressed) }}
+            onPointerDown={() => setPressed(true)}
+            onPointerUp={() => setPressed(false)}
+            onPointerCancel={() => setPressed(false)}
           >
             {children}
           </div>
@@ -107,6 +113,23 @@ export function Stage({
       )}
     </div>
   );
+}
+
+/**
+ * 原版的鼠标（cursor_obj）：平时白手套，按下时换「按下」，调酒时停在材料上是张开的手、拖着是握拳，停在文本框上是会动的「NEXT」气泡。
+ * 原版鼠标跟着画面放大；这里按缩放取整选 1/2/3 倍的图，热点也跟着乘。
+ */
+const HOTSPOT: Record<string, [number, number]> = { spr: [4, 0], clicked: [4, 0], open: [4, 0], closed: [9, 0], next: [4, 0] };
+function cursorVars(s: number, pressed: boolean): CSSProperties {
+  const k = Math.min(3, Math.max(1, Math.round(s)));
+  const url = (name: string, hot: string) => `url(/prototype-bar/img/cur_${name}@${k}.png) ${HOTSPOT[hot][0] * k} ${HOTSPOT[hot][1] * k}, auto`;
+  const vars: Record<string, string> = {
+    "--cur": url(pressed ? "clicked" : "spr", pressed ? "clicked" : "spr"),
+    "--cur-open": url("open", "open"),
+    "--cur-closed": url("closed", "closed"),
+  };
+  for (let i = 0; i < 4; i++) vars[`--cur-next-${i}`] = url(`next_${i}`, "next");
+  return vars as CSSProperties;
 }
 
 /** 一层按逻辑像素画的东西：整体 transform 缩放（里面的字浏览器照样按最终大小栅格化，是清楚的）。 */
@@ -450,20 +473,32 @@ function HdLine({ line, typed, size, hd }: { line: Line; typed: number; size: nu
 
 /** 原版文本框里的一句，加右下角「点击继续」箭头。点哪都算（原型）。 */
 export function TextBox({ bar, x, y, w, h }: { bar: Bar; x: number; y: number; w: number; h: number }) {
+  const frame = useFrames(4, 111);
+  const talking = bar.phase === "talk";
   return (
     <>
       <button
         type="button"
         className="bar-hit pointer-events-auto absolute overflow-hidden text-left"
-        style={{ left: x, top: y, width: w, height: h }}
+        style={{ left: x, top: y, width: w, height: h, cursor: talking ? `var(--cur-next-${frame})` : undefined }}
         onClick={bar.advance}
         aria-label="继续"
       >
         {bar.line && bar.phase !== "door" && bar.phase !== "end" && <LineText line={bar.line} typed={bar.typed} w={w} />}
       </button>
-      {bar.phase === "talk" && bar.isLineDone && <Sprite name="ctc_0" x={x + w - 16} y={y + h - 13} w={15} h={15} className="bar-ctc" />}
+      {talking && bar.isLineDone && <Sprite name={`arrow_${frame}`} x={x + w - 16} y={y + h - 13} w={8} h={8} />}
     </>
   );
+}
+
+/** 0..n-1 循环的帧号（原版 image_speed 0.3 ≈ 每 111ms 一帧）。 */
+export function useFrames(n: number, ms: number): number {
+  const [frame, setFrame] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setFrame((f) => (f + 1) % n), ms);
+    return () => window.clearInterval(id);
+  }, [n, ms]);
+  return frame;
 }
 
 // ---------- 调酒台 ----------
@@ -494,6 +529,15 @@ export function MixStation({
 }) {
   const { mixer } = bar;
   const on = bar.phase === "mixing";
+  // 拖材料（原版 a_button_Step_0）：在材料格上按下，瓶子跟着走，松手时落在摇酒器上（72×68，中心 513,216）就 +1。
+  // 用 pointer 事件，鼠标和触屏一样；按下时抓住指针，拖出格子也收得到。
+  const root = useRef<HTMLDivElement>(null);
+  const [drag, setDrag] = useState<{ key: IngredientKey; x: number; y: number } | null>(null);
+  const toLogical = (e: { clientX: number; clientY: number }) => {
+    const rect = root.current!.getBoundingClientRect();
+    return { x: ((e.clientX - rect.left) * 640) / rect.width, y: ((e.clientY - rect.top) * 360) / rect.height };
+  };
+  const overShaker = (p: { x: number; y: number }) => p.x >= 477 && p.x <= 549 && p.y >= 182 && p.y <= 250;
   // 原版 amounts_Draw_0：材料名用 Inconsolata 写在 (405,125) 这些位置；按钮上的字另画，黑字居中。
   const button = (text: string, x: number, y: number) => <Txt x={x} y={y + 5} w={71} runs={text} size={13} color="#111" align="center" />;
   const shakerClass = mixer.shake === "slow" ? "bar-shake-slow" : mixer.shake === "fast" ? "bar-shake-fast" : "";
@@ -501,7 +545,7 @@ export function MixStation({
   const mixLabel = mixer.shake === "idle" ? "调制" : mixer.shake === "done" ? "上酒" : "停止";
   const mixSprite = !on ? "slot_out" : mixer.shake === "done" && !made?.drink ? "mix_no" : bar.total === 0 && mixer.shake === "idle" ? "mix_no" : "mix_yes";
   return (
-    <div className="absolute" style={{ left: at[0] - STATION.x, top: at[1] - STATION.y, width: 640, height: 360 }}>
+    <div ref={root} className="absolute" style={{ left: at[0] - STATION.x, top: at[1] - STATION.y, width: 640, height: 360 }}>
       {withBg && (
         <div className="absolute overflow-hidden" style={{ left: STATION.x, top: STATION.y, width: STATION.w, height: STATION.h }}>
           <Sprite name="frame" x={-STATION.x} y={-STATION.y} w={640} h={360} />
@@ -526,7 +570,7 @@ export function MixStation({
         return (
           <div key={key}>
             <Txt x={key === "b" ? 477 : bx} y={by - 16} runs={name} size={11} mono />
-            <Sprite name={on ? `ing_${key}` : `ing_${key}_off`} x={bx} y={by} w={20} h={38} />
+            {drag?.key !== key && <Sprite name={on ? `ing_${key}` : `ing_${key}_off`} x={bx} y={by} w={20} h={38} />}
             {Array.from({ length: 10 }, (_, j) => (
               <div key={j}>
                 <Sprite name={`cell_${key}`} x={cx + (j % 5) * 9} y={cy + Math.floor(j / 5) * 18} w={8} h={17} alpha={j < Math.min(n, 10) ? 1 : 0.3} />
@@ -538,7 +582,23 @@ export function MixStation({
             {Array.from({ length: Math.max(0, n - 10) }, (_, j) => (
               <Sprite key={`b${j}`} style={cells === "fill" ? { filter: "brightness(0.35)" } : undefined} name={`big_${key}`} x={cx + (j % 5) * 9} y={cy + Math.floor(j / 5) * 18} w={8} h={17} />
             ))}
-            <HitBox x={bx - 5} y={by - 17} w={75} h={57} onClick={() => bar.add(key)} label={`加一份 ${name}`} />
+            <div
+              role="button"
+              aria-label={`把 ${name} 拖进摇酒器`}
+              className="pointer-events-auto absolute"
+              style={{ left: bx - 5, top: by - 17, width: 75, height: 57, touchAction: "none", cursor: !on ? undefined : drag?.key === key ? "var(--cur-closed)" : "var(--cur-open)" }}
+              onPointerDown={(e) => {
+                if (!bar.canMix) return bar.add(key);
+                e.currentTarget.setPointerCapture(e.pointerId);
+                setDrag({ key, ...toLogical(e) });
+              }}
+              onPointerMove={(e) => drag?.key === key && setDrag({ key, ...toLogical(e) })}
+              onPointerUp={(e) => {
+                if (drag?.key === key && overShaker(toLogical(e))) bar.add(key);
+                setDrag(null);
+              }}
+              onPointerCancel={() => setDrag(null)}
+            />
           </div>
         );
       })}
@@ -557,7 +617,14 @@ export function MixStation({
       {made ? (
         <Sprite name={made.drink ? `drink_${made.drink.id}` : "drink_glitch"} x={496} y={190} w={35} h={53} />
       ) : (
-        <Sprite name={mixer.shake === "idle" ? "shaker" : "shaker_shake"} x={477} y={182} w={72} h={68} className={shakerClass} />
+        <Sprite
+          name={mixer.shake !== "idle" ? "shaker_shake" : drag && overShaker(drag) ? "shaker_hover" : "shaker"}
+          x={477}
+          y={182}
+          w={72}
+          h={68}
+          className={shakerClass}
+        />
       )}
       {mixer.pulse && <Sprite key={mixer.pulse.id} name={`pulse_${mixer.pulse.key}`} x={477} y={182} w={72} h={68} className="bar-pulse" />}
       {mixer.float && (
@@ -571,6 +638,7 @@ export function MixStation({
       <Sprite name={mixSprite} x={553} y={243} w={71} h={25} />
       {on && button(mixLabel, 553, 243)}
       <HitBox x={553} y={243} w={71} h={25} onClick={bar.mixButton} label={mixLabel} />
+      {drag && <Sprite name={`ing_${drag.key}_hover`} x={Math.round(drag.x - 10)} y={Math.round(drag.y - 19)} w={20} h={38} />}
     </div>
   );
 }
@@ -613,15 +681,22 @@ const TAB_BOX: [number, number][] = [
 const SEARCH: Record<Exclude<Tab, "intro" | "bottle">, string> = { name: "按名称搜索", flavor: "按口味搜索", kind: "按种类搜索" };
 const GREY = "#9b9b9b";
 
-export function RecipeBook({ x, y }: { x: number; y: number }) {
+export function RecipeBook({ x, y, play }: { x: number; y: number; play: (name: string) => void }) {
   const [tab, setTab] = useState<Tab>("intro");
   const [cat, setCat] = useState<string | null>(null);
   const [open, setOpen] = useState<Drink | null>(null);
   const [hover, setHover] = useState<string | null>(null);
+  // 翻页不绕回：到头了按只响 jukechange，能翻响 jukepick
   const page = (step: number) => {
     if (!open) return;
-    const i = MIXED.indexOf(open);
-    setOpen(MIXED[(i + step + MIXED.length) % MIXED.length]);
+    const to = MIXED.indexOf(open) + step;
+    if (to < 0 || to >= MIXED.length) return play("jukechange");
+    play("jukepick");
+    setOpen(MIXED[to]);
+  };
+  const enter = (id: string) => {
+    play("hover");
+    setHover(id);
   };
   const catName = (key: string) =>
     tab === "name" ? key : `${(tab === "flavor" ? FLAVORS : KINDS).find(([k]) => k === key)?.[1] ?? key}饮品`;
@@ -640,7 +715,7 @@ export function RecipeBook({ x, y }: { x: number; y: number }) {
         aria-label={text}
         className="bar-hit pointer-events-auto absolute"
         style={{ left: ix - 4, top: iy - 3, width: 200, height: 22 }}
-        onMouseEnter={() => setHover(id)}
+        onMouseEnter={() => enter(id)}
         onMouseLeave={() => setHover((h) => (h === id ? null : h))}
         onClick={onClick}
       />
@@ -665,8 +740,14 @@ export function RecipeBook({ x, y }: { x: number; y: number }) {
         <Txt x={18} y={20} runs={SEARCH[tab]} size={13} />
         {cats.map((key, i) =>
           tab === "name"
-            ? item(key, key, 39 + Math.floor(i / 4) * 92, 58 + (i % 4) * 30, () => setCat(key))
-            : item(key, catName(key), 39, 58 + i * 30, () => setCat(key)),
+            ? item(key, key, 39 + Math.floor(i / 4) * 92, 58 + (i % 4) * 30, () => {
+                play("jukepick");
+                setCat(key);
+              })
+            : item(key, catName(key), 39, 58 + i * 30, () => {
+                play("jukepick");
+                setCat(key);
+              }),
         )}
       </>
     );
@@ -674,7 +755,12 @@ export function RecipeBook({ x, y }: { x: number; y: number }) {
     body = (
       <>
         <Txt x={18} y={20} runs={catName(cat)} size={13} />
-        {drinks.map((d, i) => item(d.id, d.name, 39, 52 + i * 26, () => setOpen(d)))}
+        {drinks.map((d, i) =>
+          item(d.id, d.name, 39, 52 + i * 26, () => {
+            play("jukechange");
+            setOpen(d);
+          }),
+        )}
       </>
     );
   }
@@ -694,7 +780,9 @@ export function RecipeBook({ x, y }: { x: number; y: number }) {
               aria-label={name}
               className="bar-hit pointer-events-auto absolute"
               style={{ left: tx, top: 9, width: tw, height: 16 }}
+              onMouseEnter={() => play("hover")}
               onClick={() => {
+                if (tab !== key) play("tab");
                 setTab(key);
                 setCat(null);
                 setOpen(null);
@@ -708,11 +796,23 @@ export function RecipeBook({ x, y }: { x: number; y: number }) {
       </div>
       {open && (
         <>
-          <button type="button" className="bar-hit absolute" style={{ left: 22, top: 209, width: 24, height: 24, transform: "scaleX(-1)" }} onClick={() => page(-1)} aria-label="上一页">
+          <button
+            type="button"
+            className="bar-hit absolute"
+            style={{ left: 22, top: 209, width: 24, height: 24, transform: "scaleX(-1)", opacity: MIXED.indexOf(open) === 0 ? 0.3 : 1 }}
+            onClick={() => page(-1)}
+            aria-label="上一页"
+          >
             <Sprite name="arrow" x={0} y={0} w={24} h={24} />
           </button>
           <Txt x={142} y={214} w={60} runs={`${MIXED.indexOf(open) + 1}/${MIXED.length}`} size={13} align="center" />
-          <button type="button" className="bar-hit absolute" style={{ left: 290, top: 209, width: 24, height: 24 }} onClick={() => page(1)} aria-label="下一页">
+          <button
+            type="button"
+            className="bar-hit absolute"
+            style={{ left: 290, top: 209, width: 24, height: 24, opacity: MIXED.indexOf(open) === MIXED.length - 1 ? 0.3 : 1 }}
+            onClick={() => page(1)}
+            aria-label="下一页"
+          >
             <Sprite name="arrow" x={0} y={0} w={24} h={24} />
           </button>
         </>

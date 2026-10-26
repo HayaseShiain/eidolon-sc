@@ -36,6 +36,11 @@ PAD = {
     "068_slot_n.png": ("gauge_on", 10, 5, 0, 0, None),
     "069_slot_b.png": ("gauge_big", 10, 5, 3, 2, None),
     "070_marcodefault.png": ("gauge", 70, 17, 0, 1, None),
+    # 点唱机：小播放器的高亮按钮是整块 188x63 上的一小块，补回偏移
+    "692_shuffle_small_spr.png": ("juke_shuffle", 188, 63, 107, 22, None),
+    "694_backmusic_small_spr.png": ("juke_back", 188, 63, 7, 26, None),
+    "695_loop_small_spr.png": ("juke_loop", 188, 63, 144, 25, None),
+    "696_nextmusic_small_spr.png": ("juke_next", 188, 63, 66, 26, None),
     "057_successtext_cn_00.png": ("success", 59, 12, 12, 0, None),
     "055_failtext_cn_00.png": ("fail", 102, 15, 0, 3, None),
     "020_sugar_sush_spr.png": ("drink_srush", 35, 53, 11, 15, None),
@@ -66,6 +71,11 @@ COPY = {
     "010_delta.png": "ing_d",
     "013_flanergide.png": "ing_f",
     "016_karmotrine.png": "ing_k",
+    "005_adelhyde_hover.png": "ing_a_hover",
+    "008_bronson_hover.png": "ing_b_hover",
+    "011_delta_hover.png": "ing_d_hover",
+    "014_flanergide_hover.png": "ing_f_hover",
+    "017_karmotrine_hover.png": "ing_k_hover",
     "006_adelhyde_off.png": "ing_a_off",
     "009_bronson_off.png": "ing_b_off",
     "012_delta_off.png": "ing_d_off",
@@ -111,6 +121,20 @@ for prefix, frames in CHANNELS.items():
 COPY["153_hassy_channel_spr.png"] = "ch_hassy_0"
 for i in range(25):
     COPY[f"170_recipes_cn_{i:02d}.png"] = f"recipe_{i}"
+# 点唱机选曲界面和小播放器
+COPY.update({
+    "699_new_jukeframe.png": "juke_frame",
+    "698_startup_juke.png": "juke_startup",
+    "620_musicslot_spr.png": "juke_slot_blue",
+    "621_playlistslot_spr.png": "juke_slot_red",
+    "622_playlistslotselect_spr.png": "juke_slot_yellow",
+    "701_ready_red.png": "juke_ready_red",
+    "702_ready_green.png": "juke_ready_green",
+    "691_small_jukebox_spr.png": "juke_small_paused",
+    "697_small_jukebox_pause_spr.png": "juke_small_playing",
+})
+for i in range(4):
+    COPY[f"717_previewload_spr_{i:02d}.png"] = f"juke_preview_{i}"
 # 加料的光圈也是 72x68 +(20,6)
 PULSES = {"pulse_a", "pulse_b", "pulse_d", "pulse_f", "pulse_k", "pulse_white"}
 
@@ -129,7 +153,29 @@ AUDIO = {
     "104_jukechange.ogg": "pick",
     "095_door.ogg": "door",
     "038_last_call.ogg": "bgm_last_call",
+    "110_mouse_hover.ogg": "hover",
+    "105_jukepick.ogg": "jukepick",
+    "104_jukechange.ogg": "jukechange",
+    "114_prompt.ogg": "prompt",
 }
+# 点唱机的 59 首（jukebox_list 的 fullplaylist），只拷到本机
+SONGS = [
+    "032_hopes_and_dreams", "002_a_neon_glow_lights_the_way", "072_welcome_to_valhalla", "022_every_day_is_night",
+    "017_commencing_simulation", "020_drive_me_wild", "030_good_for_health_bad_for_education", "075_who_was_i",
+    "067_troubling_news", "001_a_gaze_that_invited_disaster", "026_friendly_conversation", "079_youve_got_me",
+    "069_umemoto", "036_jc_eltons", "029_go_go_streaming_chan", "006_all_systems_go", "074_where_do_i_go_from_here",
+    "076_will_you_remember_me", "023_everything_will_be_okay", "040_march_of_the_white_knights", "004_a_rene",
+    "048_safe_haven", "043_neo_avatar", "063_those_who_dwell_in_the_shadows", "045_nightime_maneuvers",
+    "005_a_star_pierces_the_darkness", "078_your_love_is_a_drug", "064_through_the_storm_we_will_find_a_way",
+    "058_synthestitch", "053_snowfall", "060_the_answer_lies_within", "018_dawn_approaches",
+    "077_with_renewed_hope_we_continue_forward", "038_last_call", "047_reminescence",
+    "013_believe_in_me_who_believes_in_you", "019_digital_drive", "062_the_girl_with_the_iron_heart",
+    "042_metropolis", "044_neon_district", "037_karmotrine_dream", "052_skyline", "003_a_new_frontier", "021_dusk",
+    "041_meet_the_staff", "031_heart_of_the_city", "000_a_city_that_never_sleeps", "011_base_of_the_titans",
+    "025_follow_the_trail", "046_out_of_orbit", "059_tense", "070_underground_club", "051_showtime",
+    "008_an_alternate_reality", "061_the_assignment", "068_truth", "028_glitch_city", "054_snowfall_remix",
+    "012_base_of_titans_remix",
+]
 
 
 def pad(src: Path, w: int, h: int, x: int, y: int) -> Image.Image:
@@ -137,6 +183,19 @@ def pad(src: Path, w: int, h: int, x: int, y: int) -> Image.Image:
     canvas = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     canvas.paste(img, (x, y))
     return canvas
+
+
+# arrow_text_2：文本打完后右下角上下跳的倒三角，8x8，每帧的偏移不同
+ARROW_OFFSETS = [(0, 1), (0, 2), (0, 1), (0, 0)]
+# 鼠标（cursor_obj）：名字、逻辑尺寸、偏移；热点在组件里按倍数算
+CURSORS = {
+    "159_cursor_spr.png": ("spr", 17, 24, 0, 0),
+    "163_cursor_clicked.png": ("clicked", 17, 24, 0, 1),
+    "160_cursor_open.png": ("open", 17, 25, 0, 0),
+    "161_cursor_closed.png": ("closed", 17, 21, 0, 0),
+}
+for i in range(4):
+    CURSORS[f"164_cursor_next_{i:02d}.png"] = (f"next_{i}", 32, 20, 0, 0)
 
 
 def main() -> None:
@@ -153,8 +212,19 @@ def main() -> None:
             pad(sprites / file, 72, 68, 20, 6).save(OUT / "img" / f"{name}.png")
         else:
             shutil.copyfile(sprites / file, OUT / "img" / f"{name}.png")
+    for i, (ox, oy) in enumerate(ARROW_OFFSETS):
+        pad(sprites / f"138_arrow_text_2_{i:02d}.png", 8, 8, ox, oy).save(OUT / "img" / f"arrow_{i}.png")
+    for file, (name, w, h, ox, oy) in CURSORS.items():
+        base = pad(sprites / file, w, h, ox, oy)
+        for k in (1, 2, 3):
+            base.resize((w * k, h * k), Image.NEAREST).save(OUT / "img" / f"cur_{name}@{k}.png")
     for file, name in AUDIO.items():
         shutil.copyfile(SRC / "audio" / file, OUT / "audio" / f"{name}.ogg")
+    (OUT / "audio" / "songs").mkdir(exist_ok=True)
+    for i, song in enumerate(SONGS):
+        target = OUT / "audio" / "songs" / f"{i}.ogg"
+        if not target.exists():
+            shutil.copyfile(SRC / "audio" / f"{song}.ogg", target)
     print("ok", len(list((OUT / "img").iterdir())), "images", file=sys.stderr)
 
 

@@ -38,6 +38,7 @@ export function BarPrototype({ variant }: { variant: string }) {
     portrait: false,
     sound: true,
     bgm: false,
+    jukebox: true,
   });
   // 换变体、换「开店画面」都从头来
   const [run, setRun] = useState(0);
@@ -45,7 +46,7 @@ export function BarPrototype({ variant }: { variant: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Run key={`${current}-${run}-${knobs.door}`} variant={current} knobs={knobs} chrome={open} />
+      <Run key={`${current}-${run}-${knobs.door}-${knobs.jukebox}`} variant={current} knobs={knobs} chrome={open} />
       <PortraitGuard forced={knobs.portrait} />
       <KnobPanel knobs={knobs} setKnobs={setKnobs} onRestart={() => setRun((n) => n + 1)} open={open} setOpen={setOpen}>
         <PrototypeSwitcher variants={VARIANTS} current={current} onChange={(key: string) => router.replace(`${pathname}?variant=${key}`)} />
@@ -55,7 +56,7 @@ export function BarPrototype({ variant }: { variant: string }) {
 }
 
 function Run({ variant, knobs, chrome }: { variant: string; knobs: Knobs; chrome: boolean }) {
-  const bar = useBar({ sound: knobs.sound, bgm: knobs.bgm, withDoor: knobs.door });
+  const bar = useBar({ sound: knobs.sound, bgm: false, withDoor: knobs.door });
   return (
     <>
       {variant === "A" && <VariantA bar={bar} knobs={knobs} />}
@@ -180,8 +181,8 @@ function KnobPanel({
             <input type="checkbox" checked={knobs.sound} onChange={(e) => set("sound", e.target.checked)} />
           </label>
           <label className={row}>
-            音乐（Last Call）
-            <input type="checkbox" checked={knobs.bgm} onChange={(e) => set("bgm", e.target.checked)} />
+            开店前先选歌（A）
+            <input type="checkbox" checked={knobs.jukebox} onChange={(e) => set("jukebox", e.target.checked)} />
           </label>
           <button type="button" className="rounded px-2 py-1 ring-1 ring-yellow-400" onClick={onRestart}>
             从头来

@@ -87,7 +87,7 @@ function MixScene({ bar, onLeave, cells }: { bar: Bar; onLeave: () => void; cell
       <div className="absolute" style={{ left: 117, top: 80, width: 270, height: 176, transform: "scale(1.5)", transformOrigin: "0 0" }}>
         <MixStation cells={cells} bar={bar} at={[0, 0]} withBg />
       </div>
-      {book && <RecipeBook x={110} y={86} />}
+      {book && <RecipeBook x={110} y={86} play={bar.play} />}
     </Px>
   );
 }

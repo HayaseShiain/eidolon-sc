@@ -123,18 +123,23 @@ export function PixelText({
     const width = w ?? Math.ceil(list.reduce((n, r) => n + ctx.measureText(r.text).width, 0)) + 2;
     const lines = w === undefined ? [list.flatMap((r) => [...r.text].map((ch) => ({ ch, color: r.color ?? color })))] : layout(ctx, list, color, width);
     const height = h ?? lines.length * lh;
-    if (c.width !== width || c.height !== height) {
-      c.width = width;
-      c.height = height;
+    // 缝合像素里有些字（键、移、除、她……）是从别的字号的像素字体补进来的，点阵落在半像素上，12px 画出来是灰的；
+    // 按 2 倍画就落在整像素上。画布 2 倍大、CSS 尺寸仍是逻辑像素（电脑上画面放大 2 倍时正好 1:1）。
+    const k = font === "fusion" ? 2 : 1;
+    if (c.width !== width * k || c.height !== height * k) {
+      c.width = width * k;
+      c.height = height * k;
     }
     if (box.w !== width || box.h !== height) setBox({ w: width, h: height });
+    ctx.setTransform(k, 0, 0, k, 0, 0);
     ctx.clearRect(0, 0, width, height);
     ctx.font = fontSpec;
-    ctx.textBaseline = "middle";
+    // 顶端对齐到整数像素：像素字体的点阵才正好落在格子上（居中对齐会落在半像素上，一模糊、二值化后笔画发粗）
+    ctx.textBaseline = "top";
     lines.forEach((line, row) => {
       const lineWidth = line.reduce((n, g) => n + ctx.measureText(g.ch).width, 0);
       let cx = align === "center" ? Math.round((width - lineWidth) / 2) : 0;
-      const cy = Math.round(row * lh + lh / 2);
+      const cy = row * lh + Math.round((lh - px) / 2);
       for (const g of line) {
         ctx.fillStyle = g.color;
         ctx.fillText(g.ch, cx, cy);
@@ -142,7 +147,7 @@ export function PixelText({
       }
     });
     // 去掉抗锯齿：透明度过半的像素全不透明，其余全透明
-    const img = ctx.getImageData(0, 0, width, height);
+    const img = ctx.getImageData(0, 0, width * k, height * k);
     const d = img.data;
     // 门槛取一半：再高 Noto 落在两像素之间的细笔画会断，再低字会发粗（像素字体本来就对齐像素格，不受影响）
     for (let i = 3; i < d.length; i += 4) d[i] = d[i] >= 128 ? 255 : 0;

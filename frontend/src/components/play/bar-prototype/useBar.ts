@@ -44,8 +44,27 @@ export type Mixer = {
 const FRESH: Mixer = { counts: EMPTY, ice: false, aged: false, shake: "idle", made: null, pulse: null, float: null, name: null };
 
 /** 声音：音效每次新建一个 Audio；打字音效是一段循环（票 03：说话期间循环播，不是每字一声）。 */
+/** Web Audio：循环用解码好的缓冲区，首尾无缝（HTMLAudio 的 loop 每圈有几十毫秒空隙）。 */
+let audioContext: AudioContext | null = null;
+const buffers = new Map<string, Promise<AudioBuffer>>();
+function context(): AudioContext {
+  audioContext ??= new AudioContext();
+  if (audioContext.state === "suspended") void audioContext.resume();
+  return audioContext;
+}
+function buffer(name: string): Promise<AudioBuffer> {
+  let b = buffers.get(name);
+  if (!b) {
+    b = fetch(`/prototype-bar/audio/${name}.ogg`)
+      .then((r) => r.arrayBuffer())
+      .then((data) => context().decodeAudioData(data));
+    buffers.set(name, b);
+  }
+  return b;
+}
+
 function useSound(enabled: boolean, bgm: boolean) {
-  const loop = useRef<HTMLAudioElement | null>(null);
+  const loop = useRef<AudioBufferSourceNode | null>(null);
   const loopName = useRef<string | null>(null);
   const music = useRef<HTMLAudioElement | null>(null);
   const play = useCallback(
@@ -61,15 +80,23 @@ function useSound(enabled: boolean, bgm: boolean) {
     (name: string | null) => {
       const want = enabled ? name : null;
       if (loopName.current === want) return;
-      loop.current?.pause();
+      loop.current?.stop();
       loop.current = null;
       loopName.current = want;
       if (!want) return;
-      const audio = new Audio(`/prototype-bar/audio/${want}.ogg`);
-      audio.loop = true;
-      audio.volume = 0.35;
-      loop.current = audio;
-      void audio.play().catch(() => {});
+      const ctx = context();
+      void buffer(want).then((b) => {
+        if (loopName.current !== want) return;
+        const source = ctx.createBufferSource();
+        source.buffer = b;
+        source.loop = true;
+        const gain = ctx.createGain();
+        gain.gain.value = 0.35;
+        source.connect(gain).connect(ctx.destination);
+        source.start();
+        loop.current?.stop();
+        loop.current = source;
+      });
     },
     [enabled],
   );
@@ -86,7 +113,7 @@ function useSound(enabled: boolean, bgm: boolean) {
     void audio.play().catch(() => {});
     return () => audio.pause();
   }, [bgm]);
-  useEffect(() => () => loop.current?.pause(), []);
+  useEffect(() => () => loop.current?.stop(), []);
   return { play, setLoop };
 }
 
@@ -272,6 +299,7 @@ export function useBar({ sound, bgm, withDoor }: { sound: boolean; bgm: boolean;
   }, [withDoor]);
 
   return {
+    play,
     phase,
     step,
     line,

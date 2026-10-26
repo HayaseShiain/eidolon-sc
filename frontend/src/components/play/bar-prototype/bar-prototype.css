@@ -57,6 +57,19 @@
 }
 .bar-portrait-guard[data-forced] { display: flex; }
 
-.bar-hit { cursor: pointer; background: transparent; border: 0; padding: 0; }
+.bar-hit { cursor: inherit; background: transparent; border: 0; padding: 0; }
+.bar-cursor { cursor: var(--cur); }
 .bar-hit:focus-visible { outline: 1px solid #fff; outline-offset: -1px; }
 .bar-hit:active > .bar-press { transform: translateY(1px); }
+
+/* 点唱机：选曲界面从上往下擦出（约 34 帧），「JUKEBOX 3」横向长出来；加歌时槽外一圈白框放大淡出；小播放器向下展开 10 帧 */
+@keyframes bar-juke-wipe { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.bar-juke-wipe { animation: bar-juke-wipe 1.13s steps(34) forwards; }
+@keyframes bar-juke-startup { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.bar-juke-startup { animation: bar-juke-startup 0.44s steps(13) forwards; transform-origin: 131px 0; }
+@keyframes bar-juke-halo { from { transform: scale(1); opacity: 1; } to { transform: scale(1.8, 1.8); opacity: 0; } }
+.bar-juke-halo { animation: bar-juke-halo 0.33s steps(10) forwards; transform-origin: center; }
+@keyframes bar-juke-open { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+.bar-juke-open { animation: bar-juke-open 0.33s steps(10) forwards; }
+@keyframes bar-juke-flash { from { opacity: 1; } to { opacity: 0; } }
+.bar-juke-flash { animation: bar-juke-flash 0.44s steps(13) forwards; }
