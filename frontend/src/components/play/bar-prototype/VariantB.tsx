@@ -37,7 +37,7 @@ export function VariantB({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
               <StandBox x={40} y={0} w={344} h={257} clip={[0, 0, 424, 257]} framing="waist" pixel={knobs.stand === "pixel"} mood={bar.mood} speaking={bar.speaking} />
             )}
             <Px w={W} h={H}>
-              <MixStation bar={bar} at={[424, 0]} withBg />
+              <MixStation cells={knobs.cells} bar={bar} at={[424, 0]} withBg />
             </Px>
             {/* 台词：高清字，名字条用她的颜色 */}
             <Hd x={0} y={170} w={424} h={87}>

@@ -35,6 +35,8 @@ export type Knobs = {
   smooth: boolean;
   stand: "default" | "hd" | "pixel";
   minFont: number;
+  /** 份数格：原版是亮描边（没加的 30% 透明），`fill` 是加了的填满颜色。 */
+  cells: "outline" | "fill";
   firstToday: boolean;
   door: boolean;
   portrait: boolean;
@@ -333,7 +335,19 @@ export const STATION = { x: 355, y: 93, w: 270, h: 176 };
  * 对得上配方的显示饮品图和「成功」，对不上的是故障瓶和「失败」、按钮变灰不能上（票 07）。
  * 子元素都按原版的屏幕坐标写，外面整体平移到 `at`；`withBg` 时把外框图的这一块垫在底下（不用整张外框的变体）。
  */
-export function MixStation({ bar, at = [STATION.x, STATION.y], withBg = false }: { bar: Bar; at?: [number, number]; withBg?: boolean }) {
+const CELL_COLOR: Record<IngredientKey, string> = { a: "#ed6e8a", b: "#f0be8d", d: "#8da9f0", f: "#bde1a4", k: "#a5f1f3" };
+
+export function MixStation({
+  bar,
+  at = [STATION.x, STATION.y],
+  withBg = false,
+  cells = "outline",
+}: {
+  bar: Bar;
+  at?: [number, number];
+  withBg?: boolean;
+  cells?: Knobs["cells"];
+}) {
   const font = useFont();
   const { mixer, canMix } = bar;
   const on = bar.phase === "mixing";
@@ -375,10 +389,15 @@ export function MixStation({ bar, at = [STATION.x, STATION.y], withBg = false }:
             {label(name, bx - 3, by - 15, 7)}
             <Sprite name={canMix ? `ing_${key}` : `ing_${key}_off`} x={bx} y={by} w={20} h={38} />
             {Array.from({ length: 10 }, (_, j) => (
-              <Sprite key={j} name={`cell_${key}`} x={cx + (j % 5) * 9} y={cy + Math.floor(j / 5) * 18} w={8} h={17} alpha={j < Math.min(n, 10) ? 1 : 0.15} />
+              <div key={j}>
+                <Sprite name={`cell_${key}`} x={cx + (j % 5) * 9} y={cy + Math.floor(j / 5) * 18} w={8} h={17} alpha={j < Math.min(n, 10) ? 1 : 0.3} />
+                {cells === "fill" && j < Math.min(n, 10) && (
+                  <div className="absolute" style={{ left: cx + (j % 5) * 9 + 1, top: cy + Math.floor(j / 5) * 18 + 1, width: 6, height: 15, background: CELL_COLOR[key] }} />
+                )}
+              </div>
             ))}
             {Array.from({ length: Math.max(0, n - 10) }, (_, j) => (
-              <Sprite key={`b${j}`} name={`big_${key}`} x={cx + (j % 5) * 9} y={cy + Math.floor(j / 5) * 18} w={8} h={17} />
+              <Sprite key={`b${j}`} style={cells === "fill" ? { filter: "brightness(0.35)" } : undefined} name={`big_${key}`} x={cx + (j % 5) * 9} y={cy + Math.floor(j / 5) * 18} w={8} h={17} />
             ))}
             <HitBox x={bx - 5} y={by - 17} w={75} h={57} onClick={() => bar.add(key)} label={`加一份 ${name}`} />
           </div>

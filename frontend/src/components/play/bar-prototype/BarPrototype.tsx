@@ -31,6 +31,7 @@ export function BarPrototype({ variant }: { variant: string }) {
     smooth: false,
     stand: "default",
     minFont: 13,
+    cells: "outline",
     firstToday: true,
     door: true,
     portrait: false,
@@ -144,6 +145,13 @@ function KnobPanel({
               <option value={12}>12px</option>
               <option value={13}>13px</option>
               <option value={15}>15px</option>
+            </select>
+          </label>
+          <label className={row}>
+            份数格
+            <select className="bg-black" value={knobs.cells} onChange={(e) => set("cells", e.target.value as Knobs["cells"])}>
+              <option value="outline">原版描边</option>
+              <option value="fill">填满</option>
             </select>
           </label>
           <label className={row}>

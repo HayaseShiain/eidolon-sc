@@ -41,7 +41,7 @@ export function VariantC({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
         </div>
         {/* 调酒这一幕 */}
         <div className="absolute inset-0 transition-transform duration-300" style={{ transform: mixing ? "none" : "translateX(100%)" }}>
-          <MixScene bar={bar} onLeave={leave} />
+          <MixScene bar={bar} onLeave={leave} cells={knobs.cells} />
         </div>
         <Px>
           {bar.phase === "door" && <Door onEnter={bar.enter} />}
@@ -68,7 +68,7 @@ function TalkBox({ bar }: { bar: Bar }) {
   );
 }
 
-function MixScene({ bar, onLeave }: { bar: Bar; onLeave: () => void }) {
+function MixScene({ bar, onLeave, cells }: { bar: Bar; onLeave: () => void; cells: Knobs["cells"] }) {
   const font = useFont();
   const [book, setBook] = useState(false);
   return (
@@ -88,7 +88,7 @@ function MixScene({ bar, onLeave }: { bar: Bar; onLeave: () => void }) {
         离开
       </CornerButton>
       <div className="absolute" style={{ left: 117, top: 80, width: 270, height: 176, transform: "scale(1.5)", transformOrigin: "0 0" }}>
-        <MixStation bar={bar} at={[0, 0]} withBg />
+        <MixStation cells={cells} bar={bar} at={[0, 0]} withBg />
       </div>
       {book && <RecipeBook x={110} y={86} />}
     </Px>

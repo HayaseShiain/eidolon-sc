@@ -54,7 +54,7 @@ export function VariantA({ bar, knobs }: { bar: Bar; knobs: Knobs }) {
           {bar.phase === "mixing" && <RecipeBook x={18} y={20} />}
           <Sprite name="frame" x={0} y={0} w={640} h={360} />
           <Logo />
-          <MixStation bar={bar} />
+          <MixStation cells={knobs.cells} bar={bar} />
           <TextBox bar={bar} x={17} y={276} w={412} h={65} />
           <SideMenu bar={bar} onLeave={leave} />
           {bar.phase === "door" && <Door onEnter={bar.enter} />}
