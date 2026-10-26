@@ -327,9 +327,10 @@ export function SmallPlayer({ juke }: { juke: Jukebox }) {
   return (
     <div className="bar-juke-open absolute" style={{ left: 0, top: 0, width: 640, height: 360, transformOrigin: "0 27px" }}>
       <Sprite name={juke.playing ? "juke_small_playing" : "juke_small_paused"} x={435} y={27} w={188} h={63} />
-      {juke.shuffle && <Sprite name="juke_shuffle" x={435} y={27} w={188} h={63} />}
-      {juke.loop && <Sprite name="juke_loop" x={435} y={27} w={188} h={63} />}
-      {flash && <Sprite key={flash.id} name={`juke_${flash.which}`} x={435} y={27} w={188} h={63} className="bar-juke-flash" />}
+      {/* 高亮图不是画在底板左上角，而是画在各按钮对象的位置（碰撞区减去图里的偏移）：随机、循环 (438,29)，上一首、下一首 (439,29) */}
+      {juke.shuffle && <Sprite name="juke_shuffle" x={438} y={29} w={188} h={63} />}
+      {juke.loop && <Sprite name="juke_loop" x={438} y={29} w={188} h={63} />}
+      {flash && <Sprite key={flash.id} name={`juke_${flash.which}`} x={439} y={29} w={188} h={63} className="bar-juke-flash" />}
       <Txt x={442} y={74} runs={juke.title} size={11} mono color="#808080" />
       <Txt x={442} y={73} runs={juke.title} size={11} mono />
       {hit("上一首", 446, 476, 55, 68, () => {
