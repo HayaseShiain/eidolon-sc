@@ -7,6 +7,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CAPACITY,
   EMPTY,
+  glitchName,
+  SHORT,
   INGREDIENTS,
   make,
   SCRIPT,
@@ -35,9 +37,11 @@ export type Mixer = {
   made: Made | null;
   pulse: { key: IngredientKey | "white"; id: number } | null;
   float: { ok: boolean; id: number } | null;
+  /** 调好后那格写的名字：短名，调坏了是乱码。 */
+  name: string | null;
 };
 
-const FRESH: Mixer = { counts: EMPTY, ice: false, aged: false, shake: "idle", made: null, pulse: null, float: null };
+const FRESH: Mixer = { counts: EMPTY, ice: false, aged: false, shake: "idle", made: null, pulse: null, float: null, name: null };
 
 /** 声音：音效每次新建一个 Audio；打字音效是一段循环（票 03：说话期间循环播，不是每字一声）。 */
 function useSound(enabled: boolean, bgm: boolean) {
@@ -196,7 +200,13 @@ export function useBar({ sound, bgm, withDoor }: { sound: boolean; bgm: boolean;
       if (fastTimer.current) window.clearTimeout(fastTimer.current);
       const made = make(mixer.counts, mixer.ice, mixer.aged, mixer.shake === "slow" ? "mix" : "blend");
       play("mix");
-      setMixer((m) => ({ ...m, shake: "done", made, float: { ok: made.drink !== null, id: ++seq.current } }));
+      setMixer((m) => ({
+        ...m,
+        shake: "done",
+        made,
+        name: made.drink ? SHORT[made.drink.id] : glitchName(),
+        float: { ok: made.drink !== null, id: ++seq.current },
+      }));
       return;
     }
     if (!mixer.made?.drink || !order) return play("noclick");

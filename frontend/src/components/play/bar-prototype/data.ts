@@ -98,6 +98,21 @@ export const DRINKS: Drink[] = [
   d("fed", "A Fedora", null, false, false, "bottle", false, "bubbly", "classic", null, "内含香水和李子"),
 ];
 
+/** 调好后摇酒器下面那格写的短名（原版 `bev_a`，票 01 drinks.csv 的 short_name）。 */
+export const SHORT: Record<string, string> = {
+  srush: "Sugar Rush", sstar: "Spark Star", bfairy: "Blue Fairy", fdream: "Flff Dream", scloud: "Sun Cloud",
+  moblast: "Moonblast", gpunch: "Gut Punch", pdriver: "Piledriver", splex: "Suplex", mablast: "Marsblast",
+  cspike: "Crv Spike", beer: "Beer", bjane: "Bleed Jane", fwater: "Frothy Wtr", btouch: "Bad Touch",
+  btini: "Brandtini", cvelvet: "Coblt Vlvt", fweaver: "Frng Weavr", meblast: "Mercryblst", gtemple: "Grizz Tmpl",
+  blight: "Bloom Lght", zstar: "Zen Star", pman: "Piano Man", pwman: "P. Woman",
+};
+
+/** 调坏了时那格的乱码（原版随机拼的 `##20%!!` 一类）。 */
+export function glitchName(): string {
+  const chars = "#%!?@&*0123456789";
+  return Array.from({ length: 7 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+}
+
 export type Counts = Record<IngredientKey, number>;
 export const EMPTY: Counts = { a: 0, b: 0, d: 0, f: 0, k: 0 };
 export const CAPACITY = 20;

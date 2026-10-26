@@ -208,7 +208,7 @@ export function Sprite({
           setSize({ w: img.naturalWidth / k, h: img.naturalHeight / k });
         }
       }}
-      style={{ left: x, top: y, width: size?.w, height: size?.h, opacity: alpha, ...style }}
+      style={{ left: x, top: y, width: w ?? size?.w, height: h ?? size?.h, opacity: alpha, ...style }}
     />
   );
 }
@@ -349,7 +349,7 @@ export function MixStation({
   cells?: Knobs["cells"];
 }) {
   const font = useFont();
-  const { mixer, canMix } = bar;
+  const { mixer } = bar;
   const on = bar.phase === "mixing";
   // 调酒台的标签挤在原版的格子里，字保底会撑出格子：最多放到逻辑 9px。
   const label = (text: string, x: number, y: number, size = 8, color = INK.text) => (
@@ -387,7 +387,7 @@ export function MixStation({
         return (
           <div key={key}>
             {label(name, bx - 3, by - 15, 7)}
-            <Sprite name={canMix ? `ing_${key}` : `ing_${key}_off`} x={bx} y={by} w={20} h={38} />
+            <Sprite name={on ? `ing_${key}` : `ing_${key}_off`} x={bx} y={by} w={20} h={38} />
             {Array.from({ length: 10 }, (_, j) => (
               <div key={j}>
                 <Sprite name={`cell_${key}`} x={cx + (j % 5) * 9} y={cy + Math.floor(j / 5) * 18} w={8} h={17} alpha={j < Math.min(n, 10) ? 1 : 0.3} />
@@ -413,6 +413,11 @@ export function MixStation({
         Array.from({ length: Math.max(0, bar.total - 10) }, (_, i) => (
           <Sprite key={`gb${i}`} name="gauge_big" x={486 + (i % 5) * 11} y={253 + Math.floor(i / 5) * 6} w={10} h={5} />
         ))}
+      {mixer.name && (
+        <span className="absolute whitespace-nowrap" style={{ left: 483, top: 252, fontSize: 11, lineHeight: 1, color: "#fff", fontFamily: "Inconsolata, ui-monospace, monospace" }}>
+          {mixer.name}
+        </span>
+      )}
       {/* 摇酒器 / 成品 */}
       {made ? (
         <Sprite name={made.drink ? `drink_${made.drink.id}` : "drink_glitch"} x={496} y={190} w={35} h={53} />
