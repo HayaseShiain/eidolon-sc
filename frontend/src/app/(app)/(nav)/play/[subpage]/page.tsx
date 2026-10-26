@@ -4,6 +4,7 @@ import { AchievementsSubpage } from "@/components/play/AchievementsSubpage";
 import { CalendarSubpage } from "@/components/play/CalendarSubpage";
 import { CyclesSubpage } from "@/components/play/CyclesSubpage";
 import { GiftsSubpage } from "@/components/play/GiftsSubpage";
+import { BarPrototype } from "@/components/play/bar-prototype/BarPrototype";
 import { giftsFor } from "@/lib/gifts";
 import { PLAY_SUBPAGES, type PlaySubpage } from "@/lib/playRoute";
 import { calendarWho } from "@/lib/schedule";
@@ -40,4 +41,6 @@ const SUBPAGES: Record<PlaySubpage, (search: SearchParams) => ReactNode> = {
   achievements: () => <AchievementsSubpage />,
   calendar: (search) => <CalendarSubpage who={calendarWho(search)} />,
   cycles: (search) => <CyclesSubpage who={calendarWho(search)} />,
+  // PROTOTYPE（bar 地图票 08）
+  bar: (search) => <BarPrototype variant={typeof search.variant === "string" ? search.variant : "A"} />,
 };

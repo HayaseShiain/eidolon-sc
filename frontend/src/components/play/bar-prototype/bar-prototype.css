@@ -1,0 +1,55 @@
+/* PROTOTYPE（bar 地图票 08）：酒吧像素画面的样式，只在 prototype/bar 分支。 */
+
+.bar-px img,
+.bar-px .bar-sprite {
+  image-rendering: pixelated;
+}
+.bar-smooth img,
+.bar-smooth .bar-sprite {
+  image-rendering: auto;
+}
+.bar-stand-px canvas {
+  image-rendering: pixelated;
+}
+.bar-font {
+  font-family: "Noto Sans SC", "Noto Sans JP", system-ui, sans-serif;
+}
+
+@keyframes bar-shake {
+  0% { transform: rotate(-30deg); }
+  50% { transform: rotate(30deg); }
+  100% { transform: rotate(-30deg); }
+}
+.bar-shake-slow { animation: bar-shake 0.4s steps(12) infinite; transform-origin: 36px 34px; }
+.bar-shake-fast { animation: bar-shake 0.13s steps(4) infinite; transform-origin: 36px 34px; }
+
+@keyframes bar-pulse {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(1.8); opacity: 0; }
+}
+.bar-pulse { animation: bar-pulse 0.33s linear forwards; transform-origin: 36px 34px; }
+
+@keyframes bar-float {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-40px); opacity: 0; }
+}
+.bar-float { animation: bar-float 0.7s linear forwards; }
+
+@keyframes bar-spin { to { transform: rotate(360deg); } }
+.bar-fan { animation: bar-spin 6s steps(180) infinite; transform-origin: 12px 12px; }
+
+@keyframes bar-blink { 50% { opacity: 0; } }
+.bar-ctc { animation: bar-blink 0.9s steps(1) infinite; }
+
+@keyframes bar-wipe { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+.bar-wipe { animation: bar-wipe 0.83s steps(25) forwards; }
+
+.bar-portrait-guard { display: none; }
+@media (orientation: portrait) and (pointer: coarse) {
+  .bar-portrait-guard { display: flex; }
+}
+.bar-portrait-guard[data-forced] { display: flex; }
+
+.bar-hit { cursor: pointer; background: transparent; border: 0; padding: 0; }
+.bar-hit:focus-visible { outline: 1px solid #fff; outline-offset: -1px; }
+.bar-hit:active > .bar-press { transform: translateY(1px); }

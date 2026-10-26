@@ -118,6 +118,15 @@ const CARDS: Definition[] = [
     hasDot: () => false,
     dotLabel: "",
   },
+  // PROTOTYPE（bar 地图票 08）
+  {
+    id: "bar",
+    name: "VA-283",
+    isShown: () => true,
+    status: () => "今天的客人还没来",
+    hasDot: () => false,
+    dotLabel: "",
+  },
 ];
 
 /** The cycles card's 「记过 3 位 · 最近 円香 10月31日」, or what it is for while no one is written down. */
