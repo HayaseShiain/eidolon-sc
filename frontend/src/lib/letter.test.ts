@@ -4,10 +4,13 @@ import type { Character } from "@/lib/api";
 import {
   FALLBACK_WRITER,
   LEAD_IN,
+  SIGNATURE_DELAY,
+  SIGNATURE_SECONDS,
   finishesAt,
   hasSeenLetter,
   markLetterSeen,
   partsOf,
+  signsAt,
   writerOf,
   written,
   type Letter,
@@ -90,16 +93,16 @@ const letter: Letter = {
 };
 
 describe("时间轴", () => {
-  it("有音频时照音频里每段的起止", () => {
-    const parts = partsOf({ ...letter, audio: { url: "x.mp3", segments: [[1.2, 2], [2.6, 5], [5.9, 7], [8, 9]] } });
+  it("有音频时照音频里每段的起止；署名不念，念完以后签名", () => {
+    const parts = partsOf({ ...letter, audio: { url: "x.mp3", segments: [[1.2, 2], [2.6, 5], [5.9, 7]] } });
     expect(parts.map((p) => [p.kind, p.start, p.end])).toEqual([
       ["salutation", 1.2, 2],
       ["paragraph", 2.6, 5],
       ["paragraph", 5.9, 7],
-      ["signature", 8, 9],
     ]);
     expect(parts[1].zh).toBe("那个，你好。");
-    expect(finishesAt(parts)).toBe(9);
+    expect(signsAt(parts)).toBe(7 + SIGNATURE_DELAY);
+    expect(finishesAt(parts)).toBe(7 + SIGNATURE_DELAY + SIGNATURE_SECONDS);
   });
 
   it("没有音频时按字数估，从拆开后的静音之后开始，一块接一块", () => {
@@ -109,7 +112,7 @@ describe("时间轴", () => {
   });
 
   it("每个字在这一块的起止之间写出，第一个在开头，标点后面多停一下", () => {
-    const [, paragraph] = partsOf({ ...letter, audio: { url: "x.mp3", segments: [[0, 1], [10, 20], [21, 22], [23, 24]] } });
+    const [, paragraph] = partsOf({ ...letter, audio: { url: "x.mp3", segments: [[0, 1], [10, 20], [21, 22]] } });
     expect(paragraph.at[0]).toBe(10);
     expect(paragraph.at.every((t) => t >= 10 && t < 20)).toBe(true);
     // 「えっと、こ」：「、」后面的「こ」比前面几个字之间隔得久。

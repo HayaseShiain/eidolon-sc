@@ -7,7 +7,9 @@ import { TIERS } from "@/lib/affinity";
 import type { Stats } from "@/lib/stats";
 
 /** 一封信，和 letters.json 里的一样：页面上显示的字（不带语气提示）、每段的字幕，和念它的音频；
- * `audio.segments` 是抬头、每段正文、署名在音频里的起止秒数，按这个顺序。没合成时没有音频。 */
+ * `audio.segments` 是抬头、每段正文在音频里的起止秒数，按这个顺序。没合成时没有音频。
+ * 署名不念，信上放她手写的签名图（public/letters/signatures/<id>.webp）；`signature` 是它的替代文字，
+ * 图没有时照字写出来。 */
 export type Letter = {
   salutation: string;
   signature: string;
@@ -42,14 +44,18 @@ export function writerOf(stats: Stats, characters: Character[], hasLetter: (id: 
 export const LEAD_IN = 1.2;
 
 /** 段与段之间的停顿（秒），和 scripts/last_letter.py 一致；没有音频时按它估。 */
-const PAUSES = { afterSalutation: 0.6, betweenParagraphs: 0.9, beforeSignature: 1.0 };
+const PAUSES = { afterSalutation: 0.6, betweenParagraphs: 0.9 };
+
+/** 念完最后一段后，隔多久签名（秒），和签名从左到右写出来要多久。 */
+export const SIGNATURE_DELAY = 0.8;
+export const SIGNATURE_SECONDS = 1.6;
 
 /** 没有音频时，估一个字念多久（秒）。 */
 const SECONDS_PER_CHAR = 0.15;
 
-/** 信上的一块：抬头、一段正文（带字幕）或署名，和它在时间轴上从几秒写到几秒。 */
+/** 信上的一块：抬头或一段正文（带字幕），和它在时间轴上从几秒写到几秒。 */
 export type Part = {
-  kind: "salutation" | "paragraph" | "signature";
+  kind: "salutation" | "paragraph";
   /** 一个字一项（按码点拆，不拆坏代理对）。 */
   chars: string[];
   zh: string | null;
@@ -84,7 +90,6 @@ export function partsOf(letter: Letter): Part[] {
   const blocks: Omit<Part, "start" | "end" | "at">[] = [
     { kind: "salutation", chars: Array.from(letter.salutation), zh: null },
     ...letter.paragraphs.map((p) => ({ kind: "paragraph" as const, chars: Array.from(p.ja), zh: p.zh })),
-    { kind: "signature", chars: Array.from(letter.signature), zh: null },
   ];
   const times = letter.audio?.segments.length === blocks.length ? letter.audio.segments : estimate(blocks);
   return blocks.map((block, i) => {
@@ -98,8 +103,7 @@ function estimate(blocks: { chars: string[] }[]): [number, number][] {
   return blocks.map((block, i) => {
     const length = Math.max(1, block.chars.length * SECONDS_PER_CHAR);
     const span: [number, number] = [at, at + length];
-    const last = blocks.length - 1;
-    at += length + (i === 0 ? PAUSES.afterSalutation : i === last - 1 ? PAUSES.beforeSignature : PAUSES.betweenParagraphs);
+    at += length + (i === 0 ? PAUSES.afterSalutation : PAUSES.betweenParagraphs);
     return span;
   });
 }
@@ -111,9 +115,14 @@ export function written(part: Part, t: number): number {
   return n;
 }
 
-/** 整封信在第几秒写完：最后一块的结束。 */
+/** 第几秒开始签名：念完最后一段之后。 */
+export function signsAt(parts: Part[]): number {
+  return (parts.length > 0 ? parts[parts.length - 1].end : 0) + SIGNATURE_DELAY;
+}
+
+/** 整封信在第几秒写完：签名写完。 */
 export function finishesAt(parts: Part[]): number {
-  return parts.length > 0 ? parts[parts.length - 1].end : 0;
+  return signsAt(parts) + SIGNATURE_SECONDS;
 }
 
 // 这台设备上看过没有：按用户分开存在 localStorage（eidolon.lastLetterSeen.<用户 ID>），和公告的「已读」一样。

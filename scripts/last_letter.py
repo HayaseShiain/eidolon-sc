@@ -1,7 +1,9 @@
 """停服前最后一版（last-letter 分支）的信：把 characters/letters/*.toml 合成语音、上传，生成前端用的数据和字体子集。
 
-每封信按段念：抬头、每段正文、署名各合成一次（Drama 3，她的音色，读音词典和招呼一样用整份 readings.toml），
-再用 ffmpeg 拼成一个 mp3，段与段之间留停顿，记下每段在音频里的起止秒数。拼好的音频按内容哈希放进立绘的
+每封信按段念：抬头和每段正文各合成一次（Drama 3，她的音色，读音词典和招呼一样用整份 readings.toml）；署名不念，
+信上用她手写的签名图。合成要无损的 wav、latency 用 normal（文档说默认的 balanced 是为流式压低首包延迟，
+normal 最稳；之前用默认值合成的 mp3 偶尔有爆音），再用 ffmpeg 拼起来，段与段之间留停顿，过一道限幅
+（峰值压到约 -1.5 dB），只编码一次成 mp3，记下每段在音频里的起止秒数。拼好的音频按内容哈希放进立绘的
 存储桶 `letters/<id>-<hash>.mp3`（CDN 缓存一年，内容变了地址就变），这封信旧的地址删掉。
 
 写出两样东西，都提交：
@@ -14,7 +16,7 @@
     PYTHONIOENCODING=utf-8 uv run python ../scripts/last_letter.py --no-upload # 合成、拼好，不上传（校对时听）
     PYTHONIOENCODING=utf-8 uv run python ../scripts/last_letter.py --no-audio # 只写数据和字体，没有音频
 
-每段的录音按「音色、模型、念的字、读音」缓存在 frontend/.cache/last-letter/，改了哪段只重新合成哪段。
+每段的录音按「音色、模型、合成参数、念的字、读音」缓存在 frontend/.cache/last-letter/，改了哪段只重新合成哪段。
 """
 
 import argparse
@@ -23,6 +25,7 @@ import hashlib
 import json
 import os
 import re
+import struct
 import subprocess
 import sys
 import tomllib
@@ -34,7 +37,7 @@ import httpx
 
 from eidolon.characters import Character, load_characters
 from eidolon.delivery_cues import spoken_by, voiced, without_cues
-from eidolon.greetings import GREETING_CACHE, FishAudioSettings, _voice
+from eidolon.greetings import FISH_TTS_HTTP_URL, GREETING_CACHE, FishAudioSettings
 from eidolon.readings import load_readings, pronunciation_dictionary, readings_path
 from eidolon.s3 import Bucket, S3Settings
 
@@ -50,8 +53,11 @@ LEAD_IN = 1.2
 """音频开头的静音（秒）：点开信封时音频就开始放（浏览器只在点击里让出声），信纸展开的这段时间她还没开口。"""
 PAUSE_AFTER_SALUTATION = 0.6
 PAUSE_BETWEEN_PARAGRAPHS = 0.9
-PAUSE_BEFORE_SIGNATURE = 1.0
 """段与段之间的停顿（秒）：字幕在这时淡出，下一段再开始写。"""
+SYNTHESIS = {"format": "wav", "sample_rate": 44100, "latency": "normal"}
+"""每段的合成参数：无损、最稳的那一档（docs.fish.audio 的 Text to Speech 指南）。"""
+LIMIT = 0.84
+"""拼好后限幅的峰值（线性，约 -1.5 dBFS），免得编码成 mp3 后冲顶爆音。"""
 
 KLEE_ONE = "https://github.com/google/fonts/raw/main/ofl/kleeone"
 FONT_WEIGHTS = ("SemiBold",)
@@ -74,8 +80,8 @@ class Letter:
 
     @property
     def segments(self) -> list[str]:
-        """按念的顺序：抬头、每段正文、署名，带语气提示。"""
-        return [self.salutation, *(ja for ja, _ in self.paragraphs), self.signature]
+        """按念的顺序：抬头、每段正文，带语气提示。署名不念。"""
+        return [self.salutation, *(ja for ja, _ in self.paragraphs)]
 
 
 def load_letters(characters: dict[str, Character]) -> list[Letter]:
@@ -87,7 +93,7 @@ def load_letters(characters: dict[str, Character]) -> list[Letter]:
             raise SystemExit(f"{path.name}：character 不是这个文件名对应的角色")
         paragraphs = [(p["ja"].strip(), p["zh"].strip()) for p in data["paragraphs"]]
         letter = Letter(character, data["salutation"].strip(), data["signature"].strip(), paragraphs)
-        for text in letter.segments:
+        for text in [*letter.segments, letter.signature]:
             if _BRACKETS.search(without_cues(text)):
                 raise SystemExit(f"{path.name}：去掉语气提示后还有括号：{without_cues(text)}")
         letters.append(letter)
@@ -99,11 +105,43 @@ def said(text: str) -> str:
 
 
 def segment_cache(letter: Letter, text: str, readings_key: str) -> Path:
-    key = f"{letter.character.voice_id}\n{MODEL}\n{said(text)}\n{readings_key}"
-    return CACHE / letter.character.id / f"{hashlib.sha256(key.encode()).hexdigest()[:16]}.mp3"
+    params = json.dumps(SYNTHESIS, sort_keys=True)
+    key = f"{letter.character.voice_id}\n{MODEL}\n{params}\n{said(text)}\n{readings_key}"
+    return CACHE / letter.character.id / f"{hashlib.sha256(key.encode()).hexdigest()[:16]}.wav"
 
 
-async def voice_all(letters: list[Letter], fish: FishAudioSettings, dictionary: list[dict] | None) -> None:
+def fixed_wav(wav: bytes) -> bytes:
+    """流式传回的 wav 头里 RIFF 和 data 的长度是占位的 0xFFFFFFxx，按实际长度改正，免得 ffmpeg 读错时长。"""
+    data = wav.find(b"data", 12)
+    if wav[:4] != b"RIFF" or data < 0:
+        raise SystemExit("Fish Audio 返回的不是 wav")
+    fixed = bytearray(wav)
+    fixed[4:8] = struct.pack("<I", len(wav) - 8)
+    fixed[data + 4 : data + 8] = struct.pack("<I", len(wav) - data - 8)
+    return bytes(fixed)
+
+
+async def voice(client: httpx.AsyncClient, api_key: str, text: str, voice_id: str, dictionary: list[dict] | None) -> bytes:
+    """`text` 用她的音色念成 wav（SYNTHESIS），读音词典 `dictionary`；失败重试两次。"""
+    body: dict[str, object] = {"text": text, "reference_id": voice_id, **SYNTHESIS}
+    if dictionary is not None:
+        body["pronunciation_dictionary"] = dictionary
+    for attempt in range(3):
+        try:
+            response = await client.post(
+                FISH_TTS_HTTP_URL, headers={"Authorization": f"Bearer {api_key}", "model": MODEL}, json=body
+            )
+        except httpx.HTTPError as e:
+            print(f"  第 {attempt + 1} 次连不上：{e!r}", file=sys.stderr)
+        else:
+            if response.is_success and response.content:
+                return fixed_wav(response.content)
+            print(f"  第 {attempt + 1} 次失败：{response.status_code} {response.text[:200]}", file=sys.stderr)
+        await asyncio.sleep(3)
+    raise SystemExit(f"合成失败：{text[:20]}…")
+
+
+async def voice_all(letters: list[Letter], api_key: str, dictionary: list[dict] | None) -> None:
     readings_key = json.dumps(dictionary, ensure_ascii=False, sort_keys=True)
     todo = [
         (letter, text, path)
@@ -117,7 +155,7 @@ async def voice_all(letters: list[Letter], fish: FishAudioSettings, dictionary: 
 
         async def one(letter: Letter, text: str, path: Path) -> None:
             async with limit:
-                audio = await _voice(client, fish, said(text), letter.character.voice_id, dictionary)
+                audio = await voice(client, api_key, said(text), letter.character.voice_id, dictionary)
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(audio)
             print(f"  {letter.character.id}：{without_cues(text)[:20]}…")
@@ -136,11 +174,7 @@ def duration(path: Path) -> float:
 def assemble(letter: Letter, readings_key: str) -> tuple[bytes, list[tuple[float, float]]]:
     """拼成一个 mp3，返回音频和每段的起止秒数。"""
     parts = [segment_cache(letter, text, readings_key) for text in letter.segments]
-    last = len(parts) - 1
-    pauses = [
-        PAUSE_AFTER_SALUTATION if i == 0 else PAUSE_BEFORE_SIGNATURE if i == last - 1 else PAUSE_BETWEEN_PARAGRAPHS
-        for i in range(last)
-    ] + [0.0]
+    pauses = [PAUSE_AFTER_SALUTATION] + [PAUSE_BETWEEN_PARAGRAPHS] * (len(parts) - 2) + [0.0]
     times, at = [], LEAD_IN
     for part, pause in zip(parts, pauses):
         length = duration(part)
@@ -155,8 +189,8 @@ def assemble(letter: Letter, readings_key: str) -> tuple[bytes, list[tuple[float
     out = CACHE / letter.character.id / "letter.mp3"
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", *inputs, "-filter_complex",
-         f"{pads};{joined}concat=n={len(parts)}:v=0:a=1[out]",
-         "-map", "[out]", "-ac", "1", "-b:a", "96k", str(out)],
+         f"{pads};{joined}concat=n={len(parts)}:v=0:a=1,alimiter=limit={LIMIT}:level=false[out]",
+         "-map", "[out]", "-ac", "1", "-c:a", "libmp3lame", "-b:a", "128k", str(out)],
         check=True,
     )
     return out.read_bytes(), times
@@ -216,8 +250,7 @@ async def main() -> int:
     audio: dict[str, dict] = {}
     if not args.no_audio:
         assets_url = os.environ["EIDOLON_STAND_ASSETS_URL"].rstrip("/")
-        fish = FishAudioSettings(FishAudioSettings.from_env().api_key, MODEL)
-        await voice_all(letters, fish, dictionary)
+        await voice_all(letters, FishAudioSettings.from_env().api_key, dictionary)
         entries = {}
         for letter in letters:
             data, times = assemble(letter, readings_key)
@@ -243,7 +276,7 @@ async def main() -> int:
         json.dump(data, f, ensure_ascii=False, indent=2)
         f.write("\n")
     # 信封上写她的全名，和信里的字一起收进子集；加上 ASCII 以防万一。
-    text = "".join(without_cues(t) for letter in letters for t in letter.segments)
+    text = "".join(without_cues(t) for letter in letters for t in [*letter.segments, letter.signature])
     text += "".join(c.name for c in characters.values()) + "".join(chr(i) for i in range(0x20, 0x7F))
     subset_fonts(text)
     print(f"写好了 {len(data)} 封信{'（没有音频）' if args.no_audio else ''}")

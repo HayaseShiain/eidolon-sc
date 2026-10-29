@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { copy } from "@/i18n";
 import type { Character } from "@/lib/api";
-import { finishesAt, partsOf, written, type Letter, type Part } from "@/lib/letter";
+import { finishesAt, partsOf, signsAt, written, type Letter, type Part } from "@/lib/letter";
 import { cn } from "@/lib/utils";
 import { letterVars } from "@/theme/herVars";
 import { LetterMutedIcon, LetterSoundIcon } from "@/theme/icons";
@@ -47,16 +47,18 @@ type Props = {
 
 /**
  * 停服前最后一版的信（last-letter 分支，lib/letter）：整屏压暗，中间是她的信封，点了拆开。信纸上的字跟着她念到哪里
- * 写到哪里（有音频时按音频的进度，没有或放不出来时按时钟），每段写完，下面淡出这段的中文字幕。右上角是静音和跳过；
- * 写完以后信末出现「收好」。系统要求减少动态效果时，拆开就是整封信，声音照放。
+ * 写到哪里（有音频时按音频的进度，没有或放不出来时按时钟），每段写完，下面淡出这段的中文字幕；念完以后，
+ * 她手写的签名从左到右显出来。右上角是静音和跳过；签完名信末出现「收好」。系统要求减少动态效果时，拆开就是整封信，声音照放。
  */
 export function LetterLayer({ writer, letter, target, onClosed }: Props) {
   const isReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)", false);
   const parts = useMemo(() => partsOf(letter), [letter]);
   const total = useMemo(() => parts.reduce((n, p) => n + p.chars.length, 0), [parts]);
   const finish = finishesAt(parts);
+  const signing = signsAt(parts);
   const [stage, setStage] = useState<Stage>("envelope");
   const [count, setCount] = useState(0);
+  const [isSigned, setSigned] = useState(false);
   const [isDone, setDone] = useState(false);
   const [isMuted, setMuted] = useState(false);
   const audio = useRef<HTMLAudioElement>(null);
@@ -130,6 +132,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
     paper.current?.focus({ preventScroll: true });
     if (isReducedMotion) {
       setCount(total);
+      setSigned(true);
       setDone(true);
       return;
     }
@@ -137,6 +140,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
     const tick = () => {
       const at = now();
       setCount(parts.reduce((n, p) => n + written(p, at), 0));
+      if (at >= signing) setSigned(true);
       if (at >= finish) {
         setDone(true);
         return;
@@ -145,7 +149,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [stage, isReducedMotion, now, parts, total, finish]);
+  }, [stage, isReducedMotion, now, parts, total, signing, finish]);
 
   // 跟着写到的地方滚：写到的字落到信纸下面四分之一时，把它滚回四成高的地方。用户刚自己滚过就不动。
   useEffect(() => {
@@ -288,6 +292,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
                   offset += part.chars.length;
                   return <Block key={i} part={part} from={from} count={count - from} isReducedMotion={isReducedMotion} />;
                 })}
+                <Signature writer={writer.id} text={letter.signature} isSigned={isSigned} isReducedMotion={isReducedMotion} />
                 {isDone && (
                   <section className="flex justify-center animate-in fade-in-0 duration-700">
                     <Button ref={done} variant="letter" size="call" onClick={close} className="font-sans">
@@ -319,7 +324,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
   );
 }
 
-/** 信上的一块：抬头、一段正文（写完后淡出字幕）或署名。每个字一个 span，没写到的先占着位置、看不见，
+/** 信上的一块：抬头或一段正文（写完后淡出字幕）。每个字一个 span，没写到的先占着位置、看不见，
  * 版面从头到尾不跳；写到的字带一次「洇墨」的动画。`count` 是这一块写出了几个字（可以小于 0、大于字数）。 */
 function Block({ part, from, count, isReducedMotion }: { part: Part; from: number; count: number; isReducedMotion: boolean }) {
   const n = Math.max(0, Math.min(part.chars.length, count));
@@ -328,13 +333,6 @@ function Block({ part, from, count, isReducedMotion }: { part: Part; from: numbe
       {char}
     </span>
   ));
-  if (part.kind === "signature") {
-    return (
-      <section>
-        <p className="text-right text-letter-signature text-her-letter-ink">{chars}</p>
-      </section>
-    );
-  }
   return (
     <section>
       <p>{chars}</p>
@@ -348,6 +346,37 @@ function Block({ part, from, count, isReducedMotion }: { part: Part; from: numbe
         >
           {part.zh}
         </p>
+      )}
+    </section>
+  );
+}
+
+/** 信末她手写的签名（public/letters/signatures/<id>.webp，透明底），靠右，从左到右显出来；版面一开始就留着它的位置。
+ * 没有这张图时，用她的颜色把署名照字写出来。 */
+function Signature({
+  writer,
+  text,
+  isSigned,
+  isReducedMotion,
+}: {
+  writer: string;
+  text: string;
+  isSigned: boolean;
+  isReducedMotion: boolean;
+}) {
+  const [hasImage, setHasImage] = useState(true);
+  const shown = isSigned ? (isReducedMotion ? undefined : "animate-sign") : "invisible";
+  return (
+    <section className="flex justify-end">
+      {hasImage ? (
+        <img
+          src={`/letters/signatures/${writer}.webp`}
+          alt={text}
+          onError={() => setHasImage(false)}
+          className={cn("letter-signature w-auto max-w-[70%] object-contain object-right", shown)}
+        />
+      ) : (
+        <p className={cn("text-letter-signature text-her-letter-ink", shown)}>{text}</p>
       )}
     </section>
   );

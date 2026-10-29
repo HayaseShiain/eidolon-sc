@@ -75,6 +75,16 @@
   --text-letter-signature--line-height: calc(var(--letter-line) * 2);
   /* 信上一个字写出来：从淡、带一点洇开的模糊到清楚，稍稍往上落定。 */
   --animate-ink: ink 0.55s ease-out both;
+  /* 信末的签名从左到右显出来，和 lib/letter 的 SIGNATURE_SECONDS 一样长。 */
+  --animate-sign: sign 1.6s ease-in-out both;
+  @keyframes sign {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
   @keyframes ink {
     from {
       opacity: 0;
@@ -336,6 +346,10 @@
 /* 段与段之间空一行。 */
 .letter-paper section + section {
   margin-top: var(--letter-line);
+}
+/* 信末的签名图占两行高。 */
+.letter-signature {
+  height: calc(var(--letter-line) * 2);
 }
 
 /* 分享图的画布：固定 1080×1350 px，间距刻度钉成 4px，导出的图不随用户的根字号变。 */
