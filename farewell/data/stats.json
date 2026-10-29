@@ -1,0 +1,83 @@
+{
+  "opened": "2026-09-27",
+  "closed": "2026-10-29",
+  "days": 33,
+  "producers": 5,
+  "messages": {
+    "producers": 331,
+    "idols": 331
+  },
+  "calls": {
+    "count": 10,
+    "seconds": 639,
+    "longest_seconds": 172,
+    "hung_up": 4
+  },
+  "characters": {
+    "amana": 8,
+    "asahi": 12,
+    "chiyoko": 4,
+    "chiyuki": 40,
+    "fuyuko": 14,
+    "hana": 40,
+    "haruki": 8,
+    "hinana": 8,
+    "hiori": 38,
+    "juri": 10,
+    "kaho": 8,
+    "kiriko": 6,
+    "kogane": 52,
+    "koito": 14,
+    "luca": 22,
+    "madoka": 52,
+    "mamimi": 4,
+    "mano": 214,
+    "meguru": 44,
+    "mei": 8,
+    "mikoto": 8,
+    "natsuha": 6,
+    "nichika": 6,
+    "rinze": 20,
+    "tenka": 8,
+    "toru": 4,
+    "yuika": 4
+  },
+  "hours": [
+    26,
+    8,
+    2,
+    12,
+    0,
+    0,
+    0,
+    0,
+    3,
+    37,
+    12,
+    35,
+    9,
+    26,
+    5,
+    10,
+    24,
+    15,
+    18,
+    34,
+    4,
+    13,
+    20,
+    18
+  ],
+  "gifts": {
+    "count": 4,
+    "top": {
+      "id": "cake",
+      "count": 1
+    }
+  },
+  "memories": 3,
+  "bar": {
+    "visits": 8,
+    "drunk": 2
+  }
+}

@@ -1,0 +1,702 @@
+[
+  {
+    "id": "mano",
+    "name": "櫻木真乃",
+    "color": "#ffbad6",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030010010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030010010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/1.json"
+    },
+    "idol_id": 1,
+    "name_zh": "樱木真乃",
+    "unit": "illumination STARS",
+    "unit_order": 0,
+    "greeting": {
+      "ja": "ほわっ……プロデューサーさん、ですか？　よろしくお願いしますっ",
+      "subtitle": "呼哇……你就是制作人吗？请多指教！",
+      "audio_url": "https://stand.hmhnk.top/greetings/mano-16c5c24b9843.mp3"
+    },
+    "call_opener": {
+      "ja": "あっ、もしもし……真乃です。えっと、今、お電話だいじょうぶですか？",
+      "subtitle": "啊，喂……我是真乃。那个，现在方便接电话吗？",
+      "audio_url": "https://stand.hmhnk.top/call-openers/mano-6813eed60666.mp3"
+    },
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/mano.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/mano.json"
+  },
+  {
+    "id": "hiori",
+    "name": "風野灯織",
+    "color": "#144384",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030020010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030020010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/2.json"
+    },
+    "idol_id": 2,
+    "name_zh": "风野灯织",
+    "unit": "illumination STARS",
+    "unit_order": 0,
+    "greeting": {
+      "ja": "はじめまして、風野灯織です。……精一杯、精進します",
+      "subtitle": "初次见面，我是風野灯織。……我会竭尽全力。",
+      "audio_url": "https://stand.hmhnk.top/greetings/hiori-8990068102d6.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/hiori.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/hiori.json"
+  },
+  {
+    "id": "meguru",
+    "name": "八宮めぐる",
+    "color": "#ffe012",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030030010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030030010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/3.json"
+    },
+    "idol_id": 3,
+    "name_zh": "八宫巡",
+    "unit": "illumination STARS",
+    "unit_order": 0,
+    "greeting": {
+      "ja": "はじめまして！　えへへっ、いっぱい仲良くしようねっ、プロデューサー！",
+      "subtitle": "初次见面！嘿嘿，我们要好好相处哦，制作人！",
+      "audio_url": "https://stand.hmhnk.top/greetings/meguru-01264963cb95.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/meguru.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/meguru.json"
+  },
+  {
+    "id": "kogane",
+    "name": "月岡恋鐘",
+    "color": "#f84cad",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030040010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030040010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/4.json"
+    },
+    "idol_id": 4,
+    "name_zh": "月冈恋钟",
+    "unit": "L'Antica",
+    "unit_order": 1,
+    "greeting": {
+      "ja": "月岡恋鐘たい！　うち、ばりすごかアイドルになるけんね！",
+      "subtitle": "我是月岡恋鐘！我会成为超——厉害的偶像哦！",
+      "audio_url": "https://stand.hmhnk.top/greetings/kogane-24fa6aeb77ce.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/kogane.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/kogane.json"
+  },
+  {
+    "id": "mamimi",
+    "name": "田中摩美々",
+    "color": "#a846fb",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030050010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030050010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/5.json"
+    },
+    "idol_id": 5,
+    "name_zh": "田中摩美美",
+    "unit": "L'Antica",
+    "unit_order": 1,
+    "greeting": {
+      "ja": "ふぁ……新しいプロデューサーですかぁ？　まみみ、悪い子ですよー",
+      "subtitle": "哈啊……新来的制作人？摩美々可是坏孩子哦～",
+      "audio_url": "https://stand.hmhnk.top/greetings/mamimi-4a94c5aa23e6.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/mamimi.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/mamimi.json"
+  },
+  {
+    "id": "sakuya",
+    "name": "白瀬咲耶",
+    "color": "#006047",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030060010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030060010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/6.json"
+    },
+    "idol_id": 6,
+    "name_zh": "白濑咲耶",
+    "unit": "L'Antica",
+    "unit_order": 1,
+    "greeting": {
+      "ja": "フフ、はじめまして。アナタがプロデューサーかい？　よろしく頼むよ",
+      "subtitle": "呵呵，初次见面。你就是制作人吗？请多关照。",
+      "audio_url": "https://stand.hmhnk.top/greetings/sakuya-7eef8b4234d8.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/sakuya.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/sakuya.json"
+  },
+  {
+    "id": "yuika",
+    "name": "三峰結華",
+    "color": "#3b91c4",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030070010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030070010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/7.json"
+    },
+    "idol_id": 7,
+    "name_zh": "三峰结华",
+    "unit": "L'Antica",
+    "unit_order": 1,
+    "greeting": {
+      "ja": "どーも、三峰です！　さてさて、プロデューサーのお手並み拝見かな？",
+      "subtitle": "你好呀，我是三峰！那么，就来见识一下制作人的本事吧？",
+      "audio_url": "https://stand.hmhnk.top/greetings/yuika-b38039839c5d.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/yuika.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/yuika.json"
+  },
+  {
+    "id": "kiriko",
+    "name": "幽谷霧子",
+    "color": "#d9f2ff",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030080010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030080010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/8.json"
+    },
+    "idol_id": 8,
+    "name_zh": "幽谷雾子",
+    "unit": "L'Antica",
+    "unit_order": 1,
+    "greeting": {
+      "ja": "ゆ、幽谷……霧子です……。よろしく、お願いします……",
+      "subtitle": "我、我是幽谷……霧子……请多、指教……",
+      "audio_url": "https://stand.hmhnk.top/greetings/kiriko-d8a93f224085.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/kiriko.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/kiriko.json"
+  },
+  {
+    "id": "kaho",
+    "name": "小宮果穂",
+    "color": "#e5461c",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030090010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030090010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/9.json"
+    },
+    "idol_id": 9,
+    "name_zh": "小宫果穗",
+    "unit": "放課後クライマックスガールズ",
+    "unit_order": 2,
+    "greeting": {
+      "ja": "小宮果穂です！　ヒーローみたいなアイドル、目指しますっ！",
+      "subtitle": "我是小宮果穂！我要成为像英雄一样的偶像！",
+      "audio_url": "https://stand.hmhnk.top/greetings/kaho-0a1c8e3a2bc1.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/kaho.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/kaho.json"
+  },
+  {
+    "id": "chiyoko",
+    "name": "園田智代子",
+    "color": "#f93b90",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030100010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030100010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/10.json"
+    },
+    "idol_id": 10,
+    "name_zh": "园田智代子",
+    "unit": "放課後クライマックスガールズ",
+    "unit_order": 2,
+    "greeting": {
+      "ja": "チョコアイドル、園田智代子です！　ちょこっとだけでも、覚えてくださいねっ",
+      "subtitle": "我是巧克力偶像園田智代子！哪怕只记住一点点也好哦！",
+      "audio_url": "https://stand.hmhnk.top/greetings/chiyoko-7ffad2109a15.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/chiyoko.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/chiyoko.json"
+  },
+  {
+    "id": "juri",
+    "name": "西城樹里",
+    "color": "#ffc602",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030110010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030110010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/11.json"
+    },
+    "idol_id": 11,
+    "name_zh": "西城树里",
+    "unit": "放課後クライマックスガールズ",
+    "unit_order": 2,
+    "greeting": {
+      "ja": "……西城樹里。よろしくな。つーか、アタシで本当にいいのかよ？",
+      "subtitle": "……我是西城樹里。请多关照。话说，真的选我没问题吗？",
+      "audio_url": "https://stand.hmhnk.top/greetings/juri-ef2891a09d1d.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/juri.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/juri.json"
+  },
+  {
+    "id": "rinze",
+    "name": "杜野凛世",
+    "color": "#89c3eb",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030120010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030120010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/12.json"
+    },
+    "idol_id": 12,
+    "name_zh": "杜野凛世",
+    "unit": "放課後クライマックスガールズ",
+    "unit_order": 2,
+    "greeting": {
+      "ja": "プロデューサーさま……。凛世は……お傍に、おります……",
+      "subtitle": "制作人大人……凛世……会一直在您身边……",
+      "audio_url": "https://stand.hmhnk.top/greetings/rinze-224c62eef821.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/rinze.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/rinze.json"
+  },
+  {
+    "id": "natsuha",
+    "name": "有栖川夏葉",
+    "color": "#90e667",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030130010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030130010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/13.json"
+    },
+    "idol_id": 13,
+    "name_zh": "有栖川夏叶",
+    "unit": "放課後クライマックスガールズ",
+    "unit_order": 2,
+    "greeting": {
+      "ja": "有栖川夏葉よ。私と一緒に、トップまで駆け上がりましょう！",
+      "subtitle": "我是有栖川夏葉。和我一起，冲上顶点吧！",
+      "audio_url": "https://stand.hmhnk.top/greetings/natsuha-16c94d471baf.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/natsuha.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/natsuha.json"
+  },
+  {
+    "id": "amana",
+    "name": "大崎甘奈",
+    "color": "#f54275",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030140010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030140010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/14.json"
+    },
+    "idol_id": 14,
+    "name_zh": "大崎甘奈",
+    "unit": "ALSTROEMERIA",
+    "unit_order": 3,
+    "greeting": {
+      "ja": "大崎甘奈だよ☆　甜花ちゃんと一緒に、めーっちゃ頑張るね！",
+      "subtitle": "我是大崎甘奈！我会和甜花一起超——努力的！",
+      "audio_url": "https://stand.hmhnk.top/greetings/amana-a9475678c9b9.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/amana.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/amana.json"
+  },
+  {
+    "id": "tenka",
+    "name": "大崎甜花",
+    "color": "#e75bec",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030150010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030150010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/15.json"
+    },
+    "idol_id": 15,
+    "name_zh": "大崎甜花",
+    "unit": "ALSTROEMERIA",
+    "unit_order": 3,
+    "greeting": {
+      "ja": "て、甜花……です……。お、お手柔らかに……にへへ……",
+      "subtitle": "我、我是甜花……请、请手下留情……嘿嘿……",
+      "audio_url": "https://stand.hmhnk.top/greetings/tenka-05e395a911ca.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/tenka.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/tenka.json"
+  },
+  {
+    "id": "chiyuki",
+    "name": "桑山千雪",
+    "color": "#fbfafa",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030160010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030160010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/16.json"
+    },
+    "idol_id": 16,
+    "name_zh": "桑山千雪",
+    "unit": "ALSTROEMERIA",
+    "unit_order": 3,
+    "greeting": {
+      "ja": "桑山千雪です。ふふっ、これから一緒に、素敵なこといっぱいしましょうね",
+      "subtitle": "我是桑山千雪。呵呵，以后一起做很多美好的事吧。",
+      "audio_url": "https://stand.hmhnk.top/greetings/chiyuki-e9ec33fb4016.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/chiyuki.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/chiyuki.json"
+  },
+  {
+    "id": "asahi",
+    "name": "芹沢あさひ",
+    "color": "#f30100",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030170010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030170010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/17.json"
+    },
+    "idol_id": 17,
+    "name_zh": "芹泽朝日",
+    "unit": "Straylight",
+    "unit_order": 4,
+    "greeting": {
+      "ja": "芹沢あさひっす！　プロデューサーさん、なんか面白いことあるっすか？",
+      "subtitle": "我是芹沢あさひ！制作人，有什么好玩的事吗？",
+      "audio_url": "https://stand.hmhnk.top/greetings/asahi-db51cac5930b.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/asahi.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/asahi.json"
+  },
+  {
+    "id": "fuyuko",
+    "name": "黛冬優子",
+    "color": "#5ce626",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030180010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030180010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/18.json"
+    },
+    "idol_id": 18,
+    "name_zh": "黛冬优子",
+    "unit": "Straylight",
+    "unit_order": 4,
+    "greeting": {
+      "ja": "ふゆです、よろしくお願いしますっ♡……って、あんたがプロデューサー？",
+      "subtitle": "我是ふゆ，请多指教～……什么，你就是制作人？",
+      "audio_url": "https://stand.hmhnk.top/greetings/fuyuko-6819358540eb.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/fuyuko.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/fuyuko.json"
+  },
+  {
+    "id": "mei",
+    "name": "和泉愛依",
+    "color": "#ff00ff",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030190010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030190010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/19.json"
+    },
+    "idol_id": 19,
+    "name_zh": "和泉爱依",
+    "unit": "Straylight",
+    "unit_order": 4,
+    "greeting": {
+      "ja": "へいへーい、和泉愛依だよ～！　プロデューサー、マジでヨロシクね！",
+      "subtitle": "嘿嘿～，我是和泉愛依！制作人，真心请多关照啦！",
+      "audio_url": "https://stand.hmhnk.top/greetings/mei-6bc304fef661.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/mei.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/mei.json"
+  },
+  {
+    "id": "toru",
+    "name": "浅倉透",
+    "color": "#50d0d0",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030200010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030200010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/20.json"
+    },
+    "idol_id": 20,
+    "name_zh": "浅仓透",
+    "unit": "noctchill",
+    "unit_order": 5,
+    "greeting": {
+      "ja": "よろしく、プロデューサー。ふふっ、なんか楽しそう、これから",
+      "subtitle": "请多关照，制作人。呵呵，接下来好像会很有意思。",
+      "audio_url": "https://stand.hmhnk.top/greetings/toru-84aa1eb03f2b.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/toru.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/toru.json"
+  },
+  {
+    "id": "madoka",
+    "name": "樋口円香",
+    "color": "#be1e3e",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1940210010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1940210010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/21.json"
+    },
+    "idol_id": 21,
+    "name_zh": "樋口圆香",
+    "unit": "noctchill",
+    "unit_order": 5,
+    "greeting": {
+      "ja": "……どうも、樋口です。別に、期待はしてませんので",
+      "subtitle": "……你好，我是樋口。我可没抱什么期待。",
+      "audio_url": "https://stand.hmhnk.top/greetings/madoka-867d357e0063.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/madoka.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/madoka.json"
+  },
+  {
+    "id": "koito",
+    "name": "福丸小糸",
+    "color": "#7967c3",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030220010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030220010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/22.json"
+    },
+    "idol_id": 22,
+    "name_zh": "福丸小糸",
+    "unit": "noctchill",
+    "unit_order": 5,
+    "greeting": {
+      "ja": "ふ、福丸小糸です……！　ぜ、全然よゆーですから……！",
+      "subtitle": "我、我是福丸小糸……！完、完全游刃有余的……！",
+      "audio_url": "https://stand.hmhnk.top/greetings/koito-8efd5c062c75.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/koito.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/koito.json"
+  },
+  {
+    "id": "hinana",
+    "name": "市川雛菜",
+    "color": "#ffc639",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030230010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030230010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/23.json"
+    },
+    "idol_id": 23,
+    "name_zh": "市川雏菜",
+    "unit": "noctchill",
+    "unit_order": 5,
+    "greeting": {
+      "ja": "あは～、プロデューサー？　雛菜と一緒に、しあわせ～になろ～♡",
+      "subtitle": "啊哈～，制作人？和雛菜一起变得幸福～吧～",
+      "audio_url": "https://stand.hmhnk.top/greetings/hinana-8499d82aaa1a.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/hinana.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/hinana.json"
+  },
+  {
+    "id": "nichika",
+    "name": "七草にちか",
+    "color": "#a6ceb6",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030240010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030240010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/24.json"
+    },
+    "idol_id": 24,
+    "name_zh": "七草日花",
+    "unit": "SHHis",
+    "unit_order": 6,
+    "greeting": {
+      "ja": "七草にちかです！　ぜったい、ぜーったい売れてみせますからー！",
+      "subtitle": "我是七草にちか！我绝对、绝——对会红给你看的！",
+      "audio_url": "https://stand.hmhnk.top/greetings/nichika-adfa764380f3.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/nichika.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/nichika.json"
+  },
+  {
+    "id": "mikoto",
+    "name": "緋田美琴",
+    "color": "#760f10",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030250010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030250010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/25.json"
+    },
+    "idol_id": 25,
+    "name_zh": "绯田美琴",
+    "unit": "SHHis",
+    "unit_order": 6,
+    "greeting": {
+      "ja": "……緋田美琴です。よろしくね、プロデューサー",
+      "subtitle": "……我是緋田美琴。请多关照，制作人。",
+      "audio_url": "https://stand.hmhnk.top/greetings/mikoto-7a561f4d66ec.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/mikoto.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/mikoto.json"
+  },
+  {
+    "id": "luca",
+    "name": "斑鳩ルカ",
+    "color": "#24130d",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030260010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030260010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/26.json"
+    },
+    "idol_id": 26,
+    "name_zh": "斑鸠路加",
+    "unit": "CoMETIK",
+    "unit_order": 7,
+    "greeting": {
+      "ja": "……アンタがプロデューサー？　チッ……勝手にしろよ",
+      "subtitle": "……你就是制作人？啧……随你便。",
+      "audio_url": "https://stand.hmhnk.top/greetings/luca-e06d2d7fe1fd.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/luca.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/luca.json"
+  },
+  {
+    "id": "hana",
+    "name": "鈴木羽那",
+    "color": "#e0b5d3",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030270010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030270010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/27.json"
+    },
+    "idol_id": 27,
+    "name_zh": "铃木羽那",
+    "unit": "CoMETIK",
+    "unit_order": 7,
+    "greeting": {
+      "ja": "鈴木羽那でーすっ！　あはっ、あたしのこと、ちゃんと見ててね？",
+      "subtitle": "我是鈴木羽那！啊哈，要好好看着我哦？",
+      "audio_url": "https://stand.hmhnk.top/greetings/hana-c5f33a59290f.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/hana.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/hana.json"
+  },
+  {
+    "id": "haruki",
+    "name": "郁田はるき",
+    "color": "#ead7a4",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/1030280010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/1030280010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/28.json"
+    },
+    "idol_id": 28,
+    "name_zh": "郁田阳希",
+    "unit": "CoMETIK",
+    "unit_order": 7,
+    "greeting": {
+      "ja": "郁田はるきです。ふふ……これから、どんな色が見えるのかなぁ",
+      "subtitle": "我是郁田はるき。呵呵……接下来，会看到什么样的色彩呢。",
+      "audio_url": "https://stand.hmhnk.top/greetings/haruki-2fab44ba9a2c.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/haruki.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/haruki.json"
+  },
+  {
+    "id": "hazuki",
+    "name": "七草はづき",
+    "color": "#c3d825",
+    "stand": {
+      "default_outfit": {
+        "id": "stand/2040910010",
+        "url": "https://stand.hmhnk.top/spine/idols/stand/2040910010/"
+      },
+      "outfits_url": "https://stand.hmhnk.top/outfits/91.json"
+    },
+    "idol_id": 91,
+    "name_zh": "七草叶月",
+    "unit": null,
+    "unit_order": null,
+    "greeting": {
+      "ja": "事務員の七草はづきです～。今日からよろしくお願いしますね、プロデューサーさん",
+      "subtitle": "我是事务员七草はづき～。从今天起请多关照，制作人。",
+      "audio_url": "https://stand.hmhnk.top/greetings/hazuki-92fc403f3375.mp3"
+    },
+    "call_opener": null,
+    "call_poster_url": "https://stand.hmhnk.top/call-posters/hazuki.webp",
+    "voxels_url": "https://stand.hmhnk.top/landing-voxels/hazuki.json"
+  }
+]
