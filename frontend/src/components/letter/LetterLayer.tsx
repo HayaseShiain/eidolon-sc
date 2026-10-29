@@ -185,7 +185,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
       }
     };
     (async () => {
-      audio.current?.pause();
+      void fadeOut(audio.current, ms(600));
       if (wasRead.current) {
         await play(sheet.current, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(2rem) scale(0.92)" }], 320, "ease-in");
         await play(envelope.current, [{ opacity: 0, transform: "scale(0.9)" }, { opacity: 1, transform: "none" }], 260, "ease-out");
@@ -292,7 +292,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
                   offset += part.chars.length;
                   return <Block key={i} part={part} from={from} count={count - from} isReducedMotion={isReducedMotion} />;
                 })}
-                <Signature writer={writer.id} text={letter.signature} isSigned={isSigned} isReducedMotion={isReducedMotion} />
+                <Signature image={letter.signature_image} text={letter.signature} isSigned={isSigned} isReducedMotion={isReducedMotion} />
                 {isDone && (
                   <section className="flex justify-center animate-in fade-in-0 duration-700">
                     <Button ref={done} variant="letter" size="call" onClick={close} className="font-sans">
@@ -351,26 +351,26 @@ function Block({ part, from, count, isReducedMotion }: { part: Part; from: numbe
   );
 }
 
-/** 信末她手写的签名（public/letters/signatures/<id>.webp，透明底），靠右，从左到右显出来；版面一开始就留着它的位置。
- * 没有这张图时，用她的颜色把署名照字写出来。 */
+/** 信末她手写的签名（透明底的图），靠右，从左到右显出来；版面一开始就留着它的位置。
+ * 没有这张图（はづき）或者取不到时，用她的颜色把署名照字写出来。 */
 function Signature({
-  writer,
+  image,
   text,
   isSigned,
   isReducedMotion,
 }: {
-  writer: string;
+  image: string | null;
   text: string;
   isSigned: boolean;
   isReducedMotion: boolean;
 }) {
-  const [hasImage, setHasImage] = useState(true);
+  const [hasImage, setHasImage] = useState(image !== null);
   const shown = isSigned ? (isReducedMotion ? undefined : "animate-sign") : "invisible";
   return (
     <section className="flex justify-end">
       {hasImage ? (
         <img
-          src={`/letters/signatures/${writer}.webp`}
+          src={image ?? undefined}
           alt={text}
           onError={() => setHasImage(false)}
           className={cn("letter-signature w-auto max-w-[70%] object-contain object-right", shown)}
@@ -425,6 +425,23 @@ function Envelope({ writer, salutation, isOpen }: { writer: Character; salutatio
       </span>
     </span>
   );
+}
+
+/** 把音频在 `duration` 毫秒里淡出再停下：配乐不一下子断掉。iOS 不让网页改音量，那里放完淡出的时间直接停。 */
+async function fadeOut(audio: HTMLAudioElement | null, duration: number): Promise<void> {
+  if (!audio || audio.paused) return;
+  const from = audio.volume;
+  const started = performance.now();
+  await new Promise<void>((resolve) => {
+    const step = () => {
+      const progress = Math.min(1, (performance.now() - started) / duration);
+      audio.volume = from * (1 - progress);
+      if (progress < 1) requestAnimationFrame(step);
+      else resolve();
+    };
+    requestAnimationFrame(step);
+  });
+  audio.pause();
 }
 
 /** 这个元素现在在不在屏幕上看得见的地方（不在页面里、被藏起来的都不算）。 */

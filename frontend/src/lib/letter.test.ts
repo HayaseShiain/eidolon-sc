@@ -85,6 +85,7 @@ describe("谁来写", () => {
 const letter: Letter = {
   salutation: "プロデューサーさんへ",
   signature: "真乃より",
+  signature_image: null,
   paragraphs: [
     { ja: "えっと、こんにちは。", zh: "那个，你好。" },
     { ja: "またね", zh: "再见" },

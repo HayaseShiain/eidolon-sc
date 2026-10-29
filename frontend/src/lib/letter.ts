@@ -6,13 +6,13 @@ import type { Character } from "@/lib/api";
 import { TIERS } from "@/lib/affinity";
 import type { Stats } from "@/lib/stats";
 
-/** 一封信，和 letters.json 里的一样：页面上显示的字（不带语气提示）、每段的字幕，和念它的音频；
+/** 一封信，和 letters.json 里的一样：页面上显示的字（不带语气提示）、每段的字幕，和念它的音频（她的声音底下铺着配乐）；
  * `audio.segments` 是抬头、每段正文在音频里的起止秒数，按这个顺序。没合成时没有音频。
- * 署名不念，信上放她手写的签名图（public/letters/signatures/<id>.webp）；`signature` 是它的替代文字，
- * 图没有时照字写出来。 */
+ * 署名不念，信上放她手写的签名图（`signature_image`，透明底）；`signature` 是它的替代文字，没有图时照字写出来。 */
 export type Letter = {
   salutation: string;
   signature: string;
+  signature_image: string | null;
   paragraphs: { ja: string; zh: string }[];
   audio: { url: string; segments: [number, number][] } | null;
 };

@@ -1,18 +1,24 @@
-"""停服前最后一版（last-letter 分支）的信：把 characters/letters/*.toml 合成语音、上传，生成前端用的数据和字体子集。
+"""停服前最后一版（last-letter 分支）的信：把 characters/letters/*.toml 合成语音、配上音乐、上传，生成前端用的数据和字体子集。
 
 每封信按段念：抬头和每段正文各合成一次（Drama 3，她的音色，读音词典和招呼一样用整份 readings.toml）；署名不念，
 信上用她手写的签名图。合成要无损的 wav、latency 用 normal（文档说默认的 balanced 是为流式压低首包延迟，
-normal 最稳；之前用默认值合成的 mp3 偶尔有爆音），再用 ffmpeg 拼起来，段与段之间留停顿，过一道限幅
-（峰值压到约 -1.5 dB），只编码一次成 mp3，记下每段在音频里的起止秒数。拼好的音频按内容哈希放进立绘的
-存储桶 `letters/<id>-<hash>.mp3`（CDN 缓存一年，内容变了地址就变），这封信旧的地址删掉。
+normal 最稳；之前用默认值合成的 mp3 偶尔有爆音）。
+
+拼音频：段与段之间留停顿，她的声音统一到 VOICE_LUFS；底下铺配乐（BGM，不进仓库，只拼进上传的音频里），
+配乐从整小节淡入，她开口时压低，念完最后一段、签名开始写出来的那一刻正好是配乐第一次高潮进来的那一拍，
+配乐回到原来的音量放满四小节再淡出。最后限幅（峰值约 -1.5 dB），只编码一次成 mp3，记下每段在音频里的起止秒数。
+拼好的音频按内容哈希放进立绘的存储桶 `letters/<id>-<hash>.mp3`（CDN 缓存一年，内容变了地址就变），
+这封信旧的地址删掉。
+
+签名图从 _签名/（不进仓库，文件名里有她的全名）取，裁掉透明边、缩小成 webp，放进 `letters/signatures/<id>-<hash>.webp`。
 
 写出两样东西，都提交：
-- frontend/src/components/letter/letters.json：每封信页面上显示的字（去掉语气提示）、字幕、音频地址和每段起止；
+- frontend/src/components/letter/letters.json：每封信页面上显示的字（去掉语气提示）、字幕、签名图和音频的地址、每段起止；
 - frontend/src/components/letter/fonts/KleeOne-SemiBold.woff2：Klee One（SIL OFL 1.1）按信里用到的字做的子集。
 
 用法（在 backend/ 下，先 `set -a; . ../.env; set +a`）：
 
-    PYTHONIOENCODING=utf-8 uv run python ../scripts/last_letter.py            # 合成、上传、写数据和字体
+    PYTHONIOENCODING=utf-8 uv run python ../scripts/last_letter.py            # 合成、拼好、上传、写数据和字体
     PYTHONIOENCODING=utf-8 uv run python ../scripts/last_letter.py --no-upload # 合成、拼好，不上传（校对时听）
     PYTHONIOENCODING=utf-8 uv run python ../scripts/last_letter.py --no-audio # 只写数据和字体，没有音频
 
@@ -22,7 +28,9 @@ normal 最稳；之前用默认值合成的 mp3 偶尔有爆音），再用 ffmp
 import argparse
 import asyncio
 import hashlib
+import io
 import json
+import math
 import os
 import re
 import struct
@@ -45,19 +53,43 @@ ROOT = Path(__file__).resolve().parent.parent
 LETTERS = ROOT / "characters" / "letters"
 OUT = ROOT / "frontend" / "src" / "components" / "letter"
 CACHE = ROOT / "frontend" / ".cache" / "last-letter"
+SIGNATURES = ROOT / "_签名"
+BGM = ROOT / "染み渡るように.m4a"
 MODEL = "drama-3"
 DIRECTORY = "letters"
 CONCURRENCY = 4
 
-LEAD_IN = 1.2
-"""音频开头的静音（秒）：点开信封时音频就开始放（浏览器只在点击里让出声），信纸展开的这段时间她还没开口。"""
 PAUSE_AFTER_SALUTATION = 0.6
 PAUSE_BETWEEN_PARAGRAPHS = 0.9
 """段与段之间的停顿（秒）：字幕在这时淡出，下一段再开始写。"""
+SIGNATURE_DELAY = 0.8
+"""念完最后一段后隔多久开始签名（秒），和前端 lib/letter 的 SIGNATURE_DELAY 一致。"""
 SYNTHESIS = {"format": "wav", "sample_rate": 44100, "latency": "normal"}
 """每段的合成参数：无损、最稳的那一档（docs.fish.audio 的 Text to Speech 指南）。"""
+
+CLIMAX = 83.94
+"""配乐第一次高潮进来的那一拍（秒）：前面 66–80 秒是安静的间奏，80.8–83.4 秒几乎无声，像屏住一口气。
+签名开始写出来的那一刻对准这一拍。"""
+BAR = 2.5224
+"""配乐一小节（约 95 BPM 的四拍）。从高潮那一拍往前数整小节，找配乐的起点。"""
+MIN_LEAD = 2.2
+"""拆开后配乐至少先响多久她才开口（秒）：信纸 0.8 秒展开，再让音乐铺一会儿。实际在 MIN_LEAD 到 MIN_LEAD + BAR
+之间，好让配乐从整小节开始。"""
+VOICE_LUFS = -17.0
+"""她的声音统一到的响度（各人合成出来在 -15.5 到 -18.2 之间）。"""
+MUSIC_GAIN = -6.5
+"""配乐整体的增益（dB）：高潮约 -18 LUFS，和她的声音差不多响。"""
+DUCK = -9.0
+"""她说话时配乐再压低多少（dB）：铺在她声音下面 15 dB 左右。"""
+FADE_IN = 1.5
+TAIL = 10.1
+"""高潮进来后配乐放满多久（秒，四小节），然后淡出。"""
+FADE_OUT = 5.0
 LIMIT = 0.84
 """拼好后限幅的峰值（线性，约 -1.5 dBFS），免得编码成 mp3 后冲顶爆音。"""
+
+SIGNATURE_HEIGHT = 240
+"""签名图的高度（像素）：信上占三行（约 108 px），两倍屏再留一点余量。"""
 
 KLEE_ONE = "https://github.com/google/fonts/raw/main/ofl/kleeone"
 FONT_WEIGHTS = ("SemiBold",)
@@ -171,40 +203,115 @@ def duration(path: Path) -> float:
     return float(out.stdout.strip())
 
 
-def assemble(letter: Letter, readings_key: str) -> tuple[bytes, list[tuple[float, float]]]:
-    """拼成一个 mp3，返回音频和每段的起止秒数。"""
+def loudness(path: Path) -> float:
+    """整段的响度（LUFS，EBU R128 积分响度，静音不算在内）。"""
+    out = subprocess.run(
+        ["ffmpeg", "-hide_banner", "-nostats", "-i", str(path), "-af", "ebur128", "-f", "null", "-"],
+        capture_output=True, text=True, check=True,
+    )
+    return float(re.findall(r"I:\s*(-?[0-9.]+) LUFS", out.stderr)[-1])
+
+
+def envelope(points: list[tuple[float, float]]) -> str:
+    """折线 `points`（秒, 线性增益）写成 ffmpeg volume 滤镜按帧求值的表达式；最后一点之后保持它的增益。"""
+    expr = f"{points[-1][1]:.5f}"
+    for (t0, g0), (t1, g1) in reversed(list(zip(points, points[1:]))):
+        expr = f"if(lt(t,{t1:.3f}),{g0:.5f}+({g1 - g0:.5f})*(t-{t0:.3f})/{t1 - t0:.3f},{expr})"
+    return expr
+
+
+def assemble(letter: Letter, readings_key: str, with_music: bool) -> tuple[bytes, list[tuple[float, float]]]:
+    """拼成一个 mp3，返回音频和每段的起止秒数（从拆开算起）。"""
+    folder = CACHE / letter.character.id
     parts = [segment_cache(letter, text, readings_key) for text in letter.segments]
+    lengths = [duration(p) for p in parts]
     pauses = [PAUSE_AFTER_SALUTATION] + [PAUSE_BETWEEN_PARAGRAPHS] * (len(parts) - 2) + [0.0]
-    times, at = [], LEAD_IN
-    for part, pause in zip(parts, pauses):
-        length = duration(part)
+    span = sum(lengths) + sum(pauses)
+    # 配乐从高潮那一拍往前数 bars 小节开始，她在 lead 秒开口，签名开始写的那一刻（lead + span + SIGNATURE_DELAY）正好是高潮。
+    bars = math.ceil((span + SIGNATURE_DELAY + MIN_LEAD) / BAR)
+    start = CLIMAX - bars * BAR
+    lead = bars * BAR - span - SIGNATURE_DELAY
+    times, at = [], lead
+    for length, pause in zip(lengths, pauses):
         times.append((round(at, 3), round(at + length, 3)))
         at += length + pause
+
+    # 先拼出她的声音（开头留 lead 秒），量响度，算出统一到 VOICE_LUFS 要的增益。
     inputs = [arg for part in parts for arg in ("-i", str(part))]
-    lead = f"adelay={int(LEAD_IN * 1000)}:all=1,"
     pads = ";".join(
-        f"[{i}:a]aresample=44100,{lead if i == 0 else ''}apad=pad_dur={pause}[a{i}]" for i, pause in enumerate(pauses)
+        f"[{i}:a]aresample=44100,{f'adelay={round(lead * 1000)}:all=1,' if i == 0 else ''}apad=pad_dur={pause}[a{i}]"
+        for i, pause in enumerate(pauses)
     )
     joined = "".join(f"[a{i}]" for i in range(len(parts)))
-    out = CACHE / letter.character.id / "letter.mp3"
+    alone = folder / "voice.wav"
     subprocess.run(
         ["ffmpeg", "-y", "-v", "error", *inputs, "-filter_complex",
-         f"{pads};{joined}concat=n={len(parts)}:v=0:a=1,alimiter=limit={LIMIT}:level=false[out]",
-         "-map", "[out]", "-ac", "1", "-c:a", "libmp3lame", "-b:a", "128k", str(out)],
+         f"{pads};{joined}concat=n={len(parts)}:v=0:a=1[out]", "-map", "[out]", str(alone)],
+        check=True,
+    )
+    gain = VOICE_LUFS - loudness(alone)
+
+    out = folder / "letter.mp3"
+    if not with_music:
+        subprocess.run(
+            ["ffmpeg", "-y", "-v", "error", "-i", str(alone), "-af",
+             f"volume={gain:.2f}dB,alimiter=limit={LIMIT}:level=false",
+             "-ac", "1", "-c:a", "libmp3lame", "-b:a", "128k", str(out)],
+            check=True,
+        )
+        return out.read_bytes(), times
+
+    climax = lead + span + SIGNATURE_DELAY
+    end = climax + TAIL + FADE_OUT
+    full, duck = 10 ** (MUSIC_GAIN / 20), 10 ** ((MUSIC_GAIN + DUCK) / 20)
+    music = envelope([
+        (0, 0), (FADE_IN, full), (lead - 0.6, full), (lead, duck),
+        (climax - 0.25, duck), (climax + 0.35, full), (climax + TAIL, full), (end, 0),
+    ])
+    subprocess.run(
+        ["ffmpeg", "-y", "-v", "error", "-i", str(alone), "-ss", f"{start:.3f}", "-t", f"{end:.3f}", "-i", str(BGM),
+         "-filter_complex",
+         f"[0:a]volume={gain:.2f}dB,aresample=48000,aformat=channel_layouts=stereo[v];"
+         f"[1:a]aresample=48000,aformat=channel_layouts=stereo,volume='{music}':eval=frame[m];"
+         f"[v][m]amix=inputs=2:duration=longest:normalize=0,alimiter=limit={LIMIT}:level=false[out]",
+         "-map", "[out]", "-c:a", "libmp3lame", "-b:a", "160k", str(out)],
         check=True,
     )
     return out.read_bytes(), times
 
 
-async def upload(entries: dict[str, tuple[bytes, str]], bucket: S3Settings) -> None:
+def signature_image(character: Character) -> bytes | None:
+    """她手写的签名（_签名/ 里文件名带她全名的那张，透明底）：裁掉透明边，缩到 SIGNATURE_HEIGHT 高，转成 webp。没有时 None。"""
+    from PIL import Image
+
+    found = [p for p in SIGNATURES.glob("*.png") if character.name in p.stem]
+    if not found:
+        return None
+    image = Image.open(found[0]).convert("RGBA")
+    box = image.getchannel("A").getbbox()
+    if box:
+        image = image.crop(box)
+    if image.height > SIGNATURE_HEIGHT:
+        image = image.resize((round(image.width * SIGNATURE_HEIGHT / image.height), SIGNATURE_HEIGHT), Image.LANCZOS)
+    out = io.BytesIO()
+    image.save(out, "WEBP", quality=90, method=6)
+    (CACHE / character.id).mkdir(parents=True, exist_ok=True)
+    (CACHE / character.id / "signature.webp").write_bytes(out.getvalue())
+    return out.getvalue()
+
+
+async def upload(files: list[tuple[str, bytes, str]], bucket: S3Settings) -> None:
+    """把 (key, 内容, 类型) 放进桶，删掉同一个人同一类文件旧的版本。"""
     storage = Bucket(bucket)
     try:
         keys = set(await storage.keys(f"{DIRECTORY}/"))
-        for character_id, (audio, key) in entries.items():
+        for key, body, kind in files:
             if key not in keys:
-                await storage.put(key, audio, "audio/mpeg", GREETING_CACHE)
+                await storage.put(key, body, kind, GREETING_CACHE)
                 print(f"  上传 {key}")
-            for old in sorted(k for k in keys if k != key and re.fullmatch(rf"{DIRECTORY}/{character_id}-[0-9a-f]{{12}}\.mp3", k)):
+            stem = key.rsplit("-", 1)[0]
+            suffix = key.rsplit(".", 1)[1]
+            for old in sorted(k for k in keys if k != key and re.fullmatch(rf"{re.escape(stem)}-[0-9a-f]{{12}}\.{suffix}", k)):
                 await storage.delete(old)
                 print(f"  删除旧的 {old}")
     finally:
@@ -229,12 +336,17 @@ def subset_fonts(text: str) -> None:
         )
 
 
+def address(kind: str, character: Character, body: bytes, suffix: str) -> str:
+    return f"{DIRECTORY}/{kind}{character.id}-{hashlib.sha256(body).hexdigest()[:12]}.{suffix}"
+
+
 async def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-audio", action="store_true", help="不合成、不上传，只写数据和字体")
     parser.add_argument(
-        "--no-upload", action="store_true", help="合成、拼好（缓存里的 <id>/letter.mp3，校对时听），不上传，数据里没有音频"
+        "--no-upload", action="store_true", help="合成、拼好（缓存里的 <id>/letter.mp3，校对时听），不上传，数据里没有音频和签名图"
     )
+    parser.add_argument("--no-music", action="store_true", help="不铺配乐，只有她的声音")
     args = parser.parse_args()
 
     characters_path = ROOT / "characters" / "characters.toml"
@@ -248,24 +360,34 @@ async def main() -> int:
     readings_key = json.dumps(dictionary, ensure_ascii=False, sort_keys=True)
 
     audio: dict[str, dict] = {}
+    signatures: dict[str, str] = {}
     if not args.no_audio:
         assets_url = os.environ["EIDOLON_STAND_ASSETS_URL"].rstrip("/")
         await voice_all(letters, FishAudioSettings.from_env().api_key, dictionary)
-        entries = {}
+        files: list[tuple[str, bytes, str]] = []
         for letter in letters:
-            data, times = assemble(letter, readings_key)
-            key = f"{DIRECTORY}/{letter.character.id}-{hashlib.sha256(data).hexdigest()[:12]}.mp3"
-            entries[letter.character.id] = (data, key)
+            data, times = assemble(letter, readings_key, with_music=not args.no_music)
+            key = address("", letter.character, data, "mp3")
+            files.append((key, data, "audio/mpeg"))
             audio[letter.character.id] = {"url": f"{assets_url}/{key}", "segments": times}
+            image = signature_image(letter.character)
+            if image is None:
+                print(f"  {letter.character.id} 没有签名图，信上照字写", file=sys.stderr)
+            else:
+                key = address("signatures/", letter.character, image, "webp")
+                files.append((key, image, "image/webp"))
+                signatures[letter.character.id] = f"{assets_url}/{key}"
         if args.no_upload:
             audio.clear()
+            signatures.clear()
         else:
-            await upload(entries, S3Settings.from_env(purpose="上传信的语音"))
+            await upload(files, S3Settings.from_env(purpose="上传信的语音和签名"))
 
     data = {
         letter.character.id: {
             "salutation": without_cues(letter.salutation),
             "signature": without_cues(letter.signature),
+            "signature_image": signatures.get(letter.character.id),
             "paragraphs": [{"ja": without_cues(ja), "zh": zh} for ja, zh in letter.paragraphs],
             "audio": audio.get(letter.character.id),
         }

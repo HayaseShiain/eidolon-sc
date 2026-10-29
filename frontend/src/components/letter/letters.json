@@ -2,6 +2,7 @@
   "amana": {
     "salutation": "プロデューサーさんへ",
     "signature": "甘奈より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "プロデューサーさん、元気？　甘奈ね、ちょっとだけ遠くまで行くことになったんだ。だから、お手紙書いてみたよ。",
@@ -29,6 +30,7 @@
   "asahi": {
     "salutation": "プロデューサーさんへ",
     "signature": "芹沢あさひ",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "しばらく、ちょっと遠くまで行ってくるっす。どんなところか知らないから、ワクワクするっす。",
@@ -56,6 +58,7 @@
   "chiyoko": {
     "salutation": "プロデューサーさんへ",
     "signature": "チョコアイドル　園田智代子",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "お元気ですか？　園田智代子です！　実は私、ちょこっとだけ遠くへ行くことになりまして、こうしてお手紙を書いています！",
@@ -83,6 +86,7 @@
   "chiyuki": {
     "salutation": "プロデューサーさんへ",
     "signature": "桑山千雪",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "お気に入りのガラスペンで、この手紙を書いています。少し遠くへ行くことになったので、きちんとお伝えしたくて。",
@@ -110,6 +114,7 @@
   "fuyuko": {
     "salutation": "プロデューサーへ",
     "signature": "冬優子",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "いつもふゆを応援してくださって、ありがとうございますっ。これからも、ふゆ精一杯がんばりますね。えへへ。",
@@ -137,6 +142,7 @@
   "hana": {
     "salutation": "プロデューサーへ",
     "signature": "羽那より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "プロデューサー、元気ー？　あのね、あたし、ちょっと遠いところに行くことになったの。だから、お手紙書いてみたよ。",
@@ -164,6 +170,7 @@
   "haruki": {
     "salutation": "プロデューサーさんへ",
     "signature": "郁田はるき",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "前に、急にいなくならないでくださいねって、お願いしましたよね。なのに今度は、わたしの方が遠くへ行くことになっちゃいました。",
@@ -191,6 +198,7 @@
   "hazuki": {
     "salutation": "プロデューサーさんへ",
     "signature": "はづきより",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "プロデューサーさん、お疲れさまです～。急なお知らせですが、私、しばらく遠くへ行くことになりました。",
@@ -218,6 +226,7 @@
   "hinana": {
     "salutation": "雛菜のプロデューサーへ",
     "signature": "ひなな",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "あは～、プロデューサー、しあわせ～？　雛菜ね～、ちょっとだけ遠くに行ってくることになったの～。",
@@ -245,6 +254,7 @@
   "hiori": {
     "salutation": "プロデューサーへ",
     "signature": "風野灯織",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "しばらく、遠い場所へ行くことになりました。直接伝えるべきなのに、うまく話せそうになくて、手紙にしました。",
@@ -272,6 +282,7 @@
   "juri": {
     "salutation": "プロデューサーへ",
     "signature": "樹里",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "こういうの書くの、慣れてねーんだけどさ。アタシ、ちょっと遠くに行くことになった。しばらく顔は見せらんねー。",
@@ -299,6 +310,7 @@
   "kaho": {
     "salutation": "プロデューサーさんへ",
     "signature": "小宮果穂より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "今日は、見えないペンじゃなくて、ふつうのペンで書いてますっ！　あたし、しばらく遠くへ出動します！",
@@ -326,6 +338,7 @@
   "kiriko": {
     "salutation": "プロデューサーさんへ",
     "signature": "幽谷霧子",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "わたし　少しのあいだ　遠くへ行くことになりました。急なお知らせになって……ごめんなさい。",
@@ -353,6 +366,7 @@
   "kogane": {
     "salutation": "プロデューサーへ",
     "signature": "恋鐘より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "プロデューサー、元気にしとる？　うち、しばらく遠かところに行くことになったと。黙って行くとは、うちの性に合わんけんね。",
@@ -380,6 +394,7 @@
   "koito": {
     "salutation": "プロデューサーさんへ",
     "signature": "福丸小糸より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "少しのあいだ、遠くへ行くことになりました。置いていかれるのが怖かったのに、今度はわたしが行く番なんて、変な感じです。",
@@ -407,6 +422,7 @@
   "luca": {
     "salutation": "アンタへ",
     "signature": "ルカ",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "話すって言ったのは私だからな。黙って消えんのは、ナシにしとく。しばらく遠くに行く。それだけだ。",
@@ -434,6 +450,7 @@
   "madoka": {
     "salutation": "プロデューサーへ",
     "signature": "樋口円香",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "しばらく、遠くへ行きます。伝えるのはそれだけで十分だと、思っていました。……思っていたのですが。",
@@ -461,6 +478,7 @@
   "mamimi": {
     "salutation": "プロデューサーへ",
     "signature": "ま み み",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "えーっと、ちょっと遠くまで出かけることになりましたぁ。めんどーですけど、一応書いときますねー。",
@@ -488,6 +506,7 @@
   "mano": {
     "salutation": "プロデューサーさんへ",
     "signature": "真乃より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "えっと、プロデューサーさん、お元気ですか。わたし、少し遠くへお出かけすることになりました。",
@@ -515,6 +534,7 @@
   "meguru": {
     "salutation": "プロデューサーへ",
     "signature": "めぐるより",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "えへへ、手紙って照れちゃうね！　あのね、わたし、ちょっと遠くに行くことになったの。しばらく会えなくなっちゃう。",
@@ -542,6 +562,7 @@
   "mei": {
     "salutation": "プロデューサーへ",
     "signature": "愛依より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "プロデューサー、元気してる～？　いきなりだけど、うち、しばらく遠いとこに行くことになったんだ。会えないの、ちょっとさみしいカンジ。",
@@ -565,6 +586,7 @@
   "mikoto": {
     "salutation": "プロデューサーへ",
     "signature": "美琴",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "手紙って、何を書けばいいのか、よくわからないね。だから、短くなるかも。少しのあいだ、遠くに行くね。",
@@ -592,6 +614,7 @@
   "natsuha": {
     "salutation": "プロデューサーへ",
     "signature": "有栖川夏葉",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "いい？　落ち着いて読んでちょうだい。私、少し遠くへ行くことになったの。しばらくは会えなくなるわ。",
@@ -619,6 +642,7 @@
   "nichika": {
     "salutation": "プロデューサーさんへ",
     "signature": "七草にちか",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "えーっと、急ですけどご報告です。私、しばらく遠くへ行くことになりました。一応、書いとこうと思って。",
@@ -646,6 +670,7 @@
   "rinze": {
     "salutation": "プロデューサーさまへ",
     "signature": "凛世",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "いつぞや、したためたまま、出さずにしまった手紙がございました。今度の手紙は、きちんと貴方さまへお届けいたします。",
@@ -673,6 +698,7 @@
   "sakuya": {
     "salutation": "親愛なるプロデューサーへ",
     "signature": "白瀬咲耶",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "並んで歩く時、アナタを待たせずにいられる自分が好きだった。けれど今度は、少し待たせてしまいそうだ。遠くへ発つことになったんだ。",
@@ -700,6 +726,7 @@
   "tenka": {
     "salutation": "プロデューサーさんへ",
     "signature": "甜花より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "えと……甜花、しばらく遠いところに行きます。前は余ってた便箋、最近はすぐなくなっちゃう……にへへ。",
@@ -727,6 +754,7 @@
   "toru": {
     "salutation": "プロデューサー",
     "signature": "透",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "書くね、手紙。前は日誌を一行で済ませて、めっちゃ探させちゃったし。だから今回は、ちゃんと書く。",
@@ -754,6 +782,7 @@
   "yuika": {
     "salutation": "Ｐたんへ",
     "signature": "三峰より",
+    "signature_image": null,
     "paragraphs": [
       {
         "ja": "さーて、何から書こうかな。……よし、本題！　三峰、しばらく遠くに行くことになりました。急でごめんね。",
