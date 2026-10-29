@@ -1,11 +1,12 @@
 # 每个 PR 和 main 上的每次推送：检查后端、前端和 shell 脚本，同时构建两个镜像。
 # 推送到 main 或 v* 标签时，检查和构建全部通过才把镜像推到 GHCR（部署见 docs/deploy.md「升级」）。
+# last-letter 分支（停服前最后一版，不合回 main）推送时同样发布，标签 :last-letter。
 name: CI
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, last-letter]
     tags: ["v*"]
 
 # 同一个 PR 推了新提交时取消旧的运行；main 上的每次推送都跑完，免得漏发镜像
@@ -106,6 +107,7 @@ jobs:
           images: ghcr.io/sallyn0225/eidolon-sc-${{ matrix.service }}
           tags: |
             type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=last-letter,enable=${{ github.ref == 'refs/heads/last-letter' }}
             type=semver,pattern={{version}}
             type=sha
       - uses: docker/build-push-action@v7
