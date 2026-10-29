@@ -6,6 +6,7 @@ import { SignInButton } from "@/components/app/FailureNotice";
 import { MarkedAvatar } from "@/components/app/MarkedAvatar";
 import { Button } from "@/components/ui/button";
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "@/components/ui/context-menu";
+import { LetterButton } from "@/components/letter/LetterButton";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { copy } from "@/i18n";
@@ -48,6 +49,7 @@ export function ConversationList({ selectedId }: { selectedId: string | null }) 
     <div className="flex h-full flex-col bg-background text-foreground">
       <header className="flex shrink-0 items-center gap-2 pt-3 pr-2 pb-2 pl-4">
         <h1 className="flex-1 text-list-title">{t.title}</h1>
+        <LetterButton />
         <ServiceStatusButton />
         <Announcements userId={account?.id ?? null} />
       </header>
