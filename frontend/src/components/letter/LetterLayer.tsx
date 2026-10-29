@@ -31,8 +31,10 @@ type Stage = "envelope" | "opening" | "letter" | "closing";
 
 /** 拆开的动画多久以后换成信纸：封口翻开，信封落下。音频开头留了 LEAD_IN 的静音，她在信纸出来之后才开口。 */
 const OPENING_MS = 800;
-/** 音频这么久没往前走（网络卡住、放不出来）就改按时钟写，并且停掉音频，免得声音和字对不上。 */
+/** 音频放起来以后这么久没往前走（网络卡住）就改按时钟写，并且停掉音频，免得声音和字对不上。 */
 const STALL_MS = 4000;
+/** 拆开以后音频最多等这么久开始放（CDN 第一次回源可能很慢）；等的时候字也停着，等她开口再写。 */
+const START_MS = 10000;
 /** 用户自己滚过信纸后，这么久之内不自动跟着写到的地方滚。 */
 const HANDS_OFF_MS = 4000;
 
@@ -96,7 +98,7 @@ export function LetterLayer({ writer, letter, target, onClosed }: Props) {
       if (a.currentTime !== c.lastAudio) {
         c.lastAudio = a.currentTime;
         c.lastMove = at;
-      } else if (!a.ended && at - c.lastMove > STALL_MS) {
+      } else if (!a.ended && at - c.lastMove > (a.currentTime > 0 ? STALL_MS : START_MS)) {
         byTimer(a.currentTime);
         return a.currentTime;
       }

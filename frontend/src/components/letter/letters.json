@@ -2,7 +2,7 @@
   "amana": {
     "salutation": "プロデューサーさんへ",
     "signature": "甘奈より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/amana-d2accdbceaea.webp",
     "paragraphs": [
       {
         "ja": "プロデューサーさん、元気？　甘奈ね、ちょっとだけ遠くまで行くことになったんだ。だから、お手紙書いてみたよ。",
@@ -25,12 +25,40 @@
         "zh": "别光靠黑咖啡对付，饭也要好好吃哦。等我回来，再帮你搭配衣服！说好了哦。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/amana-a0ff6b6c1827.mp3",
+      "segments": [
+        [
+          4.407,
+          5.94
+        ],
+        [
+          6.54,
+          15.642
+        ],
+        [
+          16.542,
+          25.644
+        ],
+        [
+          26.544,
+          38.154
+        ],
+        [
+          39.054,
+          48.76
+        ],
+        [
+          49.66,
+          59.738
+        ]
+      ]
+    }
   },
   "asahi": {
     "salutation": "プロデューサーさんへ",
     "signature": "芹沢あさひ",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/asahi-fd69ab89ef90.webp",
     "paragraphs": [
       {
         "ja": "しばらく、ちょっと遠くまで行ってくるっす。どんなところか知らないから、ワクワクするっす。",
@@ -53,12 +81,40 @@
         "zh": "一直以来，谢谢啦！等我回来，要把找到的好玩的事全都讲给你听。制作人也帮我找找有什么好玩的吧。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/asahi-de15532e4939.mp3",
+      "segments": [
+        [
+          4.163,
+          5.742
+        ],
+        [
+          6.342,
+          12.426
+        ],
+        [
+          13.326,
+          21.685
+        ],
+        [
+          22.585,
+          29.318
+        ],
+        [
+          30.218,
+          38.996
+        ],
+        [
+          39.896,
+          49.648
+        ]
+      ]
+    }
   },
   "chiyoko": {
     "salutation": "プロデューサーさんへ",
     "signature": "チョコアイドル　園田智代子",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/chiyoko-534fcc8a2a32.webp",
     "paragraphs": [
       {
         "ja": "お元気ですか？　園田智代子です！　実は私、ちょこっとだけ遠くへ行くことになりまして、こうしてお手紙を書いています！",
@@ -81,12 +137,40 @@
         "zh": "所以，不才园田智代子，打算在下次见面之前，找到最适合制作人的巧克力！"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/chiyoko-e6fc85d8b57d.mp3",
+      "segments": [
+        [
+          4.564,
+          6.143
+        ],
+        [
+          6.743,
+          16.263
+        ],
+        [
+          17.163,
+          24.733
+        ],
+        [
+          25.633,
+          34.688
+        ],
+        [
+          35.588,
+          45.944
+        ],
+        [
+          46.844,
+          54.693
+        ]
+      ]
+    }
   },
   "chiyuki": {
     "salutation": "プロデューサーさんへ",
     "signature": "桑山千雪",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/chiyuki-639e9a608b33.webp",
     "paragraphs": [
       {
         "ja": "お気に入りのガラスペンで、この手紙を書いています。少し遠くへ行くことになったので、きちんとお伝えしたくて。",
@@ -109,12 +193,40 @@
         "zh": "要是发现哪颗扣子快掉了，请先别管，等我回来哦。我会再来帮你缝好的。呵呵。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/chiyuki-22dfae1ecab1.mp3",
+      "segments": [
+        [
+          2.332,
+          4.19
+        ],
+        [
+          4.79,
+          14.728
+        ],
+        [
+          15.628,
+          26.959
+        ],
+        [
+          27.859,
+          38.401
+        ],
+        [
+          39.301,
+          50.865
+        ],
+        [
+          51.765,
+          62.26
+        ]
+      ]
+    }
   },
   "fuyuko": {
     "salutation": "プロデューサーへ",
     "signature": "冬優子",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/fuyuko-dcfaa854ee1e.webp",
     "paragraphs": [
       {
         "ja": "いつもふゆを応援してくださって、ありがとうございますっ。これからも、ふゆ精一杯がんばりますね。えへへ。",
@@ -137,12 +249,40 @@
         "zh": "能走到这一步，有一半得算在你头上。……谢了。等我回来，让你看看更厉害的ふゆ。所以，给我好好等着。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/fuyuko-8f5e65453c35.mp3",
+      "segments": [
+        [
+          3.896,
+          5.197
+        ],
+        [
+          5.797,
+          15.038
+        ],
+        [
+          15.938,
+          26.062
+        ],
+        [
+          26.962,
+          36.157
+        ],
+        [
+          37.057,
+          46.903
+        ],
+        [
+          47.803,
+          59.738
+        ]
+      ]
+    }
   },
   "hana": {
     "salutation": "プロデューサーへ",
     "signature": "羽那より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/hana-21b70e640883.webp",
     "paragraphs": [
       {
         "ja": "プロデューサー、元気ー？　あのね、あたし、ちょっと遠いところに行くことになったの。だから、お手紙書いてみたよ。",
@@ -165,12 +305,40 @@
         "zh": "还有啊，等我想见你了，这次换我去见你。在那之前，你会等我吗？……好不好？"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/hana-0ca271a19d9d.mp3",
+      "segments": [
+        [
+          4.468,
+          5.954
+        ],
+        [
+          6.554,
+          16.585
+        ],
+        [
+          17.485,
+          28.538
+        ],
+        [
+          29.438,
+          41.977
+        ],
+        [
+          42.877,
+          51.19
+        ],
+        [
+          52.09,
+          62.26
+        ]
+      ]
+    }
   },
   "haruki": {
     "salutation": "プロデューサーさんへ",
     "signature": "郁田はるき",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/haruki-679f797e66c4.webp",
     "paragraphs": [
       {
         "ja": "前に、急にいなくならないでくださいねって、お願いしましたよね。なのに今度は、わたしの方が遠くへ行くことになっちゃいました。",
@@ -193,7 +361,35 @@
         "zh": "所以，等再见面的时候，我们一起去看后面的风景吧。我想看的风景，还多着呢。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/haruki-b95eae356973.mp3",
+      "segments": [
+        [
+          3.244,
+          5.101
+        ],
+        [
+          5.701,
+          19.03
+        ],
+        [
+          19.93,
+          30.146
+        ],
+        [
+          31.046,
+          44.468
+        ],
+        [
+          45.368,
+          54.841
+        ],
+        [
+          55.741,
+          67.305
+        ]
+      ]
+    }
   },
   "hazuki": {
     "salutation": "プロデューサーさんへ",
@@ -221,12 +417,40 @@
         "zh": "等我回来，一起吃点好吃的蛋糕吧。那么，我出发了。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/hazuki-e2a94f15099b.mp3",
+      "segments": [
+        [
+          2.872,
+          4.776
+        ],
+        [
+          5.376,
+          16.475
+        ],
+        [
+          17.375,
+          31.354
+        ],
+        [
+          32.254,
+          44.514
+        ],
+        [
+          45.414,
+          58.278
+        ],
+        [
+          59.178,
+          67.305
+        ]
+      ]
+    }
   },
   "hinana": {
     "salutation": "雛菜のプロデューサーへ",
     "signature": "ひなな",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/hinana-25dfbbd23e14.webp",
     "paragraphs": [
       {
         "ja": "あは～、プロデューサー、しあわせ～？　雛菜ね～、ちょっとだけ遠くに行ってくることになったの～。",
@@ -249,12 +473,40 @@
         "zh": "回来以后，再来比赛跑到车站吧～？输的人请草莓蛋糕哦～。在那之前，制作人也要幸福哦～。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/hinana-7614e52a87f3.mp3",
+      "segments": [
+        [
+          2.489,
+          4.764
+        ],
+        [
+          5.364,
+          14.281
+        ],
+        [
+          15.181,
+          24.236
+        ],
+        [
+          25.136,
+          34.935
+        ],
+        [
+          35.835,
+          44.659
+        ],
+        [
+          45.559,
+          57.215
+        ]
+      ]
+    }
   },
   "hiori": {
     "salutation": "プロデューサーへ",
     "signature": "風野灯織",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/hiori-1d7a82633d50.webp",
     "paragraphs": [
       {
         "ja": "しばらく、遠い場所へ行くことになりました。直接伝えるべきなのに、うまく話せそうになくて、手紙にしました。",
@@ -277,12 +529,40 @@
         "zh": "下次见面的时候，我会让你看到更成长的我，为此我会继续努力。在那之前，请你一定保重。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/hiori-1b9018559507.mp3",
+      "segments": [
+        [
+          4.407,
+          5.847
+        ],
+        [
+          6.447,
+          16.896
+        ],
+        [
+          17.796,
+          25.876
+        ],
+        [
+          26.776,
+          39.315
+        ],
+        [
+          40.215,
+          49.968
+        ],
+        [
+          50.868,
+          59.738
+        ]
+      ]
+    }
   },
   "juri": {
     "salutation": "プロデューサーへ",
     "signature": "樹里",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/juri-5d02f9e7569c.webp",
     "paragraphs": [
       {
         "ja": "こういうの書くの、慣れてねーんだけどさ。アタシ、ちょっと遠くに行くことになった。しばらく顔は見せらんねー。",
@@ -305,12 +585,40 @@
         "zh": "以前是你对我说的，这回换我写给你：没事的。等我回来，再一起去看棒球吧。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/juri-98e814f54902.mp3",
+      "segments": [
+        [
+          2.41,
+          3.757
+        ],
+        [
+          4.357,
+          15.317
+        ],
+        [
+          16.217,
+          28.291
+        ],
+        [
+          29.191,
+          39.408
+        ],
+        [
+          40.308,
+          49.41
+        ],
+        [
+          50.31,
+          59.738
+        ]
+      ]
+    }
   },
   "kaho": {
     "salutation": "プロデューサーさんへ",
     "signature": "小宮果穂より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/kaho-b5a67705ae36.webp",
     "paragraphs": [
       {
         "ja": "今日は、見えないペンじゃなくて、ふつうのペンで書いてますっ！　あたし、しばらく遠くへ出動します！",
@@ -333,12 +641,40 @@
         "zh": "所以这不是最终回，是「未完待续」！等我回来，还会第一个跑去跟你说「你听我说！」的。嘿嘿"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/kaho-250aa291d2ff.mp3",
+      "segments": [
+        [
+          2.271,
+          4.036
+        ],
+        [
+          4.636,
+          12.995
+        ],
+        [
+          13.895,
+          25.226
+        ],
+        [
+          26.126,
+          37.133
+        ],
+        [
+          38.033,
+          47.367
+        ],
+        [
+          48.267,
+          59.738
+        ]
+      ]
+    }
   },
   "kiriko": {
     "salutation": "プロデューサーさんへ",
     "signature": "幽谷霧子",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/kiriko-e845529cf823.webp",
     "paragraphs": [
       {
         "ja": "わたし　少しのあいだ　遠くへ行くことになりました。急なお知らせになって……ごめんなさい。",
@@ -361,12 +697,40 @@
         "zh": "就像我为大家做的祈祷那样，如果你也能这样送我出发，我会很开心的。……那么，我出发了。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/kiriko-c33b1a326657.mp3",
+      "segments": [
+        [
+          3.909,
+          5.813
+        ],
+        [
+          6.413,
+          17.001
+        ],
+        [
+          17.901,
+          30.207
+        ],
+        [
+          31.107,
+          43.043
+        ],
+        [
+          43.943,
+          57.271
+        ],
+        [
+          58.171,
+          69.827
+        ]
+      ]
+    }
   },
   "kogane": {
     "salutation": "プロデューサーへ",
     "signature": "恋鐘より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/kogane-b4151e7fd0f8.webp",
     "paragraphs": [
       {
         "ja": "プロデューサー、元気にしとる？　うち、しばらく遠かところに行くことになったと。黙って行くとは、うちの性に合わんけんね。",
@@ -389,12 +753,40 @@
         "zh": "下次见面的时候，我要用我最拿手的强棒面让你吃得饱饱的。好好期待着吧！"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/kogane-26a90509d931.mp3",
+      "segments": [
+        [
+          3.54,
+          5.119
+        ],
+        [
+          5.719,
+          17.561
+        ],
+        [
+          18.461,
+          27.238
+        ],
+        [
+          28.138,
+          40.909
+        ],
+        [
+          41.809,
+          52.444
+        ],
+        [
+          53.344,
+          62.26
+        ]
+      ]
+    }
   },
   "koito": {
     "salutation": "プロデューサーさんへ",
     "signature": "福丸小糸より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/koito-16813334e6b4.webp",
     "paragraphs": [
       {
         "ja": "少しのあいだ、遠くへ行くことになりました。置いていかれるのが怖かったのに、今度はわたしが行く番なんて、変な感じです。",
@@ -417,12 +809,40 @@
         "zh": "我不在，你可不能变得一塌糊涂哦……！下次见面的时候，我会好好检查的。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/koito-16ff33cabc6a.mp3",
+      "segments": [
+        [
+          3.804,
+          5.429
+        ],
+        [
+          6.029,
+          17.918
+        ],
+        [
+          18.818,
+          29.359
+        ],
+        [
+          30.259,
+          39.362
+        ],
+        [
+          40.262,
+          50.618
+        ],
+        [
+          51.518,
+          59.738
+        ]
+      ]
+    }
   },
   "luca": {
     "salutation": "アンタへ",
     "signature": "ルカ",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/luca-d1e7c8819be9.webp",
     "paragraphs": [
       {
         "ja": "話すって言ったのは私だからな。黙って消えんのは、ナシにしとく。しばらく遠くに行く。それだけだ。",
@@ -445,12 +865,40 @@
         "zh": "一起往前走那件事，我可没说作废。回来以后，那家店的拿坡里意面，你请。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/luca-05dc748dedff.mp3",
+      "segments": [
+        [
+          4.498,
+          5.612
+        ],
+        [
+          6.212,
+          18.008
+        ],
+        [
+          18.908,
+          32.143
+        ],
+        [
+          33.043,
+          42.471
+        ],
+        [
+          43.371,
+          54.702
+        ],
+        [
+          55.602,
+          67.305
+        ]
+      ]
+    }
   },
   "madoka": {
     "salutation": "プロデューサーへ",
     "signature": "樋口円香",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/madoka-5a2c1824f169.webp",
     "paragraphs": [
       {
         "ja": "しばらく、遠くへ行きます。伝えるのはそれだけで十分だと、思っていました。……思っていたのですが。",
@@ -473,12 +921,40 @@
         "zh": "欠的，我迟早会来还。要算利息的话，随你。……我可没打算赖账。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/madoka-916be012470e.mp3",
+      "segments": [
+        [
+          2.828,
+          4.268
+        ],
+        [
+          4.868,
+          14.063
+        ],
+        [
+          14.963,
+          27.037
+        ],
+        [
+          27.937,
+          37.736
+        ],
+        [
+          38.636,
+          49.642
+        ],
+        [
+          50.542,
+          59.738
+        ]
+      ]
+    }
   },
   "mamimi": {
     "salutation": "プロデューサーへ",
     "signature": "ま み み",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/mamimi-b03145f0823d.webp",
     "paragraphs": [
       {
         "ja": "えーっと、ちょっと遠くまで出かけることになりましたぁ。めんどーですけど、一応書いときますねー。",
@@ -501,12 +977,40 @@
         "zh": "等我回来，还会去捉弄你的，在那之前就乖乖无聊着吧。冰箱里的布丁也要给我留着哦。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/mamimi-69b8c2fe1698.mp3",
+      "segments": [
+        [
+          3.799,
+          5.285
+        ],
+        [
+          5.885,
+          17.355
+        ],
+        [
+          18.255,
+          29.958
+        ],
+        [
+          30.858,
+          44.511
+        ],
+        [
+          45.411,
+          60.876
+        ],
+        [
+          61.776,
+          74.872
+        ]
+      ]
+    }
   },
   "mano": {
     "salutation": "プロデューサーさんへ",
     "signature": "真乃より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/mano-92219f8156e4.webp",
     "paragraphs": [
       {
         "ja": "えっと、プロデューサーさん、お元気ですか。わたし、少し遠くへお出かけすることになりました。",
@@ -529,12 +1033,40 @@
         "zh": "等到有太阳香味的日子，要是能再见面，我会很开心的。请注意身体哦。我也会，嗯！好好加油的。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/mano-ce876b9ac3ea.mp3",
+      "segments": [
+        [
+          2.628,
+          4.253
+        ],
+        [
+          4.853,
+          14.281
+        ],
+        [
+          15.181,
+          24.469
+        ],
+        [
+          25.369,
+          35.028
+        ],
+        [
+          35.928,
+          45.03
+        ],
+        [
+          45.93,
+          57.215
+        ]
+      ]
+    }
   },
   "meguru": {
     "salutation": "プロデューサーへ",
     "signature": "めぐるより",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/meguru-9da24ec76dfc.webp",
     "paragraphs": [
       {
         "ja": "えへへ、手紙って照れちゃうね！　あのね、わたし、ちょっと遠くに行くことになったの。しばらく会えなくなっちゃう。",
@@ -557,12 +1089,40 @@
         "zh": "等我回来，这次我们一起喝吧。说好了哦！制作人，要好好的呀！"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/meguru-1f0022c4e2ba.mp3",
+      "segments": [
+        [
+          2.892,
+          4.378
+        ],
+        [
+          4.978,
+          14.963
+        ],
+        [
+          15.863,
+          26.126
+        ],
+        [
+          27.026,
+          37.475
+        ],
+        [
+          38.375,
+          46.455
+        ],
+        [
+          47.355,
+          54.693
+        ]
+      ]
+    }
   },
   "mei": {
     "salutation": "プロデューサーへ",
     "signature": "愛依より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/mei-34cc21b8ef40.webp",
     "paragraphs": [
       {
         "ja": "プロデューサー、元気してる～？　いきなりだけど、うち、しばらく遠いとこに行くことになったんだ。会えないの、ちょっとさみしいカンジ。",
@@ -581,12 +1141,36 @@
         "zh": "还有，那句「有困难的时候就～」。原本到底是怎么说来着？啊哈哈。总之，制作人你要是遇到麻烦，不管我在哪儿都会飞过来的！"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/mei-ec2b5fda4574.mp3",
+      "segments": [
+        [
+          3.853,
+          5.293
+        ],
+        [
+          5.893,
+          16.992
+        ],
+        [
+          17.892,
+          29.78
+        ],
+        [
+          30.68,
+          43.451
+        ],
+        [
+          44.351,
+          57.215
+        ]
+      ]
+    }
   },
   "mikoto": {
     "salutation": "プロデューサーへ",
     "signature": "美琴",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/mikoto-8d7f6f4a49c2.webp",
     "paragraphs": [
       {
         "ja": "手紙って、何を書けばいいのか、よくわからないね。だから、短くなるかも。少しのあいだ、遠くに行くね。",
@@ -609,12 +1193,40 @@
         "zh": "还有，叫我「みーちゃん」这件事，我还在等着哦。下次见面之前，你可要先练习好哦。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/mikoto-758baeeb2e4b.mp3",
+      "segments": [
+        [
+          4.561,
+          5.908
+        ],
+        [
+          6.508,
+          17.282
+        ],
+        [
+          18.182,
+          28.91
+        ],
+        [
+          29.81,
+          41.745
+        ],
+        [
+          42.645,
+          53.047
+        ],
+        [
+          53.947,
+          62.26
+        ]
+      ]
+    }
   },
   "natsuha": {
     "salutation": "プロデューサーへ",
     "signature": "有栖川夏葉",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/natsuha-46455e1f1b4c.webp",
     "paragraphs": [
       {
         "ja": "いい？　落ち着いて読んでちょうだい。私、少し遠くへ行くことになったの。しばらくは会えなくなるわ。",
@@ -637,12 +1249,40 @@
         "zh": "我们的「放学后」还有后续呢。等我回来，再陪我去晨跑吧。说好了哦？"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/natsuha-29e09748cab4.mp3",
+      "segments": [
+        [
+          4.454,
+          5.8
+        ],
+        [
+          6.4,
+          15.038
+        ],
+        [
+          15.938,
+          26.759
+        ],
+        [
+          27.659,
+          39.176
+        ],
+        [
+          40.076,
+          49.689
+        ],
+        [
+          50.589,
+          59.738
+        ]
+      ]
+    }
   },
   "nichika": {
     "salutation": "プロデューサーさんへ",
     "signature": "七草にちか",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/nichika-37f680fad847.webp",
     "paragraphs": [
       {
         "ja": "えーっと、急ですけどご報告です。私、しばらく遠くへ行くことになりました。一応、書いとこうと思って。",
@@ -665,12 +1305,40 @@
         "zh": "还有，要是把我忘了，我可是会生气的。等我回来，帮我拿些好工作来，可以吧？你可是很「能干」的嘛。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/nichika-5c8f60cb29d5.mp3",
+      "segments": [
+        [
+          2.364,
+          4.036
+        ],
+        [
+          4.636,
+          14.388
+        ],
+        [
+          15.288,
+          27.409
+        ],
+        [
+          28.309,
+          38.804
+        ],
+        [
+          39.704,
+          48.249
+        ],
+        [
+          49.149,
+          59.738
+        ]
+      ]
+    }
   },
   "rinze": {
     "salutation": "プロデューサーさまへ",
     "signature": "凛世",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/rinze-132216465ca3.webp",
     "paragraphs": [
       {
         "ja": "いつぞや、したためたまま、出さずにしまった手紙がございました。今度の手紙は、きちんと貴方さまへお届けいたします。",
@@ -693,12 +1361,40 @@
         "zh": "所以这一次，凛世也不觉得是分别。即使相隔两地，抬头看到的也是同一轮月亮。请您务必保重。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/rinze-0c9310769da9.mp3",
+      "segments": [
+        [
+          2.728,
+          4.725
+        ],
+        [
+          5.325,
+          18.421
+        ],
+        [
+          19.321,
+          34.46
+        ],
+        [
+          35.36,
+          51.057
+        ],
+        [
+          51.957,
+          65.239
+        ],
+        [
+          66.139,
+          82.439
+        ]
+      ]
+    }
   },
   "sakuya": {
     "salutation": "親愛なるプロデューサーへ",
     "signature": "白瀬咲耶",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/sakuya-17ec37a902aa.webp",
     "paragraphs": [
       {
         "ja": "並んで歩く時、アナタを待たせずにいられる自分が好きだった。けれど今度は、少し待たせてしまいそうだ。遠くへ発つことになったんだ。",
@@ -721,12 +1417,40 @@
         "zh": "谢谢你一路带我走到这里。总有一天，还能让我走在你身边吗？请你一定保重。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/sakuya-571d8d28f36b.mp3",
+      "segments": [
+        [
+          2.936,
+          5.211
+        ],
+        [
+          5.811,
+          17.886
+        ],
+        [
+          18.786,
+          29.095
+        ],
+        [
+          29.995,
+          40.723
+        ],
+        [
+          41.623,
+          51.793
+        ],
+        [
+          52.693,
+          62.26
+        ]
+      ]
+    }
   },
   "tenka": {
     "salutation": "プロデューサーさんへ",
     "signature": "甜花より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/tenka-ed3eb5ea7f49.webp",
     "paragraphs": [
       {
         "ja": "えと……甜花、しばらく遠いところに行きます。前は余ってた便箋、最近はすぐなくなっちゃう……にへへ。",
@@ -749,12 +1473,40 @@
         "zh": "下次见面的时候……能从存档的地方接着，陪我一起玩吗……？游戏厅也……想让你带我去，当作奖励。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/tenka-4706eaa8ea21.mp3",
+      "segments": [
+        [
+          3.737,
+          5.781
+        ],
+        [
+          6.381,
+          19.709
+        ],
+        [
+          20.609,
+          32.916
+        ],
+        [
+          33.816,
+          45.286
+        ],
+        [
+          46.186,
+          59.422
+        ],
+        [
+          60.322,
+          72.35
+        ]
+      ]
+    }
   },
   "toru": {
     "salutation": "プロデューサー",
     "signature": "透",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/toru-7bbf03c77707.webp",
     "paragraphs": [
       {
         "ja": "書くね、手紙。前は日誌を一行で済ませて、めっちゃ探させちゃったし。だから今回は、ちゃんと書く。",
@@ -777,12 +1529,40 @@
         "zh": "我们录过一盘说好十年后再听的磁带吧。那个，一起听吧。不过在那之前，我大概就回来了。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/toru-61442fd30ded.mp3",
+      "segments": [
+        [
+          2.518,
+          3.865
+        ],
+        [
+          4.465,
+          14.867
+        ],
+        [
+          15.767,
+          26.588
+        ],
+        [
+          27.488,
+          39.098
+        ],
+        [
+          39.998,
+          49.564
+        ],
+        [
+          50.464,
+          62.26
+        ]
+      ]
+    }
   },
   "yuika": {
     "salutation": "Ｐたんへ",
     "signature": "三峰より",
-    "signature_image": null,
+    "signature_image": "https://stand.hmhnk.top/letters/signatures/yuika-6fad9dcf2824.webp",
     "paragraphs": [
       {
         "ja": "さーて、何から書こうかな。……よし、本題！　三峰、しばらく遠くに行くことになりました。急でごめんね。",
@@ -805,6 +1585,34 @@
         "zh": "对了，三峰最适合哪副眼镜的那道作业，现在也还算数哦。对答案的事，就留到哪个下雨天吧。"
       }
     ],
-    "audio": null
+    "audio": {
+      "url": "https://stand.hmhnk.top/letters/yuika-695c65f6200b.mp3",
+      "segments": [
+        [
+          3.833,
+          4.901
+        ],
+        [
+          5.501,
+          17.018
+        ],
+        [
+          17.918,
+          30.921
+        ],
+        [
+          31.821,
+          42.688
+        ],
+        [
+          43.588,
+          54.409
+        ],
+        [
+          55.309,
+          64.782
+        ]
+      ]
+    }
   }
 }

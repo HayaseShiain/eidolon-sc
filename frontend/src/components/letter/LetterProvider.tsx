@@ -58,11 +58,18 @@ export function LetterProvider({ children }: { children: ReactNode }) {
     let live = true;
     Promise.all([getStats("all"), import("./letters.json")])
       .then(([stats, data]) => {
-        const letters = data.default as Record<string, Letter>;
+        const letters = data.default as unknown as Record<string, Letter>;
         const everyone = roster.current ?? [];
-        const id = writerOf(stats, everyone, (id) => id in letters);
+        // 网址带 ?letter=<角色标识> 时直接打开她的信，不论谁该写、看没看过：挨个看 29 封信用。
+        const asked = new URLSearchParams(window.location.search).get("letter");
+        const id = asked && asked in letters ? asked : writerOf(stats, everyone, (id) => id in letters);
         const writer = everyone.find((c) => c.id === id);
-        if (live && writer) setShown({ writer, letter: letters[writer.id] });
+        if (!live || !writer) return;
+        setShown({ writer, letter: letters[writer.id] });
+        if (asked === writer.id) {
+          autoOpened.current = true;
+          setOpen(true);
+        }
       })
       .catch(() => {
         // 统计拉不到就不出信，不打扰正常使用。
