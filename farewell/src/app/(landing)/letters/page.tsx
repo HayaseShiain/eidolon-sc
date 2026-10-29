@@ -7,6 +7,8 @@ import { CHARACTERS, type Character } from "@/lib/api";
 import { LETTERS } from "@/lib/letter";
 import { REPOSITORY_URL } from "@/lib/repository";
 
+import { prepareSpectrum } from "../model/spectrum";
+
 const t = copy.letters;
 
 export const metadata = { title: `${t.title} · ${copy.app.name}` };
@@ -40,15 +42,12 @@ export default function Letters() {
   );
 }
 
-/** 按组合分段，组合按原作的顺序、组合里按偶像编号（名单本来的顺序）；没有组合的（はづき）排在最后的「283プロ」。没有信的人不上墙。 */
+/** 和落地页的光谱一样按组合分段（prepareSpectrum）：没有组合的（はづき）排在最后的「283プロ」。没有信的人不上墙。 */
 function unitsOf(characters: Character[]): WallUnit[] {
-  const units = new Map<number, WallUnit>();
-  for (const c of characters) {
-    if (!(c.id in LETTERS)) continue;
-    const order = c.unit_order ?? Number.MAX_SAFE_INTEGER;
-    const unit = units.get(order) ?? { name: c.unit ?? copy.landing.act2.others, writers: [] };
-    unit.writers.push({ id: c.id, name: c.name, color: c.color });
-    units.set(order, unit);
-  }
-  return [...units].sort(([a], [b]) => a - b).map(([, unit]) => unit);
+  return prepareSpectrum(characters).units.flatMap((unit) => {
+    const writers = unit.idols
+      .filter((idol) => idol.id in LETTERS)
+      .map((idol) => ({ id: idol.id, name: idol.name, color: idol.colors.official }));
+    return writers.length > 0 ? [{ name: unit.name ?? copy.landing.act2.others, writers }] : [];
+  });
 }

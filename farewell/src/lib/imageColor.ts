@@ -15,6 +15,9 @@ export const mutedColors = { light: "#f5f5f5", dark: "#262626" } as const;
 /** 分享图（固定浅色）排行条的底，同主题的 `--share-track`。 */
 export const shareTrack = "#e8e7e2";
 
+/** 告别站的信封（固定浅色），同主题的 `--letter-envelope`；信纸比它亮。 */
+export const letterEnvelope = "#f0e6d4";
+
 export type ModePair = { light: string; dark: string };
 
 export type ImageColorScale = {
@@ -40,6 +43,8 @@ export type ImageColorScale = {
   onAccent: ModePair;
   /** 通话层渐变和底部压暗的终点、收起后通话条的底（通话层永远是深色，只有一份）；上面的白字 ≥ 7。 */
   call: { deep: string };
+  /** 告别站的信（固定浅色，只有一份）：信封上她的名字、信末照字写的署名。在信封上 ≥ 4.5，信纸比信封亮，在纸上也够。 */
+  letter: { ink: string };
 };
 
 type Oklch = { l: number; c: number; h: number };
@@ -89,6 +94,7 @@ function deriveScale(raw: string): ImageColorScale {
     accent,
     onAccent: { light: mostReadable(accent.light), dark: mostReadable(accent.dark) },
     call: { deep: callDeep },
+    letter: { ink: readableOn(base, letterEnvelope, AA, 0.16) },
   };
 }
 

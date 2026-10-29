@@ -88,8 +88,13 @@ describe("读过谁", () => {
     expect(readLetters()).toEqual(["mano", "hiori"]);
   });
 
-  it("存的不是名单时当作谁都没读过", () => {
-    vi.stubGlobal("localStorage", { getItem: () => "{oops", setItem: () => {} });
+  it("存的不是名单、名单里混着别的东西时，只认名单里的角色标识", () => {
+    const stored = (value: string) => vi.stubGlobal("localStorage", { getItem: () => value, setItem: () => {} });
+    stored('{"mano":true}');
+    expect(readLetters()).toEqual([]);
+    stored('["mano",3,null,"hiori"]');
+    expect(readLetters()).toEqual(["mano", "hiori"]);
+    stored("{oops");
     expect(readLetters()).toEqual([]);
   });
 

@@ -39,7 +39,7 @@ type Props = {
   /** 信封墙上她那一枚信封（信封本身，不含外面的留白）：打开时大信封从它那里放大出来，收起时落回去；
    * 它不在屏幕上时，大信封原地淡入、淡出。 */
   origin: HTMLElement | null;
-  /** 收起时大信封落回她那一枚的那一刻（原地淡出时是淡出之前）。`wasOpened`：拆开过没有，拆开过就算读过。 */
+  /** 收起时大信封落回她那一枚的那一刻（原地淡出时是淡出之前）。`wasOpened`：拆开过没有，拆开过就算读过（拆开的那一下就算）。 */
   onReturn: (wasOpened: boolean) => void;
   /** 收起的动画放完了。 */
   onClosed: () => void;
@@ -71,7 +71,10 @@ export function LetterLayer({ writer, letter, origin, onReturn, onClosed }: Prop
   const paper = useRef<HTMLDivElement>(null);
   const done = useRef<HTMLButtonElement>(null);
   const handsOffSince = useRef(-Infinity);
+  /** 信纸出来过（收起时要先把信纸收回信封）。 */
   const wasRead = useRef(false);
+  /** 拆开过：拆开的那一下就算，信纸还没出来就跳过也算读过。 */
+  const wasOpened = useRef(false);
   const clock = useRef({ byAudio: false, base: 0, since: 0, lastAudio: -1, lastMove: 0 });
 
   // 大信封从她那一枚放大出来：只在打开时量一次她那一枚在不在屏幕上。
@@ -80,7 +83,8 @@ export function LetterLayer({ writer, letter, origin, onReturn, onClosed }: Prop
   );
   useLayoutEffect(() => {
     if (!growsFromOrigin || !origin || !envelope.current || !card.current) return;
-    envelope.current.animate([{ transform: towards(envelope.current, card.current, origin) }, { transform: "none" }], {
+    const onto = keyframeOnto(envelope.current, card.current, origin);
+    envelope.current.animate([onto, { ...onto, transform: "none" }], {
       duration: GROW_MS,
       easing: "cubic-bezier(0.2, 0, 0, 1)",
     });
@@ -124,6 +128,7 @@ export function LetterLayer({ writer, letter, origin, onReturn, onClosed }: Prop
   // 拆开：音频要在这一下点击里开始放，浏览器才让它出声。
   function open() {
     if (stage !== "envelope") return;
+    wasOpened.current = true;
     const c = clock.current;
     c.since = c.lastMove = performance.now();
     c.base = 0;
@@ -209,12 +214,13 @@ export function LetterLayer({ writer, letter, origin, onReturn, onClosed }: Prop
       const from = envelope.current;
       if (!isReducedMotion && origin && from && card.current && isOnScreen(origin)) {
         void play(backdrop.current, [{ opacity: 1 }, { opacity: 0 }], FLY_MS, "ease-in");
-        await play(from, [{ transform: "none" }, { transform: towards(from, card.current, origin) }], FLY_MS, "cubic-bezier(0.4, 0, 0.2, 1)");
+        const onto = keyframeOnto(from, card.current, origin);
+        await play(from, [{ ...onto, transform: "none" }, onto], FLY_MS, "cubic-bezier(0.4, 0, 0.2, 1)");
         // 落稳了：她那一枚显出来（读过的翻开封口），大信封在它上面淡掉。
-        if (!isCancelled) onReturn(wasRead.current);
+        if (!isCancelled) onReturn(wasOpened.current);
         await play(from, [{ opacity: 1 }, { opacity: 0 }], 200, "ease-out");
       } else {
-        if (!isCancelled) onReturn(wasRead.current);
+        if (!isCancelled) onReturn(wasOpened.current);
         void play(backdrop.current, [{ opacity: 1 }, { opacity: 0 }], 300);
         await play(from, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "scale(0.85)" }], 300);
       }
@@ -465,16 +471,18 @@ async function fadeOut(audio: HTMLAudioElement | null, duration: number): Promis
   audio.pause();
 }
 
-/** 把 `el` 挪到 `to` 那里要的 transform：`el` 里的大信封 `card` 正好盖住 `to`（两者都是 8:5，等比缩放）。
- * 以大信封的中心为原点缩放，写在 `el` 的 transform-origin 上。量的时候 `el` 不能带着 transform。 */
-function towards(el: HTMLElement, card: HTMLElement, to: HTMLElement): string {
+/** `el` 动画的一帧：`el` 里的大信封 `card` 正好盖住 `to`（两者都是 8:5，等比缩放），以大信封的中心为原点缩放。
+ * 量的时候 `el` 不能带着 transform。 */
+function keyframeOnto(el: HTMLElement, card: HTMLElement, to: HTMLElement): { transformOrigin: string; transform: string } {
   const box = el.getBoundingClientRect();
   const a = card.getBoundingClientRect();
   const b = to.getBoundingClientRect();
   const ax = a.left + a.width / 2;
   const ay = a.top + a.height / 2;
-  el.style.transformOrigin = `${ax - box.left}px ${ay - box.top}px`;
-  return `translate(${b.left + b.width / 2 - ax}px, ${b.top + b.height / 2 - ay}px) scale(${b.width / a.width})`;
+  return {
+    transformOrigin: `${ax - box.left}px ${ay - box.top}px`,
+    transform: `translate(${b.left + b.width / 2 - ax}px, ${b.top + b.height / 2 - ay}px) scale(${b.width / a.width})`,
+  };
 }
 
 /** 这个元素现在在不在屏幕上看得见的地方（不在页面里的不算）。 */

@@ -41,17 +41,23 @@
   letter-spacing: 0.2em;
   color: var(--lp-dim);
 }
-/* 电脑上一行最多五枚（组合最多五人），一个组合正好一行；放不下五枚 9rem 宽的时候少放几枚。 */
+/* 电脑上一行五枚（组合最多五人），一个组合正好一行；手机上一行两枚，中间的宽度一行三枚。 */
 .lt-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(max(9rem, calc((100% - 4 * 1.75rem) / 5)), 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0 1.75rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
+@media (max-width: 1023px) {
+  .lt-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 @media (max-width: 639px) {
   .lt-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0 1.25rem;
   }
 }

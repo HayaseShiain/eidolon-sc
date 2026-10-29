@@ -145,7 +145,7 @@ function SmallEnvelope({
       </svg>
       <span
         lang="ja"
-        className="absolute inset-x-0 bottom-[9%] text-center font-letter text-[9cqw] leading-none font-semibold text-her-letter-ink"
+        className="absolute inset-x-0 bottom-[9%] text-center font-letter text-[10cqw] leading-none font-semibold text-her-letter-ink"
       >
         {name}
       </span>
