@@ -1,4 +1,4 @@
-// 落地页的字体子集要覆盖的文字（ADR-0016 修订）：落地页、统计页和 404 的文案、所有角色名、组合名、
+// 落地页的字体子集要覆盖的文字（ADR-0016 修订）：落地页、统计页、她们的信和 404 的文案、所有角色名、组合名、
 // 招呼和开场白的原文和字幕。子集脚本（scripts/landing-fonts.mts）按它生成子集，覆盖契约测试拿它和子集的
 // 清单比对。这里读仓库里的角色配置和世界设定，只在本地（脚本和测试）运行，不进页面：前端的
 // Docker 构建拿不到角色配置。
@@ -60,6 +60,11 @@ function unitNames(): string[] {
   }
 }
 
+/** 她们的信的中文字幕（快照 data/letters.json）。 */
+const letterSubtitles = (): string[] =>
+  Object.values(JSON.parse(readFileSync(new URL("letters.json", DATA), "utf-8")) as Record<string, { paragraphs: { zh: string }[] }>)
+    .flatMap((letter) => letter.paragraphs.map((p) => p.zh));
+
 /** 礼物名（快照 data/gifts.json）：统计页写出最受欢迎的那件。 */
 const giftNames = (): string[] => Object.values(JSON.parse(readFileSync(new URL("gifts.json", DATA), "utf-8")));
 
@@ -74,6 +79,8 @@ export function landingText(): string {
     ...strings(copy.landing),
     ...strings(copy.legal),
     ...strings(copy.thanks),
+    ...strings(copy.letters),
+    ...strings(copy.letter),
     ...strings(copy.notFound),
     ...giftNames(),
     ...characterNames(),
@@ -100,6 +107,14 @@ export function japaneseText(): string {
     ...callOpenerJapanese(),
     ...act5.lines.map((l) => l.ja),
   ]);
+}
+
+/**
+ * 她们的信（/letters）的中文字幕：另做一份 Noto Sans SC 的子集（components/letter/fonts），只在信打开时取。
+ * 字幕的字大多不在落地页里，放进落地页那份会让落地页多下载上百 KB。
+ */
+export function letterSubtitleText(): string {
+  return unique([ALWAYS, ...letterSubtitles()]);
 }
 
 /**

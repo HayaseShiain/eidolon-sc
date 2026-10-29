@@ -2,10 +2,10 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { act0Text, japaneseText, landingText } from "./fontText";
+import { act0Text, japaneseText, landingText, letterSubtitleText } from "./fontText";
 
-/** 子集脚本写的清单：要了哪些字（text、act0），每种字体的完整子集里实际有哪些字（glyphs）。 */
-const subset: { text: string; act0: string; glyphs: Record<string, string> } = JSON.parse(
+/** 子集脚本写的清单：要了哪些字（text、act0、letters），每种字体的完整子集和字幕那一份里实际有哪些字（glyphs）。 */
+const subset: { text: string; act0: string; letters: string; glyphs: Record<string, string> } = JSON.parse(
   readFileSync(new URL("subset.json", import.meta.url), "utf-8"),
 );
 
@@ -39,5 +39,12 @@ describe("落地页的字体子集", () => {
   it("每一个字，正文用的 Noto Sans SC 里都有", () => {
     const lacking = missing(landingText(), subset.glyphs["noto-sans-sc-400"]);
     expect(lacking, `Noto Sans SC 的子集没有这些字：${lacking.join("")}，会退回系统字体。${regenerate}`).toEqual([]);
+  });
+
+  it("她们的信的字幕里每一个字，字幕那一份 Noto Sans SC 里都有", () => {
+    const wanted = letterSubtitleText();
+    expect(missing(wanted, subset.letters), `字幕那一份没要这些字。${regenerate}`).toEqual([]);
+    const lacking = missing(wanted, subset.glyphs["noto-sans-sc-400-letters"] ?? "");
+    expect(lacking, `字幕那一份 Noto Sans SC 没有这些字：${lacking.join("")}，会退回系统字体。${regenerate}`).toEqual([]);
   });
 });

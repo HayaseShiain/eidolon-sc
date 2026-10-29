@@ -14,6 +14,9 @@
  * notofonts/noto-cjk，都是 SIL OFL 1.1），缓存在 .cache/landing-fonts/；子集由 fontTools 的 pyftsubset
  * 生成，经 `uv run --with` 临时安装，本机要有 uv（后端也用它）。子集保留竖排（vert、vpal 等）、
  * 标点挤压（palt）和字距的 OpenType 特性，去掉 hinting。
+ *
+ * 另外给她们的信（/letters）的中文字幕单做一份 Noto Sans SC，写进 src/components/letter/fonts/：字幕的字大多
+ * 不在落地页里，并进落地页那份会让落地页变重。信上她的字 Klee One 是 last-letter 分支的 scripts/last_letter.py 做的，不在这里。
  */
 
 import { spawnSync } from "node:child_process";
@@ -24,6 +27,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const FRONTEND = fileURLToPath(new URL("..", import.meta.url));
 const OUT = path.join(FRONTEND, "src/app/(landing)/fonts");
+const LETTER_OUT = path.join(FRONTEND, "src/components/letter/fonts");
 const CACHE = path.join(FRONTEND, ".cache/landing-fonts");
 const FONTTOOLS = "fonttools[woff]==4.61.1";
 /** 留下的 OpenType 特性：竖排（vert、vrt2、vpal、vhal、vkrn）、标点挤压（palt、halt）、字距和连字。
@@ -69,9 +73,10 @@ register(
   `)}`,
 );
 
-const { act0Text, landingText } = await import(pathToFileURL(path.join(OUT, "fontText.ts")).href);
+const { act0Text, landingText, letterSubtitleText } = await import(pathToFileURL(path.join(OUT, "fontText.ts")).href);
 const text: string = landingText();
 const act0: string = act0Text();
+const letters: string = letterSubtitleText();
 
 async function cached(url: string): Promise<string> {
   const file = path.join(CACHE, new URL(url).pathname.slice(1).replaceAll("/", "_"));
@@ -89,8 +94,8 @@ async function cached(url: string): Promise<string> {
 
 await mkdir(CACHE, { recursive: true });
 
-/** 用 pyftsubset 把 `source` 按 `chars` 做成 `out`。 */
-async function subset(source: string, chars: string, out: string) {
+/** 用 pyftsubset 把 `source` 按 `chars` 做成 `out`（写进 `dir`）。 */
+async function subset(source: string, chars: string, out: string, dir = OUT) {
   const textFile = path.join(CACHE, "text.txt");
   await writeFile(textFile, chars, "utf-8");
   const run = spawnSync(
@@ -99,7 +104,7 @@ async function subset(source: string, chars: string, out: string) {
       "run", "--no-project", "--with", FONTTOOLS,
       "pyftsubset", source,
       `--text-file=${textFile}`,
-      `--output-file=${path.join(OUT, out)}`,
+      `--output-file=${path.join(dir, out)}`,
       "--flavor=woff2",
       `--layout-features=${FEATURES}`,
       "--no-hinting",
@@ -108,18 +113,18 @@ async function subset(source: string, chars: string, out: string) {
     { stdio: "inherit" },
   );
   if (run.status !== 0) throw new Error(`pyftsubset 没能生成 ${out}`);
-  console.log(`${out}  ${((await stat(path.join(OUT, out))).size / 1024).toFixed(1)} KB`);
+  console.log(`${out}  ${((await stat(path.join(dir, out))).size / 1024).toFixed(1)} KB`);
 }
 
-/** `file` 里实际有字形的字。pyftsubset 遇到源字体里没有的字不报错，直接丢掉。 */
-function glyphs(file: string): string {
+/** `file` 里实际有字形、`wanted` 里要的字。pyftsubset 遇到源字体里没有的字不报错，直接丢掉。 */
+function glyphs(file: string, wanted = text): string {
   const read = "import sys; from fontTools.ttLib import TTFont; print(''.join(map(chr, sorted(TTFont(sys.argv[1]).getBestCmap()))))";
   const run = spawnSync("uv", ["run", "--no-project", "--with", FONTTOOLS, "python", "-c", read, file], {
     encoding: "utf-8",
     env: { ...process.env, PYTHONIOENCODING: "utf-8" },
   });
   if (run.status !== 0) throw new Error(`读不出 ${file} 的字：${run.stderr}`);
-  return [...run.stdout.trim()].filter((ch) => text.includes(ch)).join("");
+  return [...run.stdout.trim()].filter((ch) => wanted.includes(ch)).join("");
 }
 
 const covered: Record<string, string> = {};
@@ -132,19 +137,28 @@ for (const font of FONTS) {
   if (lacking) console.log(`  ${font.out} 没有这些字（由字体栈里的下一种字体显示）：${lacking}`);
 }
 
+// 她们的信的中文字幕：正文用的那套 Noto Sans SC，只要一份完整子集。
+const sans = FONTS.find((f) => f.out === "noto-sans-sc-400")!;
+const letterFont = `${sans.out}-letters`;
+await subset(await cached(sans.source), letters, `${letterFont}.woff2`, LETTER_OUT);
+covered[letterFont] = glyphs(path.join(LETTER_OUT, `${letterFont}.woff2`), letters);
+
 for (const license of LICENSES) {
   await writeFile(path.join(OUT, license.out), await readFile(await cached(license.source)));
 }
+const sansLicense = LICENSES.find((l) => l.out === "LICENSE-noto-sans-sc.txt")!;
+await writeFile(path.join(LETTER_OUT, sansLicense.out), await readFile(await cached(sansLicense.source)));
 
 await writeFile(
   path.join(OUT, "subset.json"),
   `${JSON.stringify(
     {
       about:
-        "落地页字体子集的清单，由 scripts/landing-fonts.mts 生成，不要手改。text 是做完整子集要的字，act0 是第 0 幕那一份要的字，glyphs 是每种字体的完整子集里实际有字形的字。",
+        "落地页字体子集的清单，由 scripts/landing-fonts.mts 生成，不要手改。text 是做完整子集要的字，act0 是第 0 幕那一份要的字，letters 是她们的信的字幕那一份要的字，glyphs 是每种字体的完整子集（和字幕那一份）里实际有字形的字。",
       sources: FONTS.map((f) => f.source),
       text,
       act0,
+      letters,
       glyphs: covered,
     },
     null,

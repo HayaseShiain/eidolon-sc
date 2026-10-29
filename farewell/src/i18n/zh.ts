@@ -144,6 +144,22 @@ export const zh = {
     signature: "Eidolon-SC",
     home: "回到首页",
   },
+  /** 她们的信 /letters：停服前最后一版里她们写给制作人的信（data/letters.json），访客自己挑一位读、听。 */
+  letters: {
+    title: "她们的信",
+    home: "回到首页",
+  },
+  /** 一封信打开以后（components/letter/LetterLayer）。 */
+  letter: {
+    /** 整封信、信封墙上她那一枚的读屏名字。 */
+    title: (name: string) => `${name}的信`,
+    /** 打开以后的大信封是个按钮：读屏名字，和信封下面那行小字。 */
+    open: (name: string) => `拆开${name}的信`,
+    openHint: "拆开",
+    skip: "跳过",
+    mute: "静音",
+    done: "收好",
+  },
   /** 找不到的地址（404）。 */
   notFound: {
     title: "这里什么都没有",

@@ -34,6 +34,10 @@ export const cn = createCn({
         "share-total-md",
         "share-total-sm",
         "share-total-xs",
+        // 她们的信（/letters）。
+        "letter",
+        "letter-zh",
+        "letter-signature",
       ],
       radius: ["bubble", "bubble-inner"],
       spacing: ["list-avatar", "bubble-avatar", "call-dock-control", "call-bar"],
