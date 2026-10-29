@@ -29,6 +29,9 @@ export default function Thanks() {
         <a href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "ghost" })}>
           {copy.app.repositoryLabel}
         </a>
+        <a href="/letters" className={buttonVariants({ variant: "outline" })}>
+          {copy.landing.letters}
+        </a>
         <a href="/" className={buttonVariants({ variant: "outline" })}>
           {t.home}
         </a>

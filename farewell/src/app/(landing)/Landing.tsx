@@ -17,7 +17,7 @@ import { Voice, type Speaker } from "./Voice";
 const t = copy.landing;
 
 /**
- * 落地页（ADR-0016），告别站的版本：没有登录，入口都去统计页 `/thanks`。第 0 幕的标题、首屏声明和 CSS 画的白光；第 1 幕白光射进
+ * 落地页（ADR-0016），告别站的版本：没有登录，入口去统计页 `/thanks`，右上角另有一个去她们的信 `/letters`。第 0 幕的标题、首屏声明和 CSS 画的白光；第 1 幕白光射进
  * 棱镜、散成一道道印象色（LightStage 加 OGL 光层，静态档是 StaticLight 的 SVG）；第 2 幕沿着光谱
  * 横向走过各个组合（Spectrum）；第 3 幕她说日语、第 4 幕她打来电话（Voice）；第 5 幕 3D 的夜空里，一件事从
  * 一位偶像传到另一位（Memory，three.js 的场景由 LightStage 加载）；第 6 幕安静的告别、第 7 幕光汇聚成去统计页的入口（Closing）；左侧的幕名轨（Rail）、
@@ -54,6 +54,9 @@ export function Landing({
       <header className="lp-top">
         <a href={REPOSITORY_URL} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "ghost" })}>
           {copy.app.repositoryLabel}
+        </a>
+        <a href="/letters" className={buttonVariants({ variant: "outline" })}>
+          {t.letters}
         </a>
         <a href="/thanks" className={buttonVariants({ variant: "outline" })}>
           {t.entry}
